@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>宵の占い処 — スプレッド選択式タロット</title>
+<meta name="description" content="一枚の声から、十二の空まで。スプレッド選択式のタロット">
+
+<!-- ▼▼ 公開URL（GitHub Pages）。移転したらこの3行とJS側のSITE_URLを直す ▼▼ -->
+<meta property="og:url" content="https://omasuuranaishi-a11y.github.io/tarot-cards/spreads/">
+<meta property="og:image" content="https://omasuuranaishi-a11y.github.io/tarot-cards/spreads/ogp.png">
+<link rel="canonical" href="https://omasuuranaishi-a11y.github.io/tarot-cards/spreads/">
+<!-- ▲▲ ここまで ▲▲ -->
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="宵の占い処">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="宵の占い処 — スプレッド選択式タロット">
+<meta property="og:description" content="一枚の声から、十二の空まで。スプレッド選択式のタロット">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="宵の占い処 — スプレッド選択式タロット">
+<meta name="twitter:description" content="一枚の声から、十二の空まで。スプレッド選択式のタロット">
+<meta name="twitter:image" content="https://omasuuranaishi-a11y.github.io/tarot-cards/spreads/ogp.png">
+<meta name="theme-color" content="#0b0e1e">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night-deep:#0b0e1e;
+  --night:#131735;
+  --night-soft:#1c2148;
+  --gold:#d8b46a;
+  --gold-bright:#f0d69a;
+  --gold-dim:rgba(216,180,106,.38);
+  --ink:#ece6d8;
+  --ink-dim:#a9a293;
+  --violet:#6f5fae;
+  --violet-glow:rgba(140,120,220,.55);
+  --card-w:64px;
+  --card-h:100px;
+  --serif-jp:'Noto Serif JP',serif;
+  --serif-en:'Cormorant Garamond',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:var(--serif-jp);
+  background:radial-gradient(ellipse at 50% -10%, #232a58 0%, var(--night) 45%, var(--night-deep) 100%);
+  color:var(--ink);
+  overflow-x:hidden;
+  min-height:100dvh;
+  letter-spacing:.04em;
+}
+/* ---------- 星空 ---------- */
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:#fff;opacity:.5;animation:twinkle var(--d,4s) ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.15}50%{opacity:.8}}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.15s!important}
+}
+/* ---------- 共通 ---------- */
+.screen{position:relative;z-index:1;min-height:100dvh;display:none;flex-direction:column;align-items:center;padding:22px 16px 40px}
+.screen.active{display:flex}
+.brand{font-family:var(--serif-en);font-size:.72rem;letter-spacing:.5em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:6px}
+h1{font-weight:500;font-size:1.5rem;letter-spacing:.28em;color:var(--gold-bright);text-align:center}
+.subtitle{font-size:.78rem;color:var(--ink-dim);margin-top:10px;text-align:center;line-height:1.9}
+.gold-rule{width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:18px auto}
+button{font-family:var(--serif-jp);cursor:pointer;letter-spacing:.12em}
+.btn-gold{
+  background:linear-gradient(160deg,rgba(216,180,106,.16),rgba(216,180,106,.06));
+  border:1px solid var(--gold-dim);color:var(--gold-bright);
+  padding:13px 34px;border-radius:999px;font-size:.92rem;
+  transition:all .35s;
+}
+.btn-gold:hover{border-color:var(--gold);box-shadow:0 0 24px rgba(216,180,106,.25)}
+.btn-ghost{background:none;border:1px solid rgba(236,230,216,.22);color:var(--ink-dim);padding:11px 26px;border-radius:999px;font-size:.82rem;transition:all .3s}
+.btn-ghost:hover{color:var(--ink);border-color:rgba(236,230,216,.5)}
+/* ---------- スプレッド選択 ---------- */
+#screen-select .spread-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:16px;width:100%;max-width:960px;margin-top:26px;
+}
+.spread-card{
+  position:relative;
+  background:linear-gradient(170deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+  border:1px solid rgba(216,180,106,.22);
+  border-radius:14px;padding:22px 20px 18px;text-align:left;
+  color:var(--ink);transition:all .4s;overflow:hidden;
+}
+.spread-card:hover,.spread-card:focus-visible{
+  border-color:var(--gold);transform:translateY(-3px);
+  box-shadow:0 12px 34px rgba(0,0,0,.45),0 0 20px rgba(216,180,106,.12);
+}
+.spread-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.spread-card .sc-count{
+  position:absolute;top:16px;right:18px;font-family:var(--serif-en);
+  font-size:.7rem;letter-spacing:.2em;color:var(--gold-dim);
+}
+.spread-card h3{font-size:1.05rem;font-weight:500;letter-spacing:.16em;color:var(--gold-bright);margin-bottom:2px}
+.spread-card .sc-en{font-family:var(--serif-en);font-size:.72rem;letter-spacing:.3em;color:var(--ink-dim);margin-bottom:12px}
+.spread-card .sc-desc{font-size:.8rem;line-height:1.9;color:var(--ink-dim)}
+.spread-card .sc-mini{
+  margin-top:14px;height:66px;position:relative;
+  border-top:1px dashed rgba(216,180,106,.18);padding-top:10px;
+}
+.sc-mini .m-dot{
+  position:absolute;width:12px;height:18px;border-radius:2px;
+  border:1px solid var(--gold-dim);background:rgba(111,95,174,.25);
+  transform:translate(-50%,-50%);
+}
+.sc-mini .m-dot.rot{transform:translate(-50%,-50%) rotate(90deg)}
+/* ---------- 問い入力 ---------- */
+#screen-ask{justify-content:center}
+.ask-box{width:100%;max-width:480px;text-align:center}
+.ask-box .spread-label{font-size:.8rem;color:var(--gold);letter-spacing:.3em;margin-bottom:8px}
+textarea#question{
+  width:100%;min-height:96px;margin-top:20px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(216,180,106,.25);
+  border-radius:10px;padding:14px;color:var(--ink);font-family:var(--serif-jp);
+  font-size:.9rem;line-height:1.9;resize:vertical;letter-spacing:.05em;
+}
+textarea#question:focus{outline:none;border-color:var(--gold);box-shadow:0 0 16px rgba(216,180,106,.12)}
+.ask-note{font-size:.72rem;color:var(--ink-dim);margin-top:10px;line-height:1.8}
+.ask-actions{display:flex;gap:12px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+/* ---------- テーブル ---------- */
+#screen-table{padding:14px 8px 0;overflow:hidden;justify-content:flex-start}
+.table-head{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;margin-bottom:6px}
+.table-head .th-spread{font-size:.78rem;letter-spacing:.24em;color:var(--gold)}
+.table-head .th-count{font-family:var(--serif-en);font-size:.74rem;letter-spacing:.18em;color:var(--ink-dim)}
+#dealer{
+  width:120px;height:54px;margin:0 auto 2px;position:relative;opacity:.55;
+  animation:dealerSway 7s ease-in-out infinite;
+}
+@keyframes dealerSway{0%,100%{transform:translateX(-3px)}50%{transform:translateX(3px)}}
+#dealer::before{
+  content:'';position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  width:84px;height:50px;background:radial-gradient(ellipse at 50% 100%, #2a2f5c 0%, transparent 72%);
+  border-radius:50% 50% 0 0;
+}
+#dealer::after{
+  content:'';position:absolute;left:50%;bottom:26px;transform:translateX(-50%);
+  width:30px;height:30px;border-radius:50%;
+  background:radial-gradient(circle at 50% 42%, #343a6e 0%, #1a1e42 70%, transparent 100%);
+}
+#table-area{
+  position:relative;width:min(94vw,540px);aspect-ratio:1/1.06;margin:0 auto;
+}
+#round-table{
+  position:absolute;inset:0;border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(140,120,220,.14), transparent 62%),
+    radial-gradient(circle at 50% 50%, #1e2350 0%, #161a3e 58%, #10132c 100%);
+  border:2px solid var(--gold-dim);
+  box-shadow:
+    inset 0 0 60px rgba(0,0,0,.55),
+    inset 0 0 18px rgba(216,180,106,.08),
+    0 24px 60px rgba(0,0,0,.55);
+}
+#round-table::before{
+  content:'';position:absolute;inset:10px;border-radius:50%;
+  border:1px solid rgba(216,180,106,.18);
+}
+/* スプレッド位置ガイド */
+.slot{
+  position:absolute;width:var(--card-w);height:var(--card-h);pointer-events:none;
+  transform:translate(-50%,-50%) rotate(var(--rot,0deg)) scale(var(--sc,1));
+  border:1px dashed rgba(216,180,106,.34);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .4s, box-shadow .4s;
+}
+.slot .slot-label{
+  font-size:.56rem;color:var(--gold-dim);letter-spacing:.1em;text-align:center;
+  line-height:1.5;padding:2px;transform:rotate(calc(var(--rot,0deg) * -1));
+}
+.slot.next{border-color:var(--gold);box-shadow:0 0 14px rgba(216,180,106,.3);animation:slotPulse 1.6s ease-in-out infinite}
+@keyframes slotPulse{0%,100%{box-shadow:0 0 8px rgba(216,180,106,.18)}50%{box-shadow:0 0 20px rgba(216,180,106,.42)}}
+/* カード */
+.tcard{
+  position:absolute;width:var(--card-w);height:var(--card-h);
+  transform:translate(-50%,-50%) rotate(var(--rot,0deg)) scale(var(--sc,1));
+  transform-style:preserve-3d;perspective:600px;
+  transition:left .8s cubic-bezier(.22,.9,.3,1), top .8s cubic-bezier(.22,.9,.3,1), transform .8s cubic-bezier(.22,.9,.3,1);
+  z-index:5;cursor:pointer;
+}
+.tcard-inner{
+  position:absolute;inset:0;transform-style:preserve-3d;
+  transition:transform .85s cubic-bezier(.3,.1,.25,1);
+  border-radius:6px;
+}
+.tcard.open .tcard-inner{transform:rotateY(180deg)}
+.tface{
+  position:absolute;inset:0;backface-visibility:hidden;border-radius:6px;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.tback{
+  background:
+    radial-gradient(circle at 50% 26%, rgba(240,214,154,.2) 0%, transparent 28%),
+    linear-gradient(155deg,#3a3170 0%, #241f52 55%, #171338 100%);
+  border:1px solid var(--gold-dim);
+  box-shadow:0 6px 16px rgba(0,0,0,.5);
+}
+.tback::before{
+  content:'☽';position:absolute;top:16%;left:50%;transform:translateX(-50%);
+  color:var(--gold);font-size:14px;opacity:.85;
+}
+.tback::after{
+  content:'✦ ✧ ✦';position:absolute;bottom:14%;left:50%;transform:translateX(-50%);
+  color:var(--gold-dim);font-size:8px;letter-spacing:2px;
+}
+.tfront{
+  transform:rotateY(180deg);
+  background:linear-gradient(168deg,#f4ecd8 0%, #e7dcc0 100%);
+  border:1px solid #b99a55;color:#3a3050;
+  box-shadow:0 6px 16px rgba(0,0,0,.5);
+  padding:4px 2px;
+}
+.tfront .tf-num{font-family:var(--serif-en);font-size:.52rem;letter-spacing:.12em;color:#8a7440}
+.tfront .tf-sym{font-size:20px;line-height:1.35;margin:2px 0;color:#4c3f78}
+.tfront .tf-name{font-size:.5rem;font-weight:600;letter-spacing:.04em;text-align:center;line-height:1.35;color:#463a66;padding:0 2px}
+.tfront .tf-rev{font-size:.44rem;color:#a0522d;letter-spacing:.1em;margin-top:1px}
+.tcard.reversed .tfront{transform:rotateY(180deg) rotate(180deg)}
+/* 山札の扇 */
+#slots{position:absolute;inset:0;z-index:1;pointer-events:none}
+#cards-layer{position:absolute;inset:0;z-index:5;pointer-events:none}
+#cards-layer .tcard{pointer-events:none}
+#cards-layer.can-flip .tcard{pointer-events:auto}
+#deck-fan{position:absolute;left:0;bottom:-4%;width:100%;height:30%;pointer-events:none;z-index:3;transition:opacity .7s, transform .7s}
+#deck-fan.fan-out{opacity:0;transform:translateY(60px);pointer-events:none}
+#deck-fan.fan-out .fan-card{pointer-events:none}
+.fan-card{
+  position:absolute;left:50%;bottom:6px;width:54px;height:86px;border-radius:5px;
+  background:linear-gradient(155deg,#38306c 0%, #221d4e 60%, #151134 100%);
+  border:1px solid rgba(216,180,106,.45);
+  transform-origin:50% 200%;
+  transform:translateX(-50%) rotate(var(--a)) translateY(var(--lift,0px));
+  box-shadow:0 4px 12px rgba(0,0,0,.5);
+  pointer-events:auto;cursor:pointer;
+  transition:transform .3s, box-shadow .3s, opacity .4s;
+}
+.fan-card::before{content:'☽';position:absolute;top:8px;left:50%;transform:translateX(-50%);color:var(--gold-dim);font-size:10px}
+.fan-card:hover,.fan-card:focus-visible{--lift:-16px;z-index:30!important;box-shadow:0 8px 20px rgba(0,0,0,.6),0 0 14px var(--violet-glow)}
+.fan-card.drawn{opacity:0;pointer-events:none;transition:opacity .4s}
+.table-foot{display:flex;gap:10px;justify-content:center;margin:14px 0 20px;flex-wrap:wrap;position:relative;z-index:6}
+.hint{font-size:.72rem;color:var(--ink-dim);text-align:center;letter-spacing:.14em;margin-top:4px;min-height:1.4em}
+/* ---------- 鑑定パネル ---------- */
+#panel{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;
+  max-height:86dvh;transform:translateY(102%);
+  transition:transform .7s cubic-bezier(.25,.9,.3,1);
+  background:linear-gradient(180deg,#191d40 0%, #121531 100%);
+  border-top:1px solid var(--gold-dim);
+  border-radius:22px 22px 0 0;
+  box-shadow:0 -18px 60px rgba(0,0,0,.6);
+  display:flex;flex-direction:column;
+}
+#panel.show{transform:translateY(0)}
+#panel-grip{
+  padding:12px 0 8px;text-align:center;cursor:pointer;flex:none;
+}
+#panel-grip::before{
+  content:'';display:block;width:44px;height:3px;border-radius:3px;
+  background:var(--gold-dim);margin:0 auto;
+}
+#panel-body{overflow-y:auto;padding:4px 20px 46px;-webkit-overflow-scrolling:touch}
+.p-inner{max-width:640px;margin:0 auto}
+.p-head{text-align:center;margin-bottom:8px}
+.p-head .p-spread{font-size:.72rem;letter-spacing:.34em;color:var(--gold)}
+.p-head .p-q{font-size:.85rem;color:var(--ink);margin-top:10px;line-height:1.9}
+.p-head .p-q::before{content:'「'}.p-head .p-q::after{content:'」'}
+.reading{
+  border:1px solid rgba(216,180,106,.2);border-radius:12px;
+  padding:18px 18px 16px;margin-top:18px;
+  background:linear-gradient(170deg,rgba(255,255,255,.03),transparent);
+}
+.reading .r-pos{font-size:.68rem;letter-spacing:.3em;color:var(--gold);margin-bottom:6px}
+.reading .r-posmean{font-size:.72rem;color:var(--ink-dim);line-height:1.8;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed rgba(216,180,106,.16)}
+.reading h4{font-size:1.02rem;font-weight:500;letter-spacing:.1em;color:var(--gold-bright)}
+.reading .r-en{font-family:var(--serif-en);font-size:.7rem;letter-spacing:.22em;color:var(--ink-dim);margin-top:2px}
+.reading .r-ori{display:inline-block;font-size:.66rem;letter-spacing:.2em;margin-top:8px;padding:3px 12px;border-radius:999px;border:1px solid var(--gold-dim);color:var(--gold-bright)}
+.reading .r-ori.rev{border-color:rgba(190,110,90,.55);color:#dfa08c}
+.reading .r-kw{font-size:.74rem;color:var(--ink-dim);letter-spacing:.14em;margin-top:10px}
+.reading .r-body{font-size:.87rem;line-height:2.15;margin-top:12px;color:var(--ink)}
+.reading .r-struct{
+  margin-top:14px;padding:12px 14px;border-radius:8px;
+  background:rgba(111,95,174,.12);border:1px solid rgba(140,120,220,.25);
+  font-size:.72rem;line-height:2;color:#c9c2e8;letter-spacing:.06em;
+}
+.reading .r-struct .rs-t{font-size:.64rem;letter-spacing:.3em;color:#9d92cf;display:block;margin-bottom:4px}
+.synth{
+  margin-top:26px;border-top:1px solid var(--gold-dim);padding-top:22px;
+}
+.synth h3{font-size:.8rem;letter-spacing:.4em;color:var(--gold);text-align:center;margin-bottom:16px}
+.synth .s-item{margin-top:14px}
+.synth .s-label{font-size:.66rem;letter-spacing:.26em;color:#9d92cf}
+.synth .s-text{font-size:.85rem;line-height:2.1;margin-top:4px}
+.synth .s-story{
+  margin-top:22px;padding:18px;border:1px solid rgba(216,180,106,.28);border-radius:12px;
+  font-size:.9rem;line-height:2.2;text-align:center;color:var(--gold-bright);
+  background:radial-gradient(circle at 50% 0%, rgba(216,180,106,.08), transparent 70%);
+}
+.p-actions{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+.p-actions-sub{margin-top:14px}
+/* シェア（金の細枠・主役のコピーボタンと競合させない） */
+.btn-share{
+  display:inline-flex;align-items:center;gap:9px;
+  background:none;border:1px solid var(--gold-dim);color:var(--gold);
+  padding:11px 22px;border-radius:999px;font-size:.8rem;
+  transition:all .3s;
+}
+.btn-share:hover,.btn-share:focus-visible{
+  color:var(--gold-bright);border-color:var(--gold);
+  box-shadow:0 0 16px rgba(216,180,106,.16);
+}
+.btn-share svg{width:12px;height:12px;fill:currentColor;flex:none;opacity:.9}
+.btn-share svg.stroke{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linejoin:round;stroke-linecap:round}
+.p-close-line{text-align:center;margin-top:26px;font-family:var(--serif-en);font-size:.66rem;letter-spacing:.5em;color:var(--gold-dim)}
+/* ---------- パネル末尾のフッター ---------- */
+.p-footer{text-align:center;margin-top:18px}
+.p-footer .pf-rule{width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);margin:0 auto 18px}
+.p-footer .pf-link{
+  display:inline-block;font-size:.76rem;letter-spacing:.16em;
+  color:var(--gold-dim);text-decoration:none;transition:color .35s;
+}
+.p-footer .pf-link::after{content:' →';font-size:.7rem;letter-spacing:0}
+.p-footer .pf-link:hover,.p-footer .pf-link:focus-visible{color:var(--gold-bright)}
+.p-footer .pf-credit{margin-top:14px;font-size:.64rem;letter-spacing:.14em;color:rgba(169,162,147,.55)}
+.p-footer .pf-credit a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(169,162,147,.22);transition:color .35s}
+.p-footer .pf-credit a:hover{color:var(--ink-dim)}
+/* 暗転 */
+#veil{
+  position:fixed;inset:0;background:var(--night-deep);z-index:40;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .8s;
+}
+#veil.show{opacity:1;pointer-events:auto}
+#veil p{font-size:.82rem;letter-spacing:.4em;color:var(--gold-dim);animation:veilPulse 2s ease-in-out infinite}
+@keyframes veilPulse{0%,100%{opacity:.4}50%{opacity:1}}
+#toast{
+  position:fixed;left:50%;bottom:24px;transform:translate(-50%,80px);
+  background:rgba(20,24,52,.95);border:1px solid var(--gold-dim);color:var(--gold-bright);
+  font-size:.78rem;letter-spacing:.14em;padding:10px 24px;border-radius:999px;
+  transition:transform .4s;z-index:60;
+}
+#toast.show{transform:translate(-50%,0)}
+@media (max-width:430px){
+  :root{--card-w:52px;--card-h:82px}
+  h1{font-size:1.28rem}
+  .reading .r-body{font-size:.84rem}
+}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+
+<!-- スプレッド選択 -->
+<section class="screen active" id="screen-select">
+  <p class="brand">Yoi no Uranai-dokoro</p>
+  <h1>宵の占い処</h1>
+  <p class="subtitle">問いの深さに合わせて、卓の並べ方を選んでください。<br>一枚の声から、十二の空まで。</p>
+  <div class="gold-rule"></div>
+  <div class="spread-grid" id="spread-grid"></div>
+</section>
+
+<!-- 問い入力 -->
+<section class="screen" id="screen-ask">
+  <div class="ask-box">
+    <p class="spread-label" id="ask-spread-name"></p>
+    <h1 style="font-size:1.2rem">問いを、ひとつ。</h1>
+    <div class="gold-rule"></div>
+    <textarea id="question" placeholder="いま、心にかかっていることを言葉にしてください（空欄のままでも占えます）"></textarea>
+    <p class="ask-note" id="ask-note"></p>
+    <div class="ask-actions">
+      <button class="btn-ghost" id="btn-back-select">スプレッドを選び直す</button>
+      <button class="btn-gold" id="btn-to-table">卓へすすむ</button>
+    </div>
+  </div>
+</section>
+
+<!-- テーブル -->
+<section class="screen" id="screen-table">
+  <div class="table-head">
+    <span class="th-spread" id="th-spread"></span>
+    <span class="th-count" id="th-count"></span>
+  </div>
+  <div id="dealer"></div>
+  <div id="table-area">
+    <div id="round-table"></div>
+    <div id="slots"></div>
+    <div id="cards-layer"></div>
+    <div id="deck-fan"></div>
+  </div>
+  <p class="hint" id="hint">山札に触れて、一枚ずつ引いてください</p>
+  <div class="table-foot">
+    <button class="btn-gold" id="btn-show-panel" style="display:none">導きをひらく</button>
+    <button class="btn-ghost" id="btn-draw-all">残りを一気に引く</button>
+    <button class="btn-ghost" id="btn-restart-table">はじめから</button>
+  </div>
+</section>
+
+<!-- 鑑定パネル -->
+<div id="panel" aria-hidden="true">
+  <div id="panel-grip" title="畳む / ひらく"></div>
+  <div id="panel-body"><div class="p-inner" id="panel-content"></div></div>
+</div>
+
+<div id="veil"><p>あなたの卓を、読み解いています</p></div>
+<div id="toast">コピーしました</div>
+
+<script>
+/* ================= ▼リンク設定（変更はここだけ）▼ ================= */
+const SITE_URL   = "https://omasuuranaishi-a11y.github.io/tarot-cards/spreads/"; // headのog:urlと揃える
+const ASTRO_URL  = "https://lin.ee/zI0K08R";                 // 占星術での読み解き → 公式LINE
+const AUTHOR_URL = "https://www.instagram.com/omasu_horoscope/"; // 制作者名 → Instagram
+const AUTHOR_NAME= "おます";
+/* ================= ▲ここまで▲ ================= */
+
+/* ================= カードデータ ================= */
+const MAJOR = [
+{num:"0",name:"愚者",en:"The Fool",sym:"☘",
+ kwU:"自由 ・ 出発 ・ まっさらな可能性",kwR:"見切り発車 ・ 足踏み ・ 根拠のない不安",
+ up:"何も決まっていないことは、何にでもなれるということです。経験や実績がまだ薄くても、この一歩には身軽さという武器があります。細かい計画より先に、まず踏み出したい気持ちの方を信じてよいときです。",
+ rev:"踏み出したい気持ちと、準備不足への不安が綱引きをしています。止まること自体は悪くありません。ただ「怖いから動かない」と「今は整える時期だから動かない」は別物です。どちらなのか、一度言葉にして確かめてください。"},
+{num:"I",name:"魔術師",en:"The Magician",sym:"∞",
+ kwU:"創造 ・ 手持ちの道具 ・ はじまりの意志",kwR:"空回り ・ 器用貧乏 ・ 言葉先行",
+ up:"必要な道具は、すでに卓の上に揃っています。足りないのは新しい何かではなく「これでやる」と決めることだけです。小さくてもいいので、意志を形にする最初の作業を今日始めてください。",
+ rev:"できることが多いぶん、力が散らばっています。あるいは、語ることが先に立って手が止まっているのかもしれません。使う道具をひとつに絞り、口より先に手を動かすと、流れが戻ってきます。"},
+{num:"II",name:"女教皇",en:"The High Priestess",sym:"☽",
+ kwU:"直感 ・ 静けさ ・ 見えない知恵",kwR:"考えすぎ ・ 秘めすぎ ・ 神経の張りつめ",
+ up:"答えはすでに、あなたの静かな部分が知っています。情報を足すより、雑音を減らすことが今の正解です。即断を求められても、一晩置く勇気を持ってください。",
+ rev:"頭の中の声が多すぎて、本当の直感が聞こえなくなっています。あるいは、抱え込んで誰にも見せていない何かが重くなってきた頃です。全部でなくていいので、一部だけ言葉にして外に出してみてください。"},
+{num:"III",name:"女帝",en:"The Empress",sym:"♀",
+ kwU:"実り ・ 受け取る豊かさ ・ 育てる力",kwR:"過保護 ・ 停滞した心地よさ ・ 浪費",
+ up:"育ててきたものが、実りの段階に入っています。ここで必要なのは頑張りを足すことではなく、受け取ることを自分に許すことです。休息も、ご褒美も、成果のうちです。",
+ rev:"心地よさが、いつのまにか動かない理由になっていないでしょうか。世話を焼きすぎて相手の力を奪っている場合もあります。与える手を少しゆるめ、自分の畑に水をやり直す時期です。"},
+{num:"IV",name:"皇帝",en:"The Emperor",sym:"♄",
+ kwU:"基盤 ・ 責任 ・ 継続で築く秩序",kwR:"硬直 ・ 支配 ・ 「こうあるべき」の重さ",
+ up:"感情の波に頼らず、仕組みと継続で積み上げる局面です。地味な決まりごと——時間割、予算、手順——が、いまのあなたの一番の味方になります。決めたルールを守る自分を、信頼の土台にしてください。",
+ rev:"「べき」が増えすぎて、自分にも周りにも窮屈になっています。守るべき芯と、手放していい形式を仕分けましょう。強さとは硬さではなく、締めるところと緩めるところを選べることです。"},
+{num:"V",name:"教皇",en:"The Hierophant",sym:"⚶",
+ kwU:"学び ・ 助言 ・ 信頼できる型",kwR:"形骸化 ・ 常識への窮屈さ ・ 権威頼み",
+ up:"自己流で悩み続けるより、先人の型を借りる方が早い場面です。本でも、師でも、伝統的なやり方でも構いません。「正しく教わる」ことは、遠回りに見えて一番の近道です。",
+ rev:"周囲の常識や「普通はこうする」が、あなたの実感と合わなくなってきています。型を破ること自体が目的化しないよう気をつけつつ、違和感には正直に。あなた自身の判断基準を育てる時期に入っています。"},
+{num:"VI",name:"恋人",en:"The Lovers",sym:"♊",
+ kwU:"選択 ・ 心が響き合う縁 ・ 素直な YES",kwR:"迷い ・ 決めきれない保留 ・ 不釣り合い",
+ up:"損得の計算より、心が「こちら」と言う方を選んでよい局面です。人との縁であれ道の選択であれ、素直さが最良の判断材料になります。選ぶことは、他方を手放す勇気とセットです。",
+ rev:"選択肢を残したままの保留が、少しずつ重くなっています。全部を取ろうとすると、どれも中途半端になります。決められないのは情報不足ではなく、失う覚悟の問題かもしれません。"},
+{num:"VII",name:"戦車",en:"The Chariot",sym:"♋",
+ kwU:"前進 ・ 勢い ・ 走りながら整える",kwR:"暴走 ・ 制御不能 ・ 方向のない焦り",
+ up:"考える時間は十分に取りました。ここからはスピードが味方をします。多少の粗さは走りながら直せばいい局面です。迷いを断って、まず出発してください。",
+ rev:"アクセルとブレーキを同時に踏んでいるか、方向を決めないまま焦りだけが加速しています。速度を落とすことは負けではありません。手綱を握り直すために、一度止まって行き先を確認してください。"},
+{num:"VIII",name:"力",en:"Strength",sym:"∞",
+ kwU:"静かな強さ ・ 根気 ・ 手なずける",kwR:"力み ・ 自信の揺らぎ ・ 感情に呑まれる",
+ up:"ねじ伏せる強さではなく、なだめて根気よく付き合う強さが問われています。相手はあなた自身の衝動や不安かもしれません。焦らず、しかし手を離さず。その粘りは必ず実を結びます。",
+ rev:"力ずくで抑え込もうとして、かえって暴れさせています。あるいは「自分には無理かも」という声に呑まれかけています。強さの回復は、まず自分に優しくすることから始まります。"},
+{num:"IX",name:"隠者",en:"The Hermit",sym:"☌",
+ kwU:"内省 ・ ひとりの時間 ・ 自分の灯",kwR:"孤立 ・ 引きこもりすぎ ・ 内向の袋小路",
+ up:"外の評価や比較から離れて、自分の内側と話す時間が必要です。ひとりになることは後退ではなく、灯を確かめる作業です。静かな場所で、本当はどうしたいのかを聞いてください。",
+ rev:"内省が長引いて、考えの袋小路に入っています。ひとりで抱える期間は役目を終えました。信頼できる誰かひとりにだけ、途中経過を話してみてください。外の光が、答えを照らします。"},
+{num:"X",name:"運命の輪",en:"Wheel of Fortune",sym:"☸",
+ kwU:"転機 ・ 流れの好転 ・ タイミングの波",kwR:"すれ違うタイミング ・ 空回りの繰り返し",
+ up:"自力では動かせなかった歯車が、外側から回り始めています。転機は準備した人にだけ「偶然」の顔をしてやってきます。来た波には、考えすぎずに乗ってください。",
+ rev:"頑張りと結果が噛み合わない時期です。これはあなたの力不足ではなく、タイミングの問題であることが多いのです。無理に回そうとせず、次の波のために足場を整えることに力を使ってください。"},
+{num:"XI",name:"正義",en:"Justice",sym:"⚖",
+ kwU:"公平 ・ 筋を通す ・ 冷静な裁定",kwR:"偏り ・ 白黒つけすぎ ・ 帳尻の合わなさ",
+ up:"感情や情に流されず、事実と筋道で判断すべき局面です。誰かに都合よくではなく、あなた自身も含めて公平に。誠実に積んだものは、少し遅れてでも必ず清算されます。",
+ rev:"どこかで天秤が傾いています。自分ばかり譲っているか、逆に相手の事情が見えなくなっているか。白か黒かを急がず、まだ見ていない側の言い分を一度机に載せてください。"},
+{num:"XII",name:"吊るされた男",en:"The Hanged Man",sym:"⚓",
+ kwU:"視点の反転 ・ 実りある停滞 ・ 手放して得る",kwR:"徒労感 ・ 我慢の空回り ・ 犠牲のしすぎ",
+ up:"動けないこの期間は、罰ではなく視点を変えるための時間です。逆さまから見ると、こだわっていたものの小ささと、見落としていたものの大きさに気づきます。今は耐える価値のある停滞です。",
+ rev:"我慢が実りにつながっていない徒労の気配があります。「耐えていれば報われる」が思考停止になっていないか点検を。手放すべきは努力ではなく、その努力の向け先かもしれません。"},
+{num:"XIII",name:"死神",en:"Death",sym:"♏",
+ kwU:"終わりと再生 ・ 大掃除 ・ 区切りをつける",kwR:"終わらせられない ・ 引きずり ・ 未練",
+ up:"怖い絵柄に見えて、実は「ちゃんと終わらせる」ことを応援するカードです。役目を終えた習慣、関係、やり方に区切りをつけると、新しいものの席が空きます。終わりは、再生の準備です。",
+ rev:"もう終わっているものを、手の中で握り続けています。手放せないのは、それが大切だった証拠でもあります。ただ、次の章はページをめくらないと始まりません。小さなお別れの儀式を、自分のためにしてあげてください。"},
+{num:"XIV",name:"節制",en:"Temperance",sym:"♐",
+ kwU:"調合 ・ ほどよさ ・ 異なるものの橋渡し",kwR:"配分の乱れ ・ 極端 ・ 噛み合わなさ",
+ up:"ゼロか百かではなく、混ぜ合わせて「ちょうどいい」を作る局面です。仕事と休み、理想と現実、自分と相手。対立に見える二つは、配合しだいで薬になります。あなたの調整力が活きます。",
+ rev:"どこかの配分が極端に振れています。やりすぎか、やらなすぎか。生活の中の「注ぎすぎているコップ」を一つ見つけて、少しだけ戻すことから整えましょう。"},
+{num:"XV",name:"悪魔",en:"The Devil",sym:"♑",
+ kwU:"欲との自覚的な付き合い ・ 執着の直視",kwR:"鎖に気づく ・ 悪習からの離脱 ・ 解放の初動",
+ up:"やめられない習慣、離れられない関係、手放せない欲。それ自体を責める必要はありません。大事なのは「自分は今つながれている」と自覚することです。鎖は、見えた瞬間から緩み始めます。",
+ rev:"長く縛られていたものから、離れる力が戻ってきています。惰性や依存の正体に、もう気づいているはずです。完全に断てなくても、距離を一歩とれたら十分な前進です。"},
+{num:"XVI",name:"塔",en:"The Tower",sym:"⚡",
+ kwU:"強制リセット ・ 前提が崩れる ・ 目が覚める衝撃",kwR:"崩壊の先送り ・ ひび割れの放置 ・ 内側の限界",
+ up:"積み上げたものが崩れる衝撃は、間違った土台ごと壊してくれる出来事でもあります。守りたかったのは建物か、それとも見栄だったのか。更地は痛みと同時に、正しく建て直す自由をくれます。",
+ rev:"崩れかけているものを、応急処置でつなぎ止めています。先送りは崩壊を防ぐのではなく、大きくするだけです。自分から少しずつ解体する方が、痛みは小さく済みます。"},
+{num:"XVII",name:"星",en:"The Star",sym:"✦",
+ kwU:"希望 ・ 回復 ・ 遠くの目標に注ぐ水",kwR:"理想と現実の距離 ・ 望みの見失い",
+ up:"嵐のあとの、静かな回復の時間です。すぐに叶わなくても、遠くに星が見えていること自体が力になります。焦らず、目標に向けて毎日少しずつ水を注いでください。方向は合っています。",
+ rev:"理想が遠すぎて、注ぐ水が虚しく感じられています。星を見失ったのではなく、雲がかかっているだけです。目標を一段近くに引き寄せて、今週できるサイズに切り直してみてください。"},
+{num:"XVIII",name:"月",en:"The Moon",sym:"☾",
+ kwU:"揺らぎ ・ 不確かさの中を歩く ・ 感受性",kwR:"霧が晴れる ・ 不安の正体判明 ・ 誤解の解消",
+ up:"輪郭のはっきりしない不安の中にいます。今は無理に結論を出さず、揺らぎごと抱えて歩いてよい時期です。夜道は、月明かりの分だけ見えれば進めます。感じたことのメモだけ残しておいてください。",
+ rev:"長かった霧が、晴れ始めています。漠然と怖かったものの正体が見え、誤解がほどけていきます。夜のあいだに感じ取ったことは無駄になりません。明るくなった道を、確かめながら進んでください。"},
+{num:"XIX",name:"太陽",en:"The Sun",sym:"☉",
+ kwU:"成功 ・ 祝福 ・ 隠さない喜び",kwR:"曇りがちの自信 ・ 喜びの出し惜しみ",
+ up:"努力が日の目を見る、率直に喜んでいい局面です。謙遜で薄めず、成果は成果として受け取り、周りとも分かち合ってください。あなたの明るさが、次の縁と機会を連れてきます。",
+ rev:"うまくいっているのに、素直に喜べない気持ちがあります。減点方式の目が、自分の光を曇らせています。満点でなくても、今日できたことをひとつ声に出して認めるところから始めましょう。"},
+{num:"XX",name:"審判",en:"Judgement",sym:"♆",
+ kwU:"再起 ・ 呼び覚まされる ・ 過去の清算と復活",kwR:"過去への固執 ・ 自己批判のループ",
+ up:"一度あきらめたこと、眠らせていた夢に、もう一度声がかかっています。過去の経験は失敗も含めてすべて、今回のための素材でした。「もう一度やってみる」に、年齢も遅すぎることもありません。",
+ rev:"過去の反省が、自分を責める道具になっています。振り返りは未来のためにあるもので、罰のためではありません。「あのときの自分も、あれが精一杯だった」と一度認めてから、次に進みましょう。"},
+{num:"XXI",name:"世界",en:"The World",sym:"🜨",
+ kwU:"完成 ・ 統合 ・ ひとつの章の大団円",kwR:"あと一歩の未完 ・ 締めくくりの甘さ",
+ up:"長かった物語が、ひとつの完成を迎えます。バラバラに見えた努力が、ここで一枚の絵につながります。達成を十分に味わってください。次の旅は、この完成を土台にして始まります。",
+ rev:"九割まで来て、最後の一割が残っています。惜しいのは力ではなく、締めくくる意志です。「完了」と宣言する基準を決めて、意識的に幕を引いてください。終わらせた人だけが、次を始められます。"}
+];
+
+const SUITS = {
+ wands:{name:"ワンド",en:"Wands",el:"火",elEn:"Fire",sym:"🜂",mark:"⚚",
+  domain:"情熱・行動・挑戦",lens:"「やりたい」という熱と、その燃やし方",
+  field:"仕事の攻め方や挑戦、モチベーション"},
+ cups:{name:"カップ",en:"Cups",el:"水",elEn:"Water",sym:"🜄",mark:"♥",
+  domain:"感情・関係・共感",lens:"心の水位と、人とのあいだに流れるもの",
+  field:"人間関係や恋愛、気持ちの通い方"},
+ swords:{name:"ソード",en:"Swords",el:"風",elEn:"Air",sym:"🜁",mark:"⚔",
+  domain:"思考・言葉・判断",lens:"頭の中の整理と、言葉の切れ味",
+  field:"考え方、決断、コミュニケーション"},
+ pents:{name:"ペンタクル",en:"Pentacles",el:"地",elEn:"Earth",sym:"🜃",mark:"✪",
+  domain:"現実・お金・積み重ね",lens:"暮らしの土台と、形に残るもの",
+  field:"お金、仕事の実務、健康や生活習慣"}
+};
+
+/* 数札1-10＋コート4種：段階の意味と正逆の型 */
+const RANKS = {
+ 1:{label:"エース",en:"Ace",stage:"種",
+  stageText:"物事がまだ純粋なエネルギーのまま差し出される「種」の段階",
+  up:"この領域で、新しい何かが始まろうとしています。まだ小さな芽ですが、方向性は本物です。受け取った火種を、消さないうちに最初のひと手につなげてください。",
+  rev:"始まりの気配はあるのに、受け取りそびれています。チャンスが悪いのではなく、器の準備がまだなのかもしれません。何が整えば動けるのか、条件をひとつ書き出してみてください。"},
+ 2:{label:"2",en:"Two",stage:"選択",
+  stageText:"二つの要素が向き合い、バランスと選択が問われる段階",
+  up:"二つのものを天秤にかけながら、うまく釣り合いを取れています。どちらかを急いで捨てる必要はありません。両方を見比べる時間そのものが、判断の精度を上げています。",
+  rev:"二択のあいだで宙ぶらりんになり、バランスを取ること自体が目的化しています。保留のコストが利益を上回り始めました。仮でいいので、期限つきの選択をしてみてください。"},
+ 3:{label:"3",en:"Three",stage:"最初の形",
+  stageText:"始まりが最初の形になり、外の世界と関わり出す段階",
+  up:"始めたことが、最初の形になって現れています。まだ完成品ではありませんが、方向の正しさを確かめるには十分です。ここまでの手応えを土台に、次の一歩を広げましょう。",
+  rev:"形にはなったものの、期待とのズレが見えてきました。ズレは失敗ではなく、初めて手に入った本物のデータです。感情的に投げ出す前に、どこを直せば合うのかを見てください。"},
+ 4:{label:"4",en:"Four",stage:"安定",
+  stageText:"一区切りがつき、土台が固まって安定する段階",
+  up:"ひとつの土台ができ、安心して立てる場所を得ています。この安定は休息と充電に使ってよいものです。ただし、居心地の良さに根を張りすぎないことも、頭の隅に置いておいてください。",
+  rev:"安定が、いつのまにか停滞に変わりかけています。守りの姿勢が長引いて、新しい風が入らなくなっています。土台を壊す必要はありません。窓をひとつ開けるくらいの変化から始めましょう。"},
+ 5:{label:"5",en:"Five",stage:"揺らぎ",
+  stageText:"安定が崩され、葛藤や喪失を通じて再調整が起こる段階",
+  up:"波風の立つ時期ですが、この揺らぎは次の段階に進むための再調整です。失ったものに目が行きがちですが、卓上を見れば残っているものも必ずあります。そちらを数えるところから立て直しが始まります。",
+  rev:"揺らぎの底は、すでに過ぎつつあります。葛藤や喪失感が長引いているのは、状況よりも記憶の反芻によるものかもしれません。回復は始まっています。その流れを信じて、少しずつ顔を上げてください。"},
+ 6:{label:"6",en:"Six",stage:"調和",
+  stageText:"揺らぎを越えて、分かち合いや前進の調和が戻る段階",
+  up:"嵐を抜けて、流れが穏やかに前へ動き出しています。与えることと受け取ることの循環がうまく回る時期です。過去のよかった記憶も、いまのあなたを支える資源として使ってください。",
+  rev:"調和のようでいて、どこかに偏りが潜んでいます。与えすぎ、頼りすぎ、あるいは過去の美化。バランスの傾きに気づくことが、本物の調和への入口です。"},
+ 7:{label:"7",en:"Seven",stage:"試練",
+  stageText:"手にしたものが試され、戦略と忍耐が問われる段階",
+  up:"ここまで積んだものが試される正念場ですが、あなたには守り抜く力と粘りがあります。がむしゃらではなく、立ち位置を選んで戦ってください。評価を急がず、長期戦の構えが吉です。",
+  rev:"粘りが消耗戦に変わっています。あるいは、目移りや迷いで力が分散しています。全部に勝つ必要はありません。守るべき一点を決め、残りは意図的に手放す勇気を持ってください。"},
+ 8:{label:"8",en:"Eight",stage:"動き",
+  stageText:"停滞が解け、物事が一気に動き出す加速の段階",
+  up:"流れが速まり、物事が音を立てて動き出します。積み重ねてきた人ほど、この加速の恩恵を受けます。来た連絡、開いた道には、いつもより早めの返事で応えてください。",
+  rev:"動くべき流れの中で、足が止まっています。慎重さか、あるいは見て見ぬふりか。流れは待ってくれませんが、乗り遅れても次の波は来ます。今回逃した理由だけは、正直に書き留めておきましょう。"},
+ 9:{label:"9",en:"Nine",stage:"大詰め",
+  stageText:"達成を目前にして、総仕上げと最後の踏ん張りが問われる段階",
+  up:"九合目まで来ています。景色はもう頂上のそれに近く、これまでの蓄積があなたを支えています。残りわずかの道のりを、雑にせず丁寧に。仕上げの質が、全体の印象を決めます。",
+  rev:"あと一歩のところで、疲れや不安が重くのしかかっています。ここまで来た事実は消えません。休むことは撤退ではありません。荷物を一度下ろして、最後の登りに備えてください。"},
+ 10:{label:"10",en:"Ten",stage:"完結",
+  stageText:"ひとつのサイクルが満ちて完結し、次へ引き継がれる段階",
+  up:"この領域でのひとつのサイクルが、満ちて完結します。実った成果は独り占めせず、周りと分かち合うことで次の循環の種になります。終わりをきちんと味わうことが、良い始まりを呼びます。",
+  rev:"満杯のコップをまだ持ち続けて、重さに疲れています。完結したものを抱え続けるのは、次のサイクルの席を塞ぐことです。役目を終えた荷物から、順に下ろしていきましょう。"},
+ 11:{label:"ペイジ",en:"Page",stage:"学び手",court:true,
+  stageText:"好奇心と吸収力を象徴する「学び手」の人物札",
+  up:"初心者の目と好奇心が、この領域の追い風になっています。「知らない」は恥ではなく、いま一番の強みです。小さな知らせや誘いは、育つ縁の入口かもしれません。素直に乗ってみてください。",
+  rev:"学びが浅いところで止まっているか、知らせを軽く扱いすぎています。わかったつもりが一番の足止めです。基礎に戻ることを面倒がらないでください。"},
+ 12:{label:"ナイト",en:"Knight",stage:"動く人",court:true,
+  stageText:"目標へ向かう推進力を象徴する「動く人」の人物札",
+  up:"考えるより動く力が、状況を切り開きます。多少前のめりでも、今はその勢いが価値です。動きながら軌道修正すればよいので、まず出発してください。",
+  rev:"勢いが空回りしているか、逆に腰が重くなりすぎています。速度そのものより、向かう先の確認を。手綱を握り直せば、この馬はまだ十分に走れます。"},
+ 13:{label:"クイーン",en:"Queen",stage:"深める人",court:true,
+  stageText:"受容と成熟した理解を象徴する「深める人」の人物札",
+  up:"押すのではなく、受け止めて深める力が問われ、そしてあなたにはそれがあります。相手や状況の言い分をいったん全部受け取ってから返す。その懐の深さが、信頼と実りを連れてきます。",
+  rev:"受け止めすぎて自分が空になっているか、感情の内圧が高まっています。世話や共感の蛇口を、少しだけ自分側へ向け直してください。満ちていない器からは、注げません。"},
+ 14:{label:"キング",en:"King",stage:"束ねる人",court:true,
+  stageText:"経験に裏打ちされた統率を象徴する「束ねる人」の人物札",
+  up:"この領域を「束ねる側」に立つときです。経験は十分に積まれています。細部に手を出すより、全体の方針を示し、責任を引き受ける姿勢が周囲を動かします。",
+  rev:"束ねる力が、支配や独走に傾きかけています。あるいは責任の重さから決断を避けています。王の仕事は完璧であることではなく、決めて、その結果を引き受けることです。"}
+};
+
+/* 小アルカナ キーワード [正, 逆] （スートごと1〜10, P, N, Q, K） */
+const MINOR_KW = {
+ wands:[["創造の火種 ・ 着火","不発 ・ 出だしの鈍り"],["展望 ・ 次の一手の構想","視野の狭さ ・ 計画倒れ"],["船出の手応え ・ 拡大","見込み違い ・ 待ちくたびれ"],["祝祭 ・ ひと区切りの安らぎ","居心地への安住 ・ 祝い損ね"],["切磋琢磨 ・ 健全な競争","不毛な衝突 ・ 消耗"],["勝利 ・ 承認 ・ 凱旋","評価待ち ・ うぬぼれ"],["優位を守る奮闘 ・ 抗戦","守勢の疲れ ・ 圧され気味"],["急展開 ・ 追い風 ・ 吉報","足止め ・ タイミングのズレ"],["最後の防衛 ・ 粘り強さ","警戒しすぎ ・ 満身創痍"],["やり遂げる重責 ・ 背負う力","抱え込み ・ 過負荷"],["情熱の芽生え ・ 吉左右の知らせ","気まぐれ ・ 熱しやすく冷めやすい"],["情熱の疾走 ・ 大胆な行動","勇み足 ・ 熱の空転"],["あたたかい主導 ・ 華のある魅力","感情的な主張 ・ 焦げつく世話"],["ビジョンの統率 ・ 火を配る器","独断 ・ 強引さ"]],
+ cups:[["心の泉 ・ 愛情のはじまり","感情の空回り ・ 心の乾き"],["心の通い合い ・ 対等な絆","気持ちのすれ違い ・ 温度差"],["祝福 ・ 仲間との喜び","馴れ合い ・ 楽しみの過多"],["倦怠 ・ 差し出された新しい杯","目覚め ・ マンネリからの脱出"],["喪失の嘆き ・ こぼれた三つの杯","残った二つに気づく ・ 回復"],["なつかしさ ・ 無垢な思い出","過去の美化 ・ 郷愁への逃避"],["夢想 ・ 選択肢の霧","地に足がつく ・ 幻の整理"],["卒業 ・ 満たされてなお去る","未練 ・ 去りきれない心残り"],["心の満足 ・ 願いの成就","満足の空虚 ・ 自己満足"],["家族的な幸福 ・ 円満の虹","理想の家庭像への疲れ ・ 不協和"],["感受性の便り ・ 心の芽","感傷 ・ 気持ちの幼さ"],["ロマンを運ぶ人 ・ 誘いの杯","口先の理想 ・ 幻滅"],["深い共感 ・ 癒やしの器","感情への呑まれ ・ 境界の曖昧さ"],["感情の成熟 ・ 静かな包容力","感情の抑圧 ・ 内に波立つ心"]],
+ swords:[["明晰 ・ 真実を切り出す","混乱 ・ 言葉の刃の誤用"],["決断の保留 ・ 目隠しの均衡","膠着の限界 ・ 見ないふりの終わり"],["痛みを伴う明察 ・ 心の傷","癒えはじめ ・ 痛みの言語化"],["休戦 ・ 戦略的な休息","休めない頭 ・ 充電不足"],["勝ち負けへの固執 ・ しこり","不毛さへの気づき ・ 矛を収める"],["移行 ・ 静かな水路を渡る","進路の迷い ・ 移りきれない過去"],["戦略 ・ 単独行 ・ 機転","ごまかし ・ 独り相撲"],["自縄自縛 ・ 思い込みの檻","檻は開いている ・ 制限からの解放"],["夜の反芻 ・ 不安の増幅","悪夢の終わり ・ 朝の気配"],["どん底からの夜明け ・ 終局","再起 ・ 最悪の峠越え"],["知への好奇心 ・ 観察眼","詮索 ・ 生煮えの言葉"],["論理の突進 ・ 切り込む速さ","攻撃的な言葉 ・ 拙速"],["聡明な距離感 ・ 芯のある判断","辛辣 ・ 孤高の冷たさ"],["公正な知性 ・ 言葉の権威","理屈での支配 ・ 冷酷な裁き"]],
+ pents:[["実りの種 ・ 現実的な好機","取らぬ狸 ・ 好機の見送り"],["やりくり上手 ・ 柔軟な両立","綱渡りの家計 ・ 器用さの限界"],["共同作業 ・ 技能の評価","連携不足 ・ 評価とのズレ"],["堅実な保持 ・ 蓄え","握りしめすぎ ・ ケチと不安"],["経済的な冬 ・ 支え合う困窮","冬の出口 ・ 助けを受け入れる"],["施しと受け取り ・ 公正な分配","貸し借りの重さ ・ 施しの上下関係"],["育成の点検 ・ 収穫待ちの評価","焦りの収穫 ・ 実らない投資"],["修練 ・ コツコツの職人仕事","雑な反復 ・ 手抜きの癖"],["自立した豊かさ ・ 庭園の実り","浪費 ・ 豊かさの孤独"],["家系的な繁栄 ・ 継承される資産","相続や家のもめごと ・ 安定の重み"],["堅実な学び手 ・ 資格や勉強の便り","計画倒れ ・ 学びの中断"],["着実な歩み ・ 信頼できる継続","停滞 ・ 変化への腰の重さ"],["実務の女主人 ・ 暮らしを整える手","世話疲れ ・ 現実への埋没"],["事業の完成者 ・ 揺るがぬ財の王","強欲 ・ 地位への固執"]]
+};
+
+/* ================= スプレッド定義 ================= */
+function circlePos(i,total,r,cx,cy,startDeg,dir){
+  const a=(startDeg+dir*i*(360/total))*Math.PI/180;
+  return {x:cx+r*Math.cos(a), y:cy+r*Math.sin(a)};
+}
+const SPREADS = {
+ one:{
+  key:"one",name:"ワンオラクル",en:"One Oracle",cards:1,sc:1.35,
+  desc:"一枚の声に耳を澄ます、いちばん静かな引き方。今日の指針や、迷いへのひと言に。",
+  note:"問いはシンプルなほど、一枚の答えは深くなります。",
+  pos:[{label:"いまのあなたへ",x:50,y:44,
+    meaning:"問い全体への、卓からのひと言。今日という日、あるいはこの迷いの核心に向けられた一枚です。"}]
+ },
+ three:{
+  key:"three",name:"スリーカード",en:"Three Cards",cards:3,sc:1.12,
+  desc:"過去・現在・未来。時間の流れに沿って、いまの立ち位置と向かう先を読みます。",
+  note:"「どうなる？」より「どう流れている？」を見るスプレッドです。",
+  pos:[
+   {label:"過去",x:24,y:44,meaning:"この問いの土壌。ここまでの経緯と、いまに影響を残しているもの。"},
+   {label:"現在",x:50,y:44,meaning:"いまのあなたの立ち位置。問いの現在地と、働いている力。"},
+   {label:"未来",x:76,y:44,meaning:"このままの流れが向かう先。決定ではなく、現時点での風向きです。"}]
+ },
+ choice:{
+  key:"choice",name:"二者択一",en:"Two Paths",cards:5,sc:1.0,
+  desc:"AとB、ふたつの道。それぞれの流れと行き着く先を並べて見比べます。",
+  note:"問いには「Aは◯◯、Bは◯◯」と、ふたつの選択肢を書いておくと読みやすくなります。",
+  pos:[
+   {label:"現在のあなた",x:50,y:74,meaning:"選択を前にした、いまのあなた自身の状態。"},
+   {label:"Aの道すじ",x:27,y:46,meaning:"最初の選択肢を選んだ場合の、道中の流れ。"},
+   {label:"Aの行き先",x:17,y:18,meaning:"最初の選択肢が行き着く先。得られるものと引き換えにするもの。"},
+   {label:"Bの道すじ",x:73,y:46,meaning:"もう一方の選択肢を選んだ場合の、道中の流れ。"},
+   {label:"Bの行き先",x:83,y:18,meaning:"もう一方の選択肢が行き着く先。得られるものと引き換えにするもの。"}]
+ },
+ hex:{
+  key:"hex",name:"ヘキサグラム",en:"Hexagram",cards:7,sc:.95,
+  desc:"六芒星のかたちに七枚。時の流れに、周囲・本音・対策を重ねて立体的に読みます。",
+  note:"人間関係や、相手のいる問いと相性のよい形です。",
+  pos:[
+   {label:"過去",x:50,y:10,meaning:"問いの発端。ここまでの経緯。"},
+   {label:"現在",x:79,y:58,meaning:"いまの状況と、働いている力。"},
+   {label:"未来",x:21,y:58,meaning:"このままの流れの向かう先。"},
+   {label:"対策",x:50,y:88,meaning:"あなたが取れる、具体的な構え方。"},
+   {label:"周囲・相手",x:21,y:26,meaning:"環境や相手側の状態。外から吹いている風。"},
+   {label:"あなたの本音",x:79,y:26,meaning:"表に出していない、あなた自身の本当の望みや怖れ。"},
+   {label:"結論",x:50,y:47,meaning:"六枚を束ねた、この問いの着地点。"}]
+ },
+ celtic:{
+  key:"celtic",name:"ケルト十字",en:"Celtic Cross",cards:10,sc:.88,
+  desc:"十枚で問いを四方から囲む、もっとも重厚な古典。ひとつの悩みを徹底的に解剖します。",
+  note:"じっくり向き合いたい、大きめの問いに。",
+  pos:[
+   {label:"現状",x:35,y:47,meaning:"問いの中心。いまのあなたと状況の核。"},
+   {label:"障害・課題",x:35,y:47,rot:90,meaning:"現状の上に横たわるもの。乗り越える課題、あるいは味方にすべき力。"},
+   {label:"顕在意識",x:35,y:15,meaning:"あなたが頭で考えていること。意識している目標や理想。"},
+   {label:"潜在意識",x:35,y:79,meaning:"心の底にある本音。自覚していない動機や怖れ。"},
+   {label:"過去",x:11,y:47,meaning:"この状況を作った、過ぎつつある影響。"},
+   {label:"近い未来",x:59,y:47,meaning:"まもなく訪れる展開。次の章の入口。"},
+   {label:"あなたの立場",x:86,y:85,meaning:"この問いにおける、あなた自身の構えと自己認識。"},
+   {label:"周囲の状況",x:86,y:62,meaning:"環境・周囲の人々からの影響。外側の風。"},
+   {label:"願望と怖れ",x:86,y:39,meaning:"期待と不安。望んでいることと、恐れていることは、しばしば同じ顔をしています。"},
+   {label:"最終結果",x:86,y:16,meaning:"九枚の流れが行き着く、この問いの結論。"}]
+ },
+ horo:{
+  key:"horo",name:"ホロスコープ",en:"Horoscope Spread",cards:13,sc:.78,
+  desc:"十二ハウスの円環に、人生の全領域を一望する大スプレッド。中央の一枚が全体を束ねます。",
+  note:"特定の悩みより「いまの自分の全体図」を見たいときに。誕生日や節目の総点検にも。",
+  pos:(()=>{
+    const houses=[
+     "第1ハウス｜あなた自身","第2ハウス｜お金・所有","第3ハウス｜学び・言葉",
+     "第4ハウス｜家庭・基盤","第5ハウス｜恋愛・創造","第6ハウス｜仕事・健康",
+     "第7ハウス｜パートナー","第8ハウス｜深い絆・継承","第9ハウス｜探究・遠く",
+     "第10ハウス｜社会・目標","第11ハウス｜仲間・願い","第12ハウス｜心の内側"];
+    const means=[
+     "いまのあなた自身の状態。周囲に見せている顔と、その内実。",
+     "金銭、収入、持ちものと才能。「自分のもの」との付き合い方。",
+     "学び、情報、コミュニケーション。日々の言葉のやり取り。",
+     "家庭、住まい、心の基盤。帰る場所の状態。",
+     "恋愛、創作、楽しみ。心が躍ることとの関わり。",
+     "仕事の実務、日課、健康。毎日の営みの調子。",
+     "パートナー、一対一の関係。あなたの前に立つ人。",
+     "深い信頼、共有する資源、受け継ぐもの。",
+     "探究、学問、旅、遠い世界。視野を広げる方向。",
+     "社会的な立場、キャリア、目指す頂。",
+     "友人、仲間、コミュニティ。未来への願い。",
+     "心の奥、ひとりの時間、秘めていること。見えない土台。"];
+    const arr=houses.map((h,i)=>{
+      const p=circlePos(i,12,40,50,48,180,-1);
+      return {label:h,x:+p.x.toFixed(1),y:+(p.y*0.98).toFixed(1),meaning:means[i]};
+    });
+    arr.push({label:"中央｜全体のテーマ",x:50,y:47,meaning:"十二の領域を貫く、いまのあなたの通奏低音。全体を束ねる一枚。"});
+    return arr;
+  })()
+ }
+};
+
+/* ================= デッキ生成 ================= */
+function buildDeck(){
+  const deck=[];
+  MAJOR.forEach((m,i)=>deck.push({type:"major",idx:i}));
+  Object.keys(SUITS).forEach(sk=>{
+    for(let r=1;r<=14;r++) deck.push({type:"minor",suit:sk,rank:r});
+  });
+  return deck;
+}
+function cardInfo(c){
+  if(c.type==="major"){
+    const m=MAJOR[c.idx];
+    return {name:m.name,en:m.en,num:m.num,sym:m.sym,kwU:m.kwU,kwR:m.kwR,isMajor:true,major:m};
+  }
+  const s=SUITS[c.suit], r=RANKS[c.rank], kw=MINOR_KW[c.suit][c.rank-1];
+  return {name:`${s.name}の${r.label}`,en:`${r.en} of ${s.en}`,
+    num:s.sym,sym:s.mark,kwU:kw[0],kwR:kw[1],isMajor:false,suitData:s,rankData:r};
+}
+function minorBody(c,rev){
+  const s=SUITS[c.suit], r=RANKS[c.rank];
+  const base=rev?r.rev:r.up;
+  return `${s.name}は${s.el}のエレメント——${s.lens}を映すスートです。その${r.label}は、${r.stageText}。ここでは${s.field}のあたりで、この段階のことが起きていると読めます。${base}`;
+}
+
+/* ================= 状態 ================= */
+let state={spread:null,question:"",drawn:[],openCount:0,phase:"select"};
+const $=id=>document.getElementById(id);
+const ORI=["正位置","逆位置"];
+
+/* ================= 星空 ================= */
+(function(){
+  const wrap=$("stars");
+  for(let i=0;i<110;i++){
+    const s=document.createElement("div");s.className="star";
+    const size=Math.random()*2+0.6;
+    s.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${(Math.random()*5+2.5).toFixed(1)}s;animation-delay:${(Math.random()*5).toFixed(1)}s`;
+    wrap.appendChild(s);
+  }
+})();
+
+/* ================= スプレッド選択画面 ================= */
+(function(){
+  const grid=$("spread-grid");
+  Object.values(SPREADS).forEach(sp=>{
+    const b=document.createElement("button");
+    b.className="spread-card";
+    const posArr = typeof sp.pos==="function"?sp.pos:sp.pos;
+    const mini=posArr.map(p=>`<span class="m-dot${p.rot?' rot':''}" style="left:${p.x}%;top:${p.y}%"></span>`).join("");
+    b.innerHTML=`<span class="sc-count">${sp.cards} CARDS</span>
+      <h3>${sp.name}</h3><p class="sc-en">${sp.en}</p>
+      <p class="sc-desc">${sp.desc}</p>
+      <div class="sc-mini">${mini}</div>`;
+    b.addEventListener("click",()=>selectSpread(sp.key));
+    grid.appendChild(b);
+  });
+})();
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $(id).classList.add("active");
+  window.scrollTo(0,0);
+}
+function selectSpread(key){
+  state.spread=SPREADS[key];
+  $("ask-spread-name").textContent=`${state.spread.name} — ${state.spread.cards}枚`;
+  $("ask-note").textContent=state.spread.note;
+  show("screen-ask");
+}
+$("btn-back-select").addEventListener("click",()=>show("screen-select"));
+$("btn-to-table").addEventListener("click",()=>{
+  state.question=$("question").value.trim();
+  setupTable();
+  show("screen-table");
+});
+
+/* ================= テーブル ================= */
+let fullDeck=[];
+function setupTable(){
+  state.drawn=[];state.openCount=0;state.phase="draw";
+  closePanel(true);
+  fullDeck=buildDeck();
+  const sp=state.spread;
+  $("th-spread").textContent=sp.name;
+  updateCount();
+  // slots
+  const slots=$("slots");slots.innerHTML="";
+  sp.pos.forEach((p,i)=>{
+    const d=document.createElement("div");d.className="slot";d.id="slot-"+i;
+    d.style.left=p.x+"%";d.style.top=p.y+"%";
+    d.style.setProperty("--rot",(p.rot||0)+"deg");
+    d.style.setProperty("--sc",sp.sc);
+    d.innerHTML=`<span class="slot-label">${p.label.split("｜")[0]}</span>`;
+    slots.appendChild(d);
+  });
+  markNextSlot();
+  // fan
+  const fan=$("deck-fan");fan.innerHTML="";
+  fan.classList.remove("fan-out");
+  $("btn-draw-all").style.display="";
+  $("btn-draw-all").textContent="残りを一気に引く";
+  $("btn-show-panel").style.display="none";
+  if(autoFlipTimer){clearInterval(autoFlipTimer);autoFlipTimer=null;}
+  const N=18,spreadDeg=132;
+  for(let i=0;i<N;i++){
+    const f=document.createElement("button");f.className="fan-card";
+    f.setAttribute("aria-label","山札からカードを引く");
+    f.style.setProperty("--a",(-spreadDeg/2+i*(spreadDeg/(N-1))).toFixed(1)+"deg");
+    f.style.zIndex=i;
+    f.addEventListener("click",()=>drawOne(f));
+    fan.appendChild(f);
+  }
+  $("cards-layer").innerHTML="";
+  $("cards-layer").classList.remove("can-flip");
+  $("hint").textContent="山札に触れて、一枚ずつ引いてください";
+}
+function updateCount(){
+  $("th-count").textContent=`${state.drawn.length} / ${state.spread.cards}`;
+}
+function markNextSlot(){
+  document.querySelectorAll(".slot").forEach(s=>s.classList.remove("next"));
+  const n=state.drawn.length;
+  if(n<state.spread.cards){const s=$("slot-"+n);if(s)s.classList.add("next");}
+}
+function drawOne(fanEl){
+  if(state.phase!=="draw")return;
+  const sp=state.spread;
+  if(state.drawn.length>=sp.cards)return;
+  const idx=Math.floor(Math.random()*fullDeck.length);
+  const card=fullDeck.splice(idx,1)[0];
+  const rev=Math.random()<0.5;
+  const posIndex=state.drawn.length;
+  state.drawn.push({card,rev,pos:sp.pos[posIndex]});
+  if(fanEl){fanEl.classList.add("drawn");}
+  else{
+    const rest=[...document.querySelectorAll(".fan-card:not(.drawn)")];
+    if(rest.length)rest[Math.floor(Math.random()*rest.length)].classList.add("drawn");
+  }
+  spawnCard(posIndex);
+  updateCount();markNextSlot();
+  if(state.drawn.length>=sp.cards){
+    state.phase="flip";
+    $("deck-fan").classList.add("fan-out");
+    $("cards-layer").classList.add("can-flip");
+    $("hint").textContent="すべて配られました。カードが順にひらきます——";
+    $("btn-draw-all").style.display="none";
+    setTimeout(startAutoFlip,900);
+  }
+}
+let autoFlipTimer=null;
+function startAutoFlip(){
+  if(state.phase!=="flip")return;
+  let i=0;
+  autoFlipTimer=setInterval(()=>{
+    while(i<state.spread.cards){
+      const el=$("card-"+i);
+      if(el&&!el.classList.contains("open"))break;
+      i++;
+    }
+    if(i>=state.spread.cards){clearInterval(autoFlipTimer);autoFlipTimer=null;return;}
+    flipCard(i);i++;
+  },480);
+}
+function spawnCard(i){
+  const d=state.drawn[i],sp=state.spread,info=cardInfo(d.card);
+  const el=document.createElement("div");
+  el.className="tcard"+(d.rev?" reversed":"");
+  el.id="card-"+i;
+  el.style.left="50%";el.style.top="104%";
+  el.style.setProperty("--rot","0deg");
+  el.style.setProperty("--sc",sp.sc);
+  el.innerHTML=`<div class="tcard-inner">
+    <div class="tface tback"></div>
+    <div class="tface tfront">
+      <span class="tf-num">${info.num}</span>
+      <span class="tf-sym">${info.sym}</span>
+      <span class="tf-name">${info.name}</span>
+      ${d.rev?'<span class="tf-rev">逆位置</span>':''}
+    </div></div>`;
+  el.addEventListener("click",()=>flipCard(i));
+  $("cards-layer").appendChild(el);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    el.style.left=d.pos.x+"%";el.style.top=d.pos.y+"%";
+    el.style.setProperty("--rot",(d.pos.rot||0)+"deg");
+  }));
+}
+function flipCard(i){
+  if(state.phase!=="flip"&&state.phase!=="done")return;
+  const el=$("card-"+i);
+  if(!el||el.classList.contains("open"))return;
+  el.classList.add("open");
+  state.openCount++;
+  if(state.openCount>=state.spread.cards&&state.phase==="flip"){
+    state.phase="done";
+    if(autoFlipTimer){clearInterval(autoFlipTimer);autoFlipTimer=null;}
+    $("hint").textContent="";
+    $("btn-show-panel").style.display="";
+    setTimeout(showVeilThenPanel,900);
+  }
+}
+$("btn-draw-all").addEventListener("click",()=>{
+  if(state.phase!=="draw")return;
+  let guard=0;
+  const t=setInterval(()=>{
+    if(state.phase!=="draw"){clearInterval(t);return;}
+    drawOne(null);guard++;
+    if(state.drawn.length>=state.spread.cards||guard>80)clearInterval(t);
+  },240);
+});
+$("btn-show-panel").addEventListener("click",()=>{
+  if($("panel-content").innerHTML)openPanel();
+  else showVeilThenPanel();
+});
+$("btn-restart-table").addEventListener("click",()=>{show("screen-select");closePanel(true);});
+
+function showVeilThenPanel(){
+  const v=$("veil");v.classList.add("show");
+  setTimeout(()=>{
+    buildPanel();
+    v.classList.remove("show");
+    openPanel();
+  },1600);
+}
+
+/* ================= 鑑定生成 ================= */
+function readingFor(d,posIndex){
+  const info=cardInfo(d.card);
+  const ori=d.rev?ORI[1]:ORI[0];
+  const kw=d.rev?info.kwR:info.kwU;
+  let body,structLines=[];
+  if(info.isMajor){
+    body=(d.rev?info.major.rev:info.major.up);
+    structLines.push(`大アルカナ ${info.num}番 —— 人生の大きなテーマを示す切り札`);
+    structLines.push(`${ori} × 「${d.pos.label.split("｜")[0]}」の位置`);
+  }else{
+    body=minorBody(d.card,d.rev);
+    const s=info.suitData,r=info.rankData;
+    structLines.push(`スート：${s.name}（${s.el}）＝ ${s.domain} の領域`);
+    structLines.push(`${r.court?"人物札":"数"}：${r.label} ＝ ${r.stage} の段階`);
+    structLines.push(`${ori} × 「${d.pos.label.split("｜")[0]}」の位置`);
+  }
+  const posLine=`「${d.pos.label.split("｜")[0]}」の位置に${ori}で出たこの一枚は、そこに「${kw.split("・")[0].trim()}」の気配が流れていることを示しています。`;
+  return {info,ori,kw,body,structLines,posLine};
+}
+function synthesize(){
+  const sp=state.spread,ds=state.drawn;
+  const majors=ds.filter(d=>d.card.type==="major");
+  const revs=ds.map((d,i)=>d.rev?i:-1).filter(i=>i>=0);
+  const elCount={火:0,水:0,風:0,地:0};
+  const nums=[];
+  ds.forEach(d=>{
+    if(d.card.type==="minor"){
+      elCount[SUITS[d.card.suit].el]++;
+      if(d.card.rank<=10)nums.push(d.card.rank);
+    }
+  });
+  const out=[];
+  // 大アルカナ比率
+  const mr=majors.length/ds.length;
+  let mTxt;
+  if(majors.length===0)mTxt="大アルカナは一枚もありません。この問いは運命の大波ではなく、日々の選択と工夫の範囲で十分に動かせるテーマです。手の届くところに舵があります。";
+  else if(mr>=0.6)mTxt=`${ds.length}枚中${majors.length}枚が大アルカナという、非常に濃い卓です。この問いは日常の工夫を超えた、人生の章の変わり目に触れています。流れそのものを尊重してください。`;
+  else if(mr>=0.34)mTxt=`大アルカナが${majors.length}枚。日常の問題に見えて、その奥に大きなテーマ——${majors.map(d=>MAJOR[d.card.idx].name).join("・")}——が横たわっています。`;
+  else mTxt=`大アルカナは${majors.length}枚（${majors.map(d=>MAJOR[d.card.idx].name).join("・")}）。全体としては現実的な調整の話ですが、この一点だけは軽く扱わないでください。`;
+  out.push({label:"切り札の枚数",text:mTxt});
+  // エレメント
+  const minorsN=ds.length-majors.length;
+  if(minorsN>=2){
+    const sorted=Object.entries(elCount).sort((a,b)=>b[1]-a[1]);
+    const top=sorted[0],zero=sorted.filter(e=>e[1]===0).map(e=>e[0]);
+    const elName={火:"情熱と行動",水:"感情と関係",風:"思考と言葉",地:"現実と暮らし"};
+    let eTxt="";
+    if(top[1]>=Math.max(2,Math.ceil(minorsN/2)))
+      eTxt=`エレメントは${top[0]}（${elName[top[0]]}）に重心があります。この問いの本丸は、${elName[top[0]]}のあたりにあると見てよいでしょう。`;
+    else eTxt="エレメントは大きく偏らず、複数の領域にまたがる問いです。ひとつの原因に絞り込みすぎない方が、実態に合います。";
+    if(zero.length&&zero.length<4&&minorsN>=3)
+      eTxt+=`一方で${zero.join("・")}のスートが不在です。${zero.map(z=>elName[z]).join("、")}の視点が、いまの見取り図から抜けているのかもしれません。`;
+    out.push({label:"エレメントの配分",text:eTxt});
+  }
+  // 正逆
+  let rTxt;
+  if(revs.length===0)rTxt="逆位置は一枚もなし。流れはよく通っています。迷いより、進め方の質を磨く段階です。";
+  else if(revs.length===ds.length)rTxt="すべて逆位置という、めずらしい卓です。外側の状況より、内側の見方が総点検を求めています。前提そのものを疑ってよいときです。";
+  else{
+    const labels=revs.map(i=>`「${ds[i].pos.label.split("｜")[0]}」`).join("・");
+    rTxt=`${ds.length}枚中${revs.length}枚が逆位置。引っかかりは${labels}に集中しています。全体が滞っているのではなく、この位置のテーマがほどけると、他も連鎖して流れ出します。`;
+  }
+  out.push({label:"正逆のバランス",text:rTxt});
+  // 数の推移
+  if(nums.length>=2){
+    let nTxt;
+    const asc=nums.every((n,i)=>i===0||n>=nums[i-1]);
+    const desc=nums.every((n,i)=>i===0||n<=nums[i-1]);
+    const seq=nums.join(" → ");
+    if(asc&&nums[0]!==nums[nums.length-1])nTxt=`数札は ${seq} と上昇しています。物事が段階を追って積み上がる、成長の流れです。`;
+    else if(desc&&nums[0]!==nums[nums.length-1])nTxt=`数札は ${seq} と下降しています。後退ではなく、一度ほどいて土台に戻る流れと読めます。`;
+    else nTxt=`数札は ${seq}。一直線ではなく、行きつ戻りつの推移です。焦らず、波として付き合ってください。`;
+    out.push({label:"数字の推移",text:nTxt});
+  }
+  // 物語
+  const kws=ds.map(d=>{
+    const info=cardInfo(d.card);
+    return (d.rev?info.kwR:info.kwU).split("・")[0].trim();
+  });
+  let story;
+  if(ds.length===1)story=`今日の一枚が差し出したのは「${kws[0]}」。この言葉を、今日一日の胸ポケットに入れて過ごしてみてください。`;
+  else story=`卓の上のキーワードを並べると——${kws.map(k=>`「${k}」`).join("、")}。${sp.cards}枚がひとつの声で語っているのは、いまが物語の途中だということです。結末は固定されていません。この読みを地図に、次の一歩はあなたが選んでください。`;
+  return {items:out,story};
+}
+
+function buildPanel(){
+  const sp=state.spread;
+  const c=$("panel-content");
+  let html=`<div class="p-head">
+    <p class="p-spread">${sp.name} ・ ${sp.cards}枚</p>
+    ${state.question?`<p class="p-q">${escapeHtml(state.question)}</p>`:""}
+  </div>`;
+  state.drawn.forEach((d,i)=>{
+    const r=readingFor(d,i);
+    html+=`<div class="reading">
+      <p class="r-pos">${i+1}枚目 ・ ${d.pos.label}</p>
+      <p class="r-posmean">${d.pos.meaning}</p>
+      <h4>${r.info.name}</h4>
+      <p class="r-en">${r.info.en}</p>
+      <span class="r-ori${d.rev?" rev":""}">${r.ori}</span>
+      <p class="r-kw">${r.kw}</p>
+      <p class="r-body">${r.posLine}${r.body}</p>
+      <div class="r-struct"><span class="rs-t">読みの構造</span>${r.structLines.join("<br>")}</div>
+    </div>`;
+  });
+  const syn=synthesize();
+  html+=`<div class="synth"><h3>卓の構成から</h3>`;
+  syn.items.forEach(it=>{
+    html+=`<div class="s-item"><p class="s-label">${it.label}</p><p class="s-text">${it.text}</p></div>`;
+  });
+  html+=`<div class="s-story">${syn.story}</div></div>
+  <div class="p-actions">
+    <button class="btn-gold" id="btn-copy">テキストをコピー</button>
+    <button class="btn-share" id="btn-share-x">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      Xでシェア
+    </button>
+    <button class="btn-share" id="btn-share-line">
+      <svg class="stroke" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.4c0 4.1-4 7.4-9 7.4-.9 0-1.8-.1-2.6-.3L4.5 21l1.3-3.6C4.1 16 3 13.8 3 11.4 3 7.3 7 4 12 4s9 3.3 9 7.4z"/></svg>
+      LINEで送る
+    </button>
+  </div>
+  <div class="p-actions p-actions-sub">
+    <button class="btn-ghost" id="btn-again">同じ形でもう一度</button>
+    <button class="btn-ghost" id="btn-newspread">スプレッドを変える</button>
+  </div>
+  <p class="p-close-line">— Yoi no Uranai-dokoro —</p>
+  <div class="p-footer">
+    <div class="pf-rule"></div>
+    <a class="pf-link" href="${ASTRO_URL}" target="_blank" rel="noopener">占星術での読み解きはこちら</a>
+    <p class="pf-credit">制作｜<a href="${AUTHOR_URL}" target="_blank" rel="noopener">${AUTHOR_NAME}</a></p>
+  </div>`;
+  c.innerHTML=html;
+  $("btn-copy").addEventListener("click",copyReading);
+  $("btn-share-x").addEventListener("click",shareToX);
+  $("btn-share-line").addEventListener("click",shareToLine);
+  $("btn-again").addEventListener("click",()=>{closePanel(true);setupTable();});
+  $("btn-newspread").addEventListener("click",()=>{closePanel(true);show("screen-select");});
+}
+
+/* ================= シェア ================= */
+/* 全文は載せず、引いたスプレッド名だけを渡す（余韻を壊さないため） */
+function shareText(){
+  return `「${state.spread.name}」を引きました。\n\n宵の占い処 — スプレッド選択式タロット`;
+}
+function openShare(url){
+  window.open(url,"_blank","noopener,noreferrer,width=600,height=640");
+}
+function shareToX(){
+  openShare(`https://x.com/intent/tweet?text=${encodeURIComponent(shareText())}&url=${encodeURIComponent(SITE_URL)}`);
+}
+function shareToLine(){
+  openShare(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(SITE_URL)}&text=${encodeURIComponent(shareText())}`);
+}
+function copyReading(){
+  const sp=state.spread;
+  let t=`【${sp.name} ・ ${sp.cards}枚】\n`;
+  if(state.question)t+=`問い：${state.question}\n`;
+  t+="\n";
+  state.drawn.forEach((d,i)=>{
+    const r=readingFor(d,i);
+    t+=`◆ ${d.pos.label}\n${r.info.name}（${r.ori}）\nキーワード：${r.kw}\n${r.posLine}${r.body}\n\n`;
+  });
+  const syn=synthesize();
+  t+="◆ 卓の構成から\n";
+  syn.items.forEach(it=>{t+=`・${it.label}：${it.text}\n`;});
+  t+=`\n${syn.story}\n\n— 宵の占い処 —`;
+  const done=()=>{const to=$("toast");to.classList.add("show");setTimeout(()=>to.classList.remove("show"),1800);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(done).catch(()=>fallbackCopy(t,done));
+  }else fallbackCopy(t,done);
+}
+function fallbackCopy(t,done){
+  const ta=document.createElement("textarea");ta.value=t;
+  ta.style.position="fixed";ta.style.opacity="0";
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand("copy");done();}catch(e){}
+  document.body.removeChild(ta);
+}
+/* パネル開閉 */
+let panelOpen=false;
+function openPanel(){$("panel").classList.add("show");$("panel").setAttribute("aria-hidden","false");panelOpen=true;}
+function closePanel(hard){$("panel").classList.remove("show");$("panel").setAttribute("aria-hidden","true");panelOpen=false;if(hard)$("panel-content").innerHTML="";}
+$("panel-grip").addEventListener("click",()=>{
+  if(panelOpen){closePanel(false);}
+  else if($("panel-content").innerHTML){openPanel();}
+});
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
+
+</script>
+</body>
+</html>

@@ -112,6 +112,54 @@ button{font-family:var(--serif-jp);cursor:pointer;letter-spacing:.12em}
   transform:translate(-50%,-50%);
 }
 .sc-mini .m-dot.rot{transform:translate(-50%,-50%) rotate(90deg)}
+/* 会員限定のスプレッド */
+.spread-card.locked{opacity:.72}
+.spread-card.locked:hover,.spread-card.locked:focus-visible{
+  transform:none;border-color:rgba(216,180,106,.22);box-shadow:none;
+}
+.spread-card .sc-lock{
+  position:absolute;top:36px;right:18px;
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.62rem;letter-spacing:.14em;color:var(--gold);
+  border:1px solid var(--gold-dim);border-radius:999px;
+  padding:3px 10px;background:rgba(216,180,106,.06);
+}
+.spread-card .sc-lock svg{width:9px;height:9px;fill:none;stroke:currentColor;stroke-width:1.7;flex:none}
+/* 会員限定モーダル */
+#gate{
+  position:fixed;inset:0;z-index:50;padding:24px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(11,14,30,.9);
+  opacity:0;pointer-events:none;transition:opacity .45s;
+}
+#gate.show{opacity:1;pointer-events:auto}
+.gate-box{
+  width:100%;max-width:376px;text-align:center;padding:32px 26px 26px;
+  background:linear-gradient(170deg,#1b1f45 0%, #141833 100%);
+  border:1px solid var(--gold-dim);border-radius:16px;
+  box-shadow:0 24px 60px rgba(0,0,0,.6), 0 0 30px rgba(216,180,106,.06);
+  transform:translateY(14px) scale(.985);
+  transition:transform .45s cubic-bezier(.25,.9,.3,1);
+}
+#gate.show .gate-box{transform:none}
+.gate-box .gate-mark{font-size:.86rem;letter-spacing:.34em;color:var(--gold);opacity:.75}
+.gate-box h2{font-size:.92rem;font-weight:500;letter-spacing:.28em;color:var(--gold-bright);margin-top:12px}
+.gate-box .gate-text{font-size:.82rem;line-height:2.1;color:var(--ink-dim);margin-top:4px;text-wrap:balance}
+.gate-box .gate-text .gt-name{color:var(--ink)}
+.gate-actions{display:flex;flex-direction:column;gap:10px;margin-top:26px}
+.btn-gate-line{
+  display:block;text-decoration:none;text-align:center;
+  background:linear-gradient(160deg,rgba(216,180,106,.16),rgba(216,180,106,.06));
+  border:1px solid var(--gold-dim);color:var(--gold-bright);
+  padding:13px 20px;border-radius:999px;font-size:.84rem;letter-spacing:.12em;
+  transition:all .35s;
+}
+.btn-gate-line:hover,.btn-gate-line:focus-visible{border-color:var(--gold);box-shadow:0 0 24px rgba(216,180,106,.22)}
+.btn-gate-close{
+  background:none;border:1px solid rgba(236,230,216,.2);color:var(--ink-dim);
+  padding:12px 20px;border-radius:999px;font-size:.8rem;transition:all .3s;
+}
+.btn-gate-close:hover,.btn-gate-close:focus-visible{color:var(--ink);border-color:rgba(236,230,216,.45)}
 /* ---------- 問い入力 ---------- */
 #screen-ask{justify-content:center}
 .ask-box{width:100%;max-width:480px;text-align:center}
@@ -406,15 +454,34 @@ textarea#question:focus{outline:none;border-color:var(--gold);box-shadow:0 0 16p
   <div id="panel-body"><div class="p-inner" id="panel-content"></div></div>
 </div>
 
+<!-- 会員限定モーダル -->
+<div id="gate" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+  <div class="gate-box">
+    <p class="gate-mark">✧</p>
+    <h2 id="gate-title">会員限定のスプレッド</h2>
+    <div class="gold-rule" style="width:80px;margin:16px auto 0"></div>
+    <p class="gate-text"><span class="gt-name" id="gate-name"></span>は、会員の方にお使いいただける卓です。<br><span id="gate-open"></span></p>
+    <div class="gate-actions">
+      <a class="btn-gate-line" id="gate-line" href="#" target="_blank" rel="noopener">公開のお知らせを受け取る</a>
+      <button class="btn-gate-close" id="gate-close">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <div id="veil"><p>あなたの卓を、読み解いています</p></div>
 <div id="toast">コピーしました</div>
 
 <script>
 /* ================= ▼リンク設定（変更はここだけ）▼ ================= */
 const SITE_URL   = "https://omasuuranaishi-a11y.github.io/tarot-cards/spreads/"; // headのog:urlと揃える
-const ASTRO_URL  = "https://lin.ee/zI0K08R";                 // 占星術での読み解き → 公式LINE
+const LINE_URL   = "https://lin.ee/zI0K08R";                 // 公式LINE（フッター＆会員限定モーダル共通）
+const ASTRO_URL  = LINE_URL;                                 // 占星術での読み解き → 公式LINE
 const AUTHOR_URL = "https://www.instagram.com/omasu_horoscope/"; // 制作者名 → Instagram
 const AUTHOR_NAME= "おます";
+
+/* 会員限定にするスプレッド。公開するときはこの配列から key を消すだけでよい */
+const MEMBER_ONLY = ["choice","hex","celtic","horo"];
+const MEMBER_OPEN = "9月の公開を予定しています。";
 /* ================= ▲ここまで▲ ================= */
 
 /* ================= カードデータ ================= */
@@ -732,10 +799,13 @@ const ORI=["正位置","逆位置"];
   const grid=$("spread-grid");
   Object.values(SPREADS).forEach(sp=>{
     const b=document.createElement("button");
-    b.className="spread-card";
+    const locked=isLocked(sp.key);
+    b.className="spread-card"+(locked?" locked":"");
+    if(locked)b.setAttribute("aria-label",`${sp.name}（会員限定）`);
     const posArr = typeof sp.pos==="function"?sp.pos:sp.pos;
     const mini=posArr.map(p=>`<span class="m-dot${p.rot?' rot':''}" style="left:${p.x}%;top:${p.y}%"></span>`).join("");
     b.innerHTML=`<span class="sc-count">${sp.cards} CARDS</span>
+      ${locked?`<span class="sc-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>会員限定</span>`:""}
       <h3>${sp.name}</h3><p class="sc-en">${sp.en}</p>
       <p class="sc-desc">${sp.desc}</p>
       <div class="sc-mini">${mini}</div>`;
@@ -749,7 +819,32 @@ function show(id){
   $(id).classList.add("active");
   window.scrollTo(0,0);
 }
+/* ================= 会員限定ゲート ================= */
+function isLocked(key){return MEMBER_ONLY.indexOf(key)>=0;}
+let gateReturnFocus=null;
+function openGate(sp){
+  gateReturnFocus=document.activeElement;
+  $("gate-name").textContent=`「${sp.name}」`;
+  $("gate-open").textContent=MEMBER_OPEN;
+  $("gate-line").href=LINE_URL;
+  const g=$("gate");
+  g.classList.add("show");g.setAttribute("aria-hidden","false");
+  setTimeout(()=>$("gate-close").focus(),60);
+}
+function closeGate(){
+  const g=$("gate");
+  g.classList.remove("show");g.setAttribute("aria-hidden","true");
+  if(gateReturnFocus&&gateReturnFocus.focus)gateReturnFocus.focus();
+  gateReturnFocus=null;
+}
+$("gate-close").addEventListener("click",closeGate);
+$("gate").addEventListener("click",e=>{if(e.target===$("gate"))closeGate();});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&$("gate").classList.contains("show"))closeGate();
+});
+
 function selectSpread(key){
+  if(isLocked(key)){openGate(SPREADS[key]);return;}
   state.spread=SPREADS[key];
   $("ask-spread-name").textContent=`${state.spread.name} — ${state.spread.cards}枚`;
   $("ask-note").textContent=state.spread.note;

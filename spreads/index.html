@@ -209,7 +209,12 @@ textarea#question:focus{outline:none;border-color:var(--gold);box-shadow:0 0 16p
   background:radial-gradient(circle at 50% 42%, #343a6e 0%, #1a1e42 70%, transparent 100%);
 }
 #table-area{
-  position:relative;width:min(94vw,540px);aspect-ratio:1/1.06;margin:0 auto;
+  position:relative;aspect-ratio:1/1.06;
+  /* 下の余白は、扇が卓からはみ出す分の逃げ場（案内文とボタンに重ねない） */
+  margin:0 auto 70px;
+  /* 画面が低いときは卓を縮めて、下の案内文とボタンを切らせない */
+  height:min(calc(94vw * 1.06), 572px, calc(100dvh - 318px));
+  width:auto;
 }
 #round-table{
   position:absolute;inset:0;border-radius:50%;
@@ -297,7 +302,7 @@ textarea#question:focus{outline:none;border-color:var(--gold);box-shadow:0 0 16p
   position:absolute;left:50%;bottom:6px;width:54px;height:86px;border-radius:5px;
   background:linear-gradient(155deg,#38306c 0%, #221d4e 60%, #151134 100%);
   border:1px solid rgba(216,180,106,.45);
-  transform-origin:50% 200%;
+  transform-origin:50% 165%;
   transform:translateX(-50%) rotate(var(--a)) translateY(var(--lift,0px));
   box-shadow:0 4px 12px rgba(0,0,0,.5);
   pointer-events:auto;cursor:pointer;
@@ -900,7 +905,7 @@ function setupTable(){
   $("btn-draw-all").textContent="残りを一気に引く";
   $("btn-show-panel").style.display="none";
   if(autoFlipTimer){clearInterval(autoFlipTimer);autoFlipTimer=null;}
-  const N=18,spreadDeg=132;
+  const N=18,spreadDeg=112;
   for(let i=0;i<N;i++){
     const f=document.createElement("button");f.className="fan-card";
     f.setAttribute("aria-label","山札からカードを引く");

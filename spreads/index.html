@@ -295,8 +295,14 @@ textarea#question:focus{outline:none;border-color:var(--gold);box-shadow:0 0 16p
 #cards-layer{position:absolute;inset:0;z-index:5;pointer-events:none}
 #cards-layer .tcard{pointer-events:none}
 #cards-layer.can-flip .tcard{pointer-events:auto}
-#deck-fan{position:absolute;left:0;bottom:-4%;width:100%;height:30%;pointer-events:none;z-index:3;transition:opacity .7s, transform .7s}
-#deck-fan.fan-out{opacity:0;transform:translateY(60px);pointer-events:none}
+/* 扇そのものをタップ面にする。カードの隙間や周囲を押しても引けるようにするため */
+#deck-fan{
+  position:absolute;left:50%;transform:translateX(-50%);bottom:-4%;
+  width:min(90%,320px);height:40%;
+  pointer-events:auto;cursor:pointer;z-index:3;
+  transition:opacity .7s, transform .7s;
+}
+#deck-fan.fan-out{opacity:0;transform:translateX(-50%) translateY(60px);pointer-events:none}
 #deck-fan.fan-out .fan-card{pointer-events:none}
 .fan-card{
   position:absolute;left:50%;bottom:6px;width:54px;height:86px;border-radius:5px;
@@ -1011,6 +1017,22 @@ $("btn-draw-all").addEventListener("click",()=>{
     if(state.drawn.length>=state.spread.cards||guard>80)clearInterval(t);
   },240);
 });
+/* 扇の隙間や周囲を押したときは、いちばん近いカードを引く */
+function nearestFanCard(clientX){
+  const rest=[...document.querySelectorAll(".fan-card:not(.drawn)")];
+  if(!rest.length)return null;
+  let best=rest[0],bd=Infinity;
+  rest.forEach(c=>{
+    const r=c.getBoundingClientRect(),d=Math.abs((r.left+r.right)/2-clientX);
+    if(d<bd){bd=d;best=c;}
+  });
+  return best;
+}
+$("deck-fan").addEventListener("click",e=>{
+  if(e.target!==$("deck-fan"))return;  // カード自体のクリックは各カードのハンドラが処理する
+  drawOne(nearestFanCard(e.clientX));
+});
+
 $("btn-show-panel").addEventListener("click",()=>{
   if($("panel-content").innerHTML)openPanel();
   else showVeilThenPanel();

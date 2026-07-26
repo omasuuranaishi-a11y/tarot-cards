@@ -39,6 +39,9 @@
   --ink-dim:#a9a293;
   --violet:#6f5fae;
   --violet-glow:rgba(140,120,220,.55);
+  /* 星を透かさないための不透明な下地 */
+  --panel-a:#1a1f45;
+  --panel-b:#151935;
   --card-w:64px;
   --card-h:100px;
   --serif-jp:'Noto Serif JP',serif;
@@ -56,8 +59,8 @@ body{
 }
 /* ---------- 星空 ---------- */
 #stars{position:fixed;inset:0;pointer-events:none;z-index:0}
-.star{position:absolute;border-radius:50%;background:#fff;opacity:.5;animation:twinkle var(--d,4s) ease-in-out infinite}
-@keyframes twinkle{0%,100%{opacity:.15}50%{opacity:.8}}
+.star{position:absolute;border-radius:50%;background:#fff;opacity:.38;animation:twinkle var(--d,4s) ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.58}}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.15s!important}
 }
@@ -70,13 +73,14 @@ h1{font-weight:500;font-size:1.5rem;letter-spacing:.28em;color:var(--gold-bright
 .gold-rule{width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:18px auto}
 button{font-family:var(--serif-jp);cursor:pointer;letter-spacing:.12em}
 .btn-gold{
-  background:linear-gradient(160deg,rgba(216,180,106,.16),rgba(216,180,106,.06));
+  background:linear-gradient(160deg,rgba(216,180,106,.16),rgba(216,180,106,.06)),
+             linear-gradient(160deg,var(--panel-a),var(--panel-b));
   border:1px solid var(--gold-dim);color:var(--gold-bright);
   padding:13px 34px;border-radius:999px;font-size:.92rem;
   transition:all .35s;
 }
 .btn-gold:hover{border-color:var(--gold);box-shadow:0 0 24px rgba(216,180,106,.25)}
-.btn-ghost{background:none;border:1px solid rgba(236,230,216,.22);color:var(--ink-dim);padding:11px 26px;border-radius:999px;font-size:.82rem;transition:all .3s}
+.btn-ghost{background:linear-gradient(160deg,var(--panel-a),var(--panel-b));border:1px solid rgba(236,230,216,.22);color:var(--ink-dim);padding:11px 26px;border-radius:999px;font-size:.82rem;transition:all .3s}
 .btn-ghost:hover{color:var(--ink);border-color:rgba(236,230,216,.5)}
 /* ---------- スプレッド選択 ---------- */
 #screen-select .spread-grid{
@@ -85,7 +89,8 @@ button{font-family:var(--serif-jp);cursor:pointer;letter-spacing:.12em}
 }
 .spread-card{
   position:relative;
-  background:linear-gradient(170deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+  background:linear-gradient(170deg,rgba(255,255,255,.05),rgba(255,255,255,.014)),
+             linear-gradient(170deg,var(--panel-a),var(--panel-b));
   border:1px solid rgba(216,180,106,.22);
   border-radius:14px;padding:22px 20px 18px;text-align:left;
   color:var(--ink);transition:all .4s;overflow:hidden;
@@ -113,7 +118,15 @@ button{font-family:var(--serif-jp);cursor:pointer;letter-spacing:.12em}
 }
 .sc-mini .m-dot.rot{transform:translate(-50%,-50%) rotate(90deg)}
 /* 会員限定のスプレッド */
-.spread-card.locked{opacity:.72}
+/* opacityで沈めると星が透けるので、色を落として沈める */
+.spread-card.locked{
+  background:linear-gradient(170deg,rgba(255,255,255,.026),rgba(255,255,255,.008)),
+             linear-gradient(170deg,#161a3a,#12162f);
+  border-color:rgba(216,180,106,.15);
+}
+.spread-card.locked h3{color:rgba(240,214,154,.6)}
+.spread-card.locked .sc-count,.spread-card.locked .sc-en,.spread-card.locked .sc-desc{opacity:.62}
+.spread-card.locked .sc-mini{opacity:.5}
 .spread-card.locked:hover,.spread-card.locked:focus-visible{
   transform:none;border-color:rgba(216,180,106,.22);box-shadow:none;
 }
@@ -166,7 +179,9 @@ button{font-family:var(--serif-jp);cursor:pointer;letter-spacing:.12em}
 .ask-box .spread-label{font-size:.8rem;color:var(--gold);letter-spacing:.3em;margin-bottom:8px}
 textarea#question{
   width:100%;min-height:96px;margin-top:20px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(216,180,106,.25);
+  background:linear-gradient(170deg,rgba(255,255,255,.05),rgba(255,255,255,.02)),
+             linear-gradient(170deg,var(--panel-a),var(--panel-b));
+  border:1px solid rgba(216,180,106,.25);
   border-radius:10px;padding:14px;color:var(--ink);font-family:var(--serif-jp);
   font-size:.9rem;line-height:1.9;resize:vertical;letter-spacing:.05em;
 }
@@ -354,7 +369,8 @@ textarea#question:focus{outline:none;border-color:var(--gold);box-shadow:0 0 16p
 /* シェア（金の細枠・主役のコピーボタンと競合させない） */
 .btn-share{
   display:inline-flex;align-items:center;gap:9px;
-  background:none;border:1px solid var(--gold-dim);color:var(--gold);
+  background:linear-gradient(160deg,var(--panel-a),var(--panel-b));
+  border:1px solid var(--gold-dim);color:var(--gold);
   padding:11px 22px;border-radius:999px;font-size:.8rem;
   transition:all .3s;
 }

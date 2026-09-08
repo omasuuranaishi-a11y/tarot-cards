@@ -4,24 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>宵の占い処 — スプレッド選択式タロット</title>
-<meta name="description" content="一枚の声から、十二の空まで。スプレッド選択式のタロット">
+<meta name="description" content="一枚のひと言から、三枚で読む時の流れまで。スプレッド選択式のタロット">
 
 <!-- ▼▼ 公開URL（GitHub Pages）。移転したらこの3行とJS側のSITE_URLを直す ▼▼ -->
 <meta property="og:url" content="https://omasuuranaishi-a11y.github.io/tarot-cards/spreads/">
 <meta property="og:image" content="https://omasuuranaishi-a11y.github.io/tarot-cards/spreads/ogp.png">
-<link rel="canonical" href="https://omasuuranaishi-a11y.github.io/tarot-cards/spreads/">
+<link rel="canonical" href="https://omasu-official.onrender.com/tarot/">
 <!-- ▲▲ ここまで ▲▲ -->
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="宵の占い処">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:title" content="宵の占い処 — スプレッド選択式タロット">
-<meta property="og:description" content="一枚の声から、十二の空まで。スプレッド選択式のタロット">
+<meta property="og:description" content="一枚のひと言から、三枚で読む時の流れまで。スプレッド選択式のタロット">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="宵の占い処 — スプレッド選択式タロット">
-<meta name="twitter:description" content="一枚の声から、十二の空まで。スプレッド選択式のタロット">
+<meta name="twitter:description" content="一枚のひと言から、三枚で読む時の流れまで。スプレッド選択式のタロット">
 <meta name="twitter:image" content="https://omasuuranaishi-a11y.github.io/tarot-cards/spreads/ogp.png">
 <meta name="theme-color" content="#0b0e1e">
 
@@ -434,7 +434,8 @@ textarea#question:focus{outline:none;border-color:var(--gold);box-shadow:0 0 16p
 <section class="screen active" id="screen-select">
   <p class="brand">Yoi no Uranai-dokoro</p>
   <h1>宵の占い処</h1>
-  <p class="subtitle">問いの深さに合わせて、卓の並べ方を選んでください。<br>一枚の声から、十二の空まで。</p>
+  <p style="font-size:1rem;line-height:1.9;margin:20px auto;max-width:34em">公式サイト版はこちらです。<br><a href="https://omasu-official.onrender.com/tarot/" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:4px">公式サイトでタロットを開く →</a></p>
+  <p class="subtitle">問いの深さに合わせて、卓の並べ方を選んでください。<br>一枚のひと言から、三枚で読む時の流れまで。</p>
   <div class="gold-rule"></div>
   <div class="spread-grid" id="spread-grid"></div>
 </section>
@@ -500,15 +501,15 @@ textarea#question:focus{outline:none;border-color:var(--gold);box-shadow:0 0 16p
 
 <script>
 /* ================= ▼リンク設定（変更はここだけ）▼ ================= */
-const SITE_URL   = "https://omasuuranaishi-a11y.github.io/tarot-cards/spreads/"; // headのog:urlと揃える
+const SITE_URL   = "https://omasu-official.onrender.com/tarot/"; // シェア先は公式サイト版に統一
 const LINE_URL   = "https://lin.ee/zI0K08R";                 // 公式LINE（フッター＆会員限定モーダル共通）
-const ASTRO_URL  = LINE_URL;                                 // 占星術での読み解き → 公式LINE
+const ASTRO_URL  = "https://omasuhoroscope.stores.jp/items/6a7808293ffe3e076fdcb962";                                 // わたしのトリセツの商品案内
 const AUTHOR_URL = "https://www.instagram.com/omasu_horoscope/"; // 制作者名 → Instagram
 const AUTHOR_NAME= "おます";
 
 /* 会員限定にするスプレッド。公開するときはこの配列から key を消すだけでよい */
 const MEMBER_ONLY = ["choice","hex","celtic","horo"];
-const MEMBER_OPEN = "9月の公開を予定しています。";
+const MEMBER_OPEN = "公開時期・利用方法は未定です。";
 /* ================= ▲ここまで▲ ================= */
 
 /* ================= カードデータ ================= */
@@ -824,7 +825,7 @@ const ORI=["正位置","逆位置"];
 /* ================= スプレッド選択画面 ================= */
 (function(){
   const grid=$("spread-grid");
-  Object.values(SPREADS).forEach(sp=>{
+  Object.values(SPREADS).filter(sp=>!isLocked(sp.key)).forEach(sp=>{
     const b=document.createElement("button");
     const locked=isLocked(sp.key);
     b.className="spread-card"+(locked?" locked":"");
@@ -1178,7 +1179,8 @@ function buildPanel(){
   <p class="p-close-line">— Yoi no Uranai-dokoro —</p>
   <div class="p-footer">
     <div class="pf-rule"></div>
-    <a class="pf-link" href="${ASTRO_URL}" target="_blank" rel="noopener">占星術での読み解きはこちら</a>
+    <p>いまの気持ちを整理したら、あなた自身のことも。<br>生まれたときの星から読む「わたしのトリセツ」</p>
+    <a class="pf-link" href="${ASTRO_URL}" target="_blank" rel="noopener">「わたしのトリセツ」の内容を見る</a>
     <p class="pf-credit">制作｜<a href="${AUTHOR_URL}" target="_blank" rel="noopener">${AUTHOR_NAME}</a></p>
   </div>`;
   c.innerHTML=html;

@@ -258,7 +258,18 @@
     const hd = div('', `<span class="no"></span><span class="tt"></span><span class="rule"></span>`, stage); hd.id = 'heading';
     const bd = div('', '無音・仮タイミング ｜ 全編 v1', stage); bd.id = 'badge';
     const sb = div('', `<div id="subtext"></div>`, stage); sb.id = 'sub';
-    const wp = div('', `<div class="ring"><svg viewBox="0 0 140 140"><circle cx="70" cy="58" r="24" fill="rgba(250,248,244,.55)"/><path d="M26,140 C30,100 50,88 70,88 C90,88 110,100 114,140 Z" fill="rgba(250,248,244,.55)"/></svg></div><div class="nm">おます</div><div class="ph">アイコン仮</div>`, stage);
+    // ワイプ：本人のアイコン（1080x1080）の顔まわりを丸く切り出し、口と目だけを重ねて動かす
+    const FACE = '#FFFFFB', LINE = '#645F54', DARK = '#3D3C42';
+    const wp = div('', `<div class="ring"><svg viewBox="290 205 500 500">
+      <image href="${E.ICON || '../lib/icon.png'}" x="0" y="0" width="1080" height="1080"/>
+      <g id="blink" opacity="0">
+        <ellipse cx="442" cy="504" rx="26" ry="21" fill="${FACE}"/><ellipse cx="590" cy="503" rx="27" ry="22" fill="${FACE}"/>
+        <path d="M419,509 Q442,522 465,509 M566,508 Q590,521 614,508" fill="none" stroke="${LINE}" stroke-width="7" stroke-linecap="round"/>
+      </g>
+      <ellipse cx="505" cy="584.5" rx="13" ry="10" fill="${FACE}"/>
+      <ellipse id="mouth" cx="505" cy="585" rx="8" ry="4.5" fill="${LINE}"/>
+      <ellipse id="mouthIn" cx="505" cy="586" rx="4.5" ry="0" fill="${DARK}"/>
+    </svg></div><div class="nm">おます</div><div class="ph">口の動きは仮（音声未収録）</div>`, stage);
     wp.id = 'wipe';
   }
 
@@ -293,6 +304,20 @@
     // ワイプ：挿絵・比較図の場面では下げる
     const wv = clamp(1 - hideWipe * 1.2), wp = document.getElementById('wipe');
     wp.style.opacity = wv.toFixed(3); wp.style.transform = `translateY(${((1 - wv) * 16).toFixed(1)}px)`;
+    // 口：読んでいる文の間だけ開閉（仮。録音後は音声の大きさで動かす）
+    let speaking = 0;
+    for (const u of E.units) {
+      if (t < u.start || t > u.end) continue;
+      u.ss.forEach((a, k) => { speaking = Math.max(speaking, Math.min(clamp((t - a) / .12), clamp((u.se[k] - .05 - t) / .12))); });
+    }
+    const syl = Math.max(0, .55 * Math.sin(2 * Math.PI * 4.1 * t) + .35 * Math.sin(2 * Math.PI * 6.7 * t + 1.3) + .2 * Math.sin(2 * Math.PI * 2.3 * t + .4));
+    const open = clamp(speaking * syl);
+    document.getElementById('mouth').setAttribute('ry', (4.5 + open * 6).toFixed(2));
+    document.getElementById('mouth').setAttribute('rx', (8 + open * 1.5).toFixed(2));
+    document.getElementById('mouthIn').setAttribute('ry', Math.max(0, open * 6 - 1.5).toFixed(2));
+    // 瞬き：3〜5秒ごとに0.15秒
+    const k = Math.floor(t / 4.1), bt = k * 4.1 + 1.6 + 1.2 * Math.sin(k * 1.7);
+    document.getElementById('blink').setAttribute('opacity', (t >= bt && t < bt + .15) ? 1 : 0);
   };
 
   E.scene = (name, fn) => { E.scenes[name] = fn; };

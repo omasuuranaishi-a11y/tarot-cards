@@ -14,12 +14,12 @@
 | `03_編集表.md` | 全編 v3 の94場面ごとの「時刻／長さ／画面／注目対象／動き／読む文」と、v2・v3 で変えたこと・章タイトルの時刻・実写に差し替えた場面 |
 | `04_素材出典と利用条件.md` | 使った素材、利用条件（v3 の Mixkit の素材ごとの出典・ライセンス・確認日を含む）、未検証の項目 |
 | `05_概要欄の案.md` | YouTube の題と概要欄の下書き（チャプターの時刻は仮、Mixkit のクレジット入り）。投稿はしていない |
-| `full-v3/newmoon-full-v3.mp4` | **全編の仮編集 v3**（約26分01秒、1920×1080、30fps、無音・仮タイミング）。一部の挿絵を実写（イメージ）に差し替え |
+| `full-v3/newmoon-full-v3.mp4` | **全編の仮編集 v3**（約26分08秒・47,051コマ、1920×1080、30fps、無音・仮タイミング）。一部の挿絵を実写（イメージ）に差し替え |
 | `full-v3/review.html` | 全編 v3 のレビュー。動画と、章ごと・場面ごとの読む文（実写の場面は素材名つき）を並べて確認できる |
 | `full-v3/index.html`、`full-v3/v3.js`、`full-v3/full.css` | v3 の作り。v2 の `v2.js` の後に `v3.js` を読み、差し替える場面を実写の場面（`lib/footage.js`）にする。`full.css` は v2 に実写の重ね・「イメージ」の表記を足したもの |
 | `full-v3/timeline.json` | v3 の場面ごとの時刻 |
 | `tools/stock.tsv`、`tools/fetch_stock.sh` | 実写素材の一覧（場面・題・ページ・切り出し方）と、取得して 30fps の JPEG 連番を作るスクリプト。素材そのものは `stock/` に置き、GitHub には入れない |
-| `full-v2/newmoon-full-v2.mp4` | 全編の仮編集 v2（約26分01秒）。v3 の前の版として残している |
+| `full-v2/newmoon-full-v2.mp4` | 全編の仮編集 v2（約26分01秒）。v3 の前の版として残している。締め（13-4）に一文を足す前の書き出し |
 | `full-v2/review.html` | 全編 v2 のレビュー。動画と、章ごと・場面ごとの読む文を並べて確認できる |
 | `full-v2/index.html`、`full-v2/v2.js`、`full-v2/full.css` | v2 の作り。読む文と画面の動きは v1 と同じ `full/chapters.js` を使い、`v2.js` で冒頭と締めの画面を差し替え、`full.css` で字幕などを変えている |
 | `full-v2/timeline.json` | v2 の場面ごとの時刻（`review.html` と `03_編集表.md` の元データ） |
@@ -50,7 +50,7 @@ node tools/render.mjs still thumbnail/thumbnail.html thumbnail/thumbnail.png 128
 node tools/render.mjs video sample/sample.html sample/newmoon-sample-v1.mp4 1920 1080 30
 # 全編 v3：先に実写素材を取得して連番を作る（stock/ に入る。GitHub には入れない）
 FFMPEG=ffmpeg bash tools/fetch_stock.sh
-# 開始秒・終了秒で区切って並行に書き出し、ffmpeg の concat でつなぐ（区切りはコマ数 46,843 を4等分：0・11711・23422・35132・46843 コマ ÷ 30）
+# 開始秒・終了秒で区切って並行に書き出し、ffmpeg の concat でつなぐ（区切りはコマ数で決める：例 0・11711・23422・35132・47051 コマ ÷ 30。キーフレームでずれないよう、秒ではなくコマの境目で切る）
 CRF=21 node tools/render.mjs video full-v3/index.html full-v3/part0.mp4 1920 1080 30 0 390.3666667
 # 場面の表・レビューの作り直し
 node tools/export_units.mjs full-v3/index.html full-v3/timeline.json

@@ -84,7 +84,7 @@ if V3:
             "| 09-4 | 火 | Campfire burning wood logs in the dark | 左右反転・0.6倍 |",
             "| 09-6 | 二人の会話 | A young woman on a dater listening to the man's conversation amidst the candlelights | そのまま |",
             "| 11-8〜11-9 | 湖面の月 | The moon and the stars at sea | 左右反転・1.4倍に拡大して水面を字幕の上へ・0.5倍 |",
-            "| 13-4 | 夜空 | Full moon with a soft haze | 1.4倍に拡大して月を右上へ（締めの文字・問いかけ・ワイプはそのまま） |", "",
+            "| 13-4 | 夜空 | Full moon with a soft haze | 1.2倍に拡大し、左に黒い余白を足して月を右上へ（締めの文字・問いかけ・コメント欄の一言・名前・ワイプと重ならない位置） |", "",
             "挿絵のまま残した場面：11-11（湖面の月。波で映り方が変わる図解なので）、11-6・12-3〜12-6（手帳。文字で問いを並べる場面なので）、スマホの場面（文面が主役なので）。", ""]
 else:
     out += ["## 実写素材に差し替えられる場面", "",

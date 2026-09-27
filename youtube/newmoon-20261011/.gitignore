@@ -1,2 +1,4 @@
 node_modules
-.render-tmp.html
+.render-tmp*.html
+.stills*.html
+tools/.stills*.mjs

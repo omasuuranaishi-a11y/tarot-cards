@@ -6,6 +6,7 @@
 //   FFMPEG        ffmpeg の実行ファイル（既定 ffmpeg）
 //   CHROMIUM_PATH Chromium の実行ファイル（既定は Playwright 付属）
 //   LOCAL_FONTS   @fontsource のフォルダ。指定するとGoogle Fontsの代わりに読み込む（オフライン環境用）
+//   CRF           画質（既定 18。小さいほど高画質・大きいファイル）
 import { chromium } from 'playwright';
 import { spawn } from 'child_process';
 import fs from 'fs';
@@ -24,7 +25,7 @@ if (LOCAL) {
   const html = fs.readFileSync(abs, 'utf8')
     .replace(/<link[^>]*fonts\.googleapis[^>]*>/g, '')
     .replace('<head>', `<head>\n<base href="file://${path.dirname(abs)}/">\n${css}`);
-  const tmp = path.join(path.dirname(abs), '.render-tmp.html');
+  const tmp = path.join(path.dirname(abs), `.render-tmp-${process.pid}.html`);
   fs.writeFileSync(tmp, html);
   url = 'file://' + tmp;
   process.on('exit', () => { try { fs.unlinkSync(tmp); } catch {} });
@@ -49,7 +50,7 @@ if (mode === 'still') {
   const n = Math.round((t1 - t0) * fps);
   const ff = spawn(process.env.FFMPEG || 'ffmpeg', ['-y', '-loglevel', 'error',
     '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-',
-    '-c:v', 'libx264', '-preset', 'medium', '-crf', '18', '-pix_fmt', 'yuv420p',
+    '-c:v', 'libx264', '-preset', 'medium', '-crf', process.env.CRF || '18', '-pix_fmt', 'yuv420p', '-r', String(fps),
     '-movflags', '+faststart', out], { stdio: ['pipe', 'inherit', 'inherit'] });
   const started = Date.now();
   for (let i = 0; i < n; i++) {

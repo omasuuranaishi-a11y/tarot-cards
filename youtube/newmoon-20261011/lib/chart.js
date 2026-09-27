@@ -1,7 +1,7 @@
 /* ホロスコープの作図（SVG）。座標はチャート中心を原点にした値。
    天体・カスプの値は chart-data.js（Swiss Ephemeris の計算値）だけを使い、手で描き直さない。 */
 (function () {
-  const C = window.CHART;
+function make(C) {
   const ASC = C.bodies.asc.lon;
   const NS = 'http://www.w3.org/2000/svg';
   const R = { out: 430, signIn: 370, tick: 370, planet: 330, label: 270, house: 213, asp: 200 };
@@ -154,5 +154,8 @@
     return refs;
   }
 
-  window.Chart = { C, R, SIGNS, SIGN_GLYPH, PLANETS, phi, pt, lonOf, fmtDeg, fmtPos, fmtOrb, sep, el, arcPath, ringArc, build, NS };
+  return { C, R, SIGNS, SIGN_GLYPH, PLANETS, phi, pt, lonOf, fmtDeg, fmtPos, fmtOrb, sep, el, arcPath, ringArc, build, NS, dm };
+}
+  window.Chart = make(window.CHART);
+  window.Chart.make = make;
 })();

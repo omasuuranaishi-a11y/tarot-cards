@@ -1,4 +1,4 @@
-/* 全編 v2：v1 の章・読む文（../full/chapters.js）はそのままに、冒頭と締めの画面だけを差し替える。
+/* 全編 v2：v1 の章・読む文（../full/chapters.js）を使い、冒頭と締めの画面だけを差し替える。
    参考動画の分析（reference/参考動画の分析.md）の 7・8・10 に対応。 */
 (function () {
   const C = window.CHAPTERS;
@@ -13,18 +13,18 @@
   };
   u2.cues = null;
 
-  // 13-3：次回の告知に、チャンネル登録のひとこと（文字だけ。読む文は変えない）
+  // 13-3：次回の告知に、チャンネル登録のひとこと（文字だけ）
   const u133 = C[12].units[2], f133 = u133.cues;
   u133.cues = T => f133(T).map(c => {
     if (c.k === 'scene') c.p.texts = [...(c.p.texts || []), tx('<div class="cta">よろしければ、チャンネル登録をお願いします</div>', T.s(0) + 2.4, T.b, 'left:124px;top:300px')];
     return c;
   });
-  // 13-4：締めに問いかけを1つ（文字だけ。読む文は変えない）
+  // 13-4：締めの問いかけとコメント欄への誘い（読む文の2文目に合わせて出す）
   const u134 = C[12].units[3], f134 = u134.cues;
   u134.cues = T => f134(T).map(c => {
     if (c.k === 'scene') c.p.texts = [...(c.p.texts || []),
-      tx('<div class="q">あなたがこの関係で、守りたいものは何ですか？</div>', T.s(1) + 1.2, T.b + 2, 'left:120px;top:620px'),
-      tx('よければ、コメント欄で教えてください', T.s(1) + 1.8, T.b + 2, 'left:124px;top:690px', 's')];
+      tx('<div class="q">あなたがこの関係で、守りたいものは何ですか？</div>', T.s(1) + .2, T.b + 2, 'left:120px;top:450px'),
+      tx('よければ、コメント欄で一言教えてください', T.s(1) + 1.0, T.b + 2, 'left:124px;top:520px', 's')];
     return c;
   });
 })();

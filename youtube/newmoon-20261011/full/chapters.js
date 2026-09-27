@@ -702,8 +702,8 @@
         panel('結び直す', [[`<div class="mid">${g('♀')} 関係を大切にしたい気持ち</div>`, T.a + .3], [`<div class="mid">${g('♂')} 自分がどう動くか</div>`, T.at(0, .5)], ['<div class="mid hl">どちらか一方ではなく、結び直す</div>', T.s(1) + .4]], T.a, T.b)] },
     { text: '次は、10月26日の牡牛座の満月でお会いしましょう。', pad: 1.6,
       cues: T => [S('align', T.a, T.b, { keys: [[T.a, 0], [T.a + .6, 0], [T.b - .4, 180]], texts: [tx('<div class="h">次回　10月26日</div><div class="m" style="margin-top:8px">牡牛座の満月</div>', T.a + .5, T.b, 'left:120px;top:140px')] })] },
-    { text: '最後までご覧いただき、ありがとうございました。星よみ専門家のおますでした。', pad: 3.0,
-      cues: T => [S('sky', T.a, T.b + 2, { wipe: true, texts: [tx('<div class="m">ご覧いただき、ありがとうございました</div>', T.a + .5, T.b + 2, 'left:120px;top:380px'), tx('<div class="h">星よみ専門家　おます</div>', T.s(1), T.b + 2, 'left:120px;top:470px')] })] },
+    { text: '最後までご覧いただき、ありがとうございました。よければ、あなたがこの関係で守りたいものを、コメント欄で一言教えてください。星よみ専門家のおますでした。', pad: 3.0,
+      cues: T => [S('sky', T.a, T.b + 2, { wipe: true, texts: [tx('<div class="m">ご覧いただき、ありがとうございました</div>', T.a + .5, T.b + 2, 'left:120px;top:360px'), tx('<div class="h">星よみ専門家　おます</div>', T.s(2), T.b + 2, 'left:120px;top:620px')] })] },
   ]);
 
   window.CHAPTERS = chapters;

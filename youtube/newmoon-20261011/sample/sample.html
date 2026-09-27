@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>天秤座新月 見本 v1</title>
+<!-- 第5章冒頭〜第6章「金星と火星、0°12′のスクエア」の見本。無音・仮タイミング。
+     1920x1080。window.render(t) で任意の時刻の画面を描く（tools/render.mjs で書き出す）。
+     ブラウザで開くと再生される（?t=秒 でその時刻に止める）。 -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../lib/style.css">
+<style>
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--night)}
+#stage{position:absolute;inset:0;overflow:hidden;
+  background:radial-gradient(ellipse 70% 80% at 38% 45%, #251b36 0%, #1a1328 45%, var(--night) 100%)}
+.scene{position:absolute;inset:0;opacity:0}
+svg.full{position:absolute;left:0;top:0;width:1920px;height:1080px}
+.mincho{font-family:var(--mincho)}
+.gothic{font-family:var(--gothic)}
+.gold{color:var(--gold)}
+.g{font-family:var(--glyph);font-variant-emoji:text}
+
+/* 見出し */
+#heading{position:absolute;left:0;top:30px;display:flex;align-items:baseline;gap:18px;padding:12px 90px 14px 64px;
+  background:linear-gradient(90deg,rgba(14,11,24,.94) 0%,rgba(14,11,24,.9) 75%,rgba(14,11,24,0) 100%)}
+#heading .no{font-family:var(--gothic);font-weight:700;font-size:24px;color:var(--gold);letter-spacing:.08em}
+#heading .tt{font-family:var(--mincho);font-weight:600;font-size:36px;color:var(--white);letter-spacing:.06em}
+#heading .rule{position:absolute;left:64px;right:90px;bottom:2px;height:1.5px;background:linear-gradient(90deg,var(--gold),rgba(187,150,91,0))}
+#badge{position:absolute;right:48px;top:40px;font-family:var(--gothic);font-size:19px;font-weight:500;color:var(--gold);
+  border:1px solid var(--gold-soft);padding:6px 16px;letter-spacing:.08em;background:rgba(14,11,24,.6)}
+
+/* 右の説明パネル */
+.panel{position:absolute;left:1250px;top:150px;width:610px;opacity:0}
+.panel .ph{font-family:var(--mincho);font-weight:600;font-size:34px;color:var(--white);letter-spacing:.06em;padding-bottom:14px;margin-bottom:22px;
+  border-bottom:1.5px solid;border-image:linear-gradient(90deg,var(--gold),rgba(187,150,91,0)) 1}
+.row{opacity:0}
+.big{font-family:var(--gothic);font-weight:700;font-size:46px;color:var(--white);letter-spacing:.02em}
+.mid{font-family:var(--gothic);font-weight:500;font-size:30px;color:var(--white);line-height:1.6}
+.sub{font-family:var(--gothic);font-weight:400;font-size:24px;color:var(--dim);line-height:1.6}
+.hl{color:var(--gold)}
+
+/* チャート上の注釈 */
+.callout{position:absolute;left:0;top:0;opacity:0;padding:10px 18px 12px;background:rgba(20,15,32,.9);border-left:2px solid var(--gold);white-space:nowrap}
+.callout .n{font-family:var(--mincho);font-weight:600;font-size:28px;color:var(--white);letter-spacing:.04em}
+.callout .v{font-family:var(--gothic);font-weight:700;font-size:28px;color:var(--gold);margin-top:2px}
+.callout .s{font-family:var(--gothic);font-size:21px;color:var(--dim);margin-top:2px}
+
+/* 字幕（仮） */
+#sub{position:absolute;left:0;right:0;bottom:0;height:150px;
+  background:linear-gradient(180deg,rgba(14,11,24,0) 0%,rgba(14,11,24,.78) 45%,rgba(14,11,24,.9) 100%)}
+#subtext{position:absolute;left:180px;width:1360px;bottom:30px;text-align:center;font-family:var(--gothic);font-weight:500;
+  font-size:33px;line-height:1.5;color:var(--white);letter-spacing:.03em;text-shadow:0 2px 8px rgba(0,0,0,.8);word-break:auto-phrase}
+
+/* ワイプ（アイコンは仮） */
+#wipe{position:absolute;left:1720px;top:780px;width:140px;text-align:center}
+#wipe .ring{width:140px;height:140px;border-radius:50%;border:2px solid var(--gold);overflow:hidden;
+  background:radial-gradient(circle at 50% 40%, #5a4061 0%, var(--purple) 60%, #2a1d30 100%);position:relative}
+#wipe .ring svg{position:absolute;inset:0}
+#wipe .nm{font-family:var(--mincho);font-weight:600;font-size:28px;color:var(--white);margin-top:10px;letter-spacing:.2em;text-indent:.2em}
+#wipe .ph{font-family:var(--gothic);font-size:15px;color:var(--gold);margin-top:2px;letter-spacing:.05em}
+
+/* スマホの場面 */
+#phone{position:absolute;left:470px;top:120px;width:400px;height:800px;border-radius:44px;border:2px solid var(--gold);
+  background:#120e1c;box-shadow:0 30px 80px rgba(0,0,0,.55)}
+#phone .top{position:absolute;left:0;right:0;top:0;height:92px;border-bottom:1px solid rgba(187,150,91,.3);
+  font-family:var(--gothic);font-size:22px;color:var(--dim);text-align:center;padding-top:44px}
+#phone .msgs{position:absolute;left:24px;right:24px;top:118px;bottom:110px}
+.msg{position:absolute;max-width:300px;padding:14px 18px;font-family:var(--gothic);font-size:24px;line-height:1.5;color:var(--white);opacity:0;border-radius:8px}
+.msg.in{left:0;background:#2a2136}
+.msg.out{right:0;background:var(--purple);border:1px solid var(--gold-soft)}
+#phone .input{position:absolute;left:20px;right:20px;bottom:24px;min-height:64px;border:1px solid rgba(187,150,91,.5);border-radius:10px;
+  padding:16px 18px;font-family:var(--gothic);font-size:24px;line-height:1.4;color:var(--white)}
+#cursor{display:inline-block;width:2px;height:28px;background:var(--gold);vertical-align:-5px;margin-left:2px}
+.tag{position:absolute;left:1000px;opacity:0;display:flex;align-items:flex-start;gap:18px}
+.tag .gl{font-family:var(--glyph);font-size:44px;color:var(--gold);line-height:1;width:48px;text-align:center}
+.tag .tx .a{font-family:var(--gothic);font-weight:700;font-size:26px;color:var(--gold);letter-spacing:.06em}
+.tag .tx .b{font-family:var(--mincho);font-weight:600;font-size:38px;color:var(--white);letter-spacing:.04em;margin-top:4px}
+#memo{position:absolute;left:1000px;top:600px;width:720px;padding:26px 32px;border:1px solid var(--gold-soft);background:rgba(68,48,73,.35);opacity:0}
+#memo .t{font-family:var(--mincho);font-weight:600;font-size:30px;color:var(--gold);letter-spacing:.1em}
+#memo .l{font-family:var(--gothic);font-weight:500;font-size:34px;color:var(--white);margin-top:12px;display:inline-block;position:relative}
+#memo .u{position:absolute;left:0;bottom:-6px;height:2px;background:var(--gold);width:0}
+.note{position:absolute;left:64px;top:944px;font-family:var(--gothic);font-size:20px;color:var(--dim);opacity:0}
+
+/* 元素の場面 */
+.el-title{position:absolute;opacity:0}
+.el-title .a{font-family:var(--mincho);font-weight:600;font-size:44px;color:var(--white);letter-spacing:.06em}
+.el-title .b{font-family:var(--gothic);font-weight:500;font-size:26px;color:var(--gold);margin-top:6px;letter-spacing:.08em}
+.el-title .c{font-family:var(--mincho);font-weight:500;font-size:36px;color:var(--white);margin-top:26px;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- ===== チャートの場面 ===== -->
+  <div class="scene" id="sc-chart">
+    <svg class="full" id="chartsvg" viewBox="0 0 1920 1080">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#BB965B"/>
+        </marker>
+      </defs>
+      <g id="cam"><g id="chart"></g><g id="ov"></g></g>
+    </svg>
+    <svg class="full" id="screen" viewBox="0 0 1920 1080"></svg>
+    <div id="callouts"></div>
+    <div id="panels"></div>
+  </div>
+
+  <!-- ===== 水と火（蠍座の金星・獅子座の火星） ===== -->
+  <div class="scene" id="sc-elem">
+    <svg class="full" id="elemsvg" viewBox="0 0 1920 1080"></svg>
+    <div class="el-title" id="el-l" style="left:120px;top:150px">
+      <div class="a"><span class="g gold">♀</span> 蠍座の金星</div><div class="b">水のサイン ・ 不動宮</div>
+      <div class="c">深く、静かに、<br>関係を守りたい</div>
+    </div>
+    <div class="el-title" id="el-r" style="left:1080px;top:150px">
+      <div class="a"><span class="g gold">♂</span> 獅子座の火星</div><div class="b">火のサイン ・ 不動宮</div>
+      <div class="c">堂々と、表に出して<br>動きたい</div>
+    </div>
+    <div class="el-title" id="el-c" style="left:0;right:0;top:838px;text-align:center;padding:14px 0 18px;background:linear-gradient(90deg,rgba(14,11,24,0),rgba(14,11,24,.82) 25%,rgba(14,11,24,.82) 75%,rgba(14,11,24,0))">
+      <div class="c" style="margin:0">譲りにくいサイン同士 ─ 自分の中の引っ張り合い</div>
+    </div>
+  </div>
+
+  <!-- ===== 日常の例（スマホ） ===== -->
+  <div class="scene" id="sc-phone">
+    <div id="phone">
+      <div class="top">身近な人</div>
+      <div class="msgs">
+        <div class="msg in" id="m1" style="top:0">今週の土曜も、<br>お願いできる？</div>
+        <div class="msg out" id="m2" style="top:96px">大丈夫だよ</div>
+        <div class="msg in" id="m3" style="top:176px">来週もいい？</div>
+        <div class="msg out" id="m4" style="top:272px">今週は難しいけれど、<br>来週の日曜なら行けるよ</div>
+      </div>
+      <div class="input"><span id="typed"></span><span id="cursor"></span></div>
+    </div>
+    <div class="tag" id="t1" style="top:170px"><div class="gl">♀</div><div class="tx"><div class="a">金星</div><div class="b">関係を大切にしたい</div></div></div>
+    <div class="tag" id="t2" style="top:330px"><div class="gl">♂</div><div class="tx"><div class="a">火星</div><div class="b">本当は、自分の時間がほしい</div></div></div>
+    <div class="tag" id="t3" style="top:490px"><div class="gl">□</div><div class="tx"><div class="a">スクエア</div><div class="b">飲み込んだ気持ちが、強く出る</div></div></div>
+    <div class="tag" id="t4" style="top:170px"><div class="gl">♀</div><div class="tx"><div class="a">金星　逆行中</div><div class="b">これまでの関係を、見直す</div></div></div>
+    <div class="tag" id="t5" style="top:330px"><div class="gl">♂</div><div class="tx"><div class="a">火星</div><div class="b">はっきり、でも穏やかに</div></div></div>
+    <div class="tag" id="t6" style="top:490px"><div class="gl">♀♂</div><div class="tx"><div class="a">結び直す</div><div class="b">断ることと、大切にすることは<br>両立できる</div></div></div>
+    <div id="memo"><div class="t">守りたいもの</div><div class="l">土曜の午前は、自分の時間<span class="u" id="memo-u"></span></div></div>
+    <div class="note" id="note">日常の例です。配置が出来事を決めるわけではありません。</div>
+  </div>
+
+  <div id="heading"><span class="no" id="h-no">05</span><span class="tt" id="h-tt">支配星の金星は、逆行中</span><span class="rule"></span></div>
+  <div id="badge">無音・仮タイミング ｜ 見本 v1</div>
+  <div id="sub"><div id="subtext"></div></div>
+  <div id="wipe">
+    <div class="ring"><svg viewBox="0 0 140 140"><circle cx="70" cy="58" r="24" fill="rgba(250,248,244,.55)"/><path d="M26,140 C30,100 50,88 70,88 C90,88 110,100 114,140 Z" fill="rgba(250,248,244,.55)"/></svg></div>
+    <div class="nm">おます</div>
+    <div class="ph">アイコン仮</div>
+  </div>
+</div>
+
+<script src="../lib/chart-data.js"></script>
+<script src="../lib/chart.js"></script>
+<script>
+/* ============ 読む文と、単位ごとの長さ ============
+   各単位の長さ = 文字数 ÷ 5.5字/秒（毎分330字）＋ 図を見せる間（pad）。
+   録音後は、この dur を実際の音声の長さに置き換える。 */
+const UNITS = [
+ { ch: '05', title: '支配星の金星は、逆行中', pad: 1.2,
+   text: 'ここからは、新月の支配星を追っていきます。新月が起きたのは天秤座17度21分。天秤座を担当する天体、支配星は金星です。その金星は、いま蠍座7度25分にあります。' },
+ { ch: '06', title: '金星と火星、0°12′のスクエア', pad: 1.2, text: 'そして、この金星と、ほぼぴったりの角度を作っている天体があります。獅子座の火星です。' },
+ { pad: 1.6, text: '金星が蠍座7度25分、火星が獅子座7度13分。サインは違いますが、度数はほとんど同じですね。' },
+ { pad: 2.4, text: '二つの差は90度12分です。90度、スクエアからのずれは、わずか12分。' },
+ { pad: 3.4, text: '今回のチャートで、太陽と月の重なりの次に正確な角度です。' },
+ { pad: 2.4, text: 'しかも、金星は逆行で度数を戻し、火星は前へ進んでいます。二つは近づいていく途中で、この角度は、新月から約5時間半後の、10月11日の朝6時31分ごろに、ぴったり90度になります。' },
+ { pad: 2.0, text: '蠍座と獅子座は、どちらも不動宮です。不動宮は、一度決めたことや、大切にしているものを、簡単には手放さないサインです。牡牛座、獅子座、蠍座、水瓶座の四つがあり、今回はそのうち二つが、90度でぶつかっています。' },
+ { pad: 1.6, text: '金星は、何を大切にしたいか、何を受け取りたいか。火星は、それをどう求めて、どう行動に移すか。この二つが90度で結ばれると、欲しいものと、そのための動き方が、かみ合いにくいという読みができます。' },
+ { pad: 1.8, text: '蠍座の金星は、深く、静かに、関係を守りたい。獅子座の火星は、堂々と、表に出して動きたい。どちらも譲りにくいサイン同士なので、自分の中で引っ張り合いが起きやすいんですね。' },
+ { pad: 2.4, text: 'さらに、支配星をたどってみます。天秤座の太陽と月の支配星は、金星。蠍座にある金星の支配星は、火星。獅子座にある火星の支配星は、太陽。そして太陽は天秤座にいるので、また金星へ戻ってきます。' },
+ { pad: 2.0, text: '太陽、金星、火星が、ひとつの輪でつながっているんですね。その輪の中で、金星と火星が、12分のスクエアを作っている。ここが、今回の新月の中心だと私は考えています。' },
+ { pad: 2.0, text: '例えば、身近な人から、今週もまた頼みごとをされたとき。関係を大切にしたいから、「大丈夫だよ」と引き受ける。でも本当は、自分の時間がほしい。その気持ちを飲み込み続けると、ある日、思っていたより強い言い方で出てしまう。' },
+ { pad: 1.6, text: '金星が逆行している間は、新しく何かを始めるより、これまでの関係の中で、自分が何を大切にしてきたかを見直すことに向いています。言葉にする前に、守りたいものを一つ確かめる。' },
+ { pad: 2.4, text: 'それから、火星の力で、はっきり、でも穏やかに伝えてみる。「今週は難しいけれど、来週の日曜なら行けるよ」。断ることと、関係を大切にすることは、両立できます。' },
+ { pad: 4.0, text: '支配星の金星が逆行し、火星とスクエア。今回の新月は、関係を大切にする気持ちと、自分の動き方を、結び直すところから始まります。' },
+];
+const RATE = 5.5, LEAD = 0.35;
+let acc = 0;
+UNITS.forEach((u, i) => {
+  u.sent = u.text.split(/(?<=。)/).filter(s => s.trim());
+  const n = u.text.replace(/\s/g, '').length;
+  u.speech = n / RATE;
+  u.start = acc; u.dur = LEAD + u.speech + u.pad; u.end = acc + u.dur; acc = u.end;
+  let s0 = u.start + LEAD;
+  u.ss = u.sent.map(s => { const a = s0; s0 += s.length / RATE; return a; });
+  u.se = u.sent.map((s, k) => u.ss[k] + s.length / RATE);
+});
+window.DURATION = acc;
+window.UNITS = UNITS;
+const S = i => UNITS[i].start, E = i => UNITS[i].end, SS = (i, k) => UNITS[i].ss[k], SE = (i, k) => UNITS[i].se[k];
+
+/* ============ 補助 ============ */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const prog = (t, a, d) => clamp((t - a) / d);
+const lerp = (a, b, p) => a + (b - a) * p;
+/* 区間 [a,b] で 0→1→0。出入りはなめらかに */
+const win = (t, a, b, fi = .6, fo = .6) => (t < a || t > b) ? 0 : Math.min(ease(clamp((t - a) / fi)), ease(clamp((b - t) / fo)));
+const $ = id => document.getElementById(id);
+const { pt, R, el, lonOf, ringArc, arcPath } = Chart;
+/* 文字などの出方：小さく上へ移動しながら現れ、静かに止まる */
+function rise(node, v, dy = 12) {
+  node.style.opacity = v.toFixed(3);
+  node.style.transform = `translateY(${((1 - easeOut(v)) * dy).toFixed(2)}px)`;
+}
+
+/* ============ チャート ============ */
+const refs = Chart.build($('chart'));
+const ov = $('ov');
+const P = k => [refs.planet[k].gx, refs.planet[k].gy];   // 記号の表示位置
+const L = (k, r) => pt(lonOf(k), r);                        // 真の黄経上の点
+const V = 'venus', M = 'mars';
+
+function path(d, attrs = {}) { return el('path', Object.assign({ d, fill: 'none' }, attrs), ov); }
+function line(a, b, attrs = {}) { return el('line', Object.assign({ x1: a[0], y1: a[1], x2: b[0], y2: b[1] }, attrs), ov); }
+function drawable(node) { const len = node.getTotalLength(); node.style.strokeDasharray = len; node.style.strokeDashoffset = len; node._len = len; return node; }
+function draw(node, p) { node.style.strokeDashoffset = (node._len * (1 - p)).toFixed(2); }
+
+// 7°〜8°の目盛り強調（蠍座・獅子座）
+const deg7V = path(arcPath(R.signIn - 16, R.signIn, 217, 218), { fill: '#BB965B', stroke: 'none', opacity: 0 });
+const deg7M = path(arcPath(R.signIn - 16, R.signIn, 127, 128), { fill: '#BB965B', stroke: 'none', opacity: 0 });
+// 中心から金星・火星への半径と、90°12′の角度の弧
+const radV = drawable(line([0, 0], L(V, R.signIn), { stroke: '#FAF8F4', 'stroke-width': 1.6, 'stroke-opacity': .8 }));
+const radM = drawable(line([0, 0], L(M, R.signIn), { stroke: '#FAF8F4', 'stroke-width': 1.6, 'stroke-opacity': .8 }));
+const angArc = drawable(path(ringArc(78, lonOf(M), lonOf(V)), { stroke: '#BB965B', 'stroke-width': 3 }));
+const angTxt = el('text', { class: 'deg-label', 'font-size': 30, 'text-anchor': 'middle', 'dominant-baseline': 'central', opacity: 0 }, ov);
+{ const [x, y] = pt((lonOf(M) + lonOf(V)) / 2, 96); angTxt.setAttribute('x', x); angTxt.setAttribute('y', y); angTxt.style.fontSize = '26px'; angTxt.textContent = '90°12′'; }
+// 金星－火星のスクエア
+const sqLine = drawable(line(L(V, R.asp), L(M, R.asp), { stroke: '#BB965B', 'stroke-width': 4, 'stroke-linecap': 'round' }));
+const sqGlow = line(L(V, R.asp), L(M, R.asp), { stroke: '#BB965B', 'stroke-width': 9, 'stroke-opacity': 0, 'stroke-linecap': 'round' });
+const sqTxt = el('text', { class: 'deg-label', 'text-anchor': 'middle', 'dominant-baseline': 'central', opacity: 0 }, ov);
+{ const a = L(V, R.asp), b = L(M, R.asp), mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, d = Math.hypot(mx, my);
+  sqTxt.setAttribute('x', mx - mx / d * 80 + 30); sqTxt.setAttribute('y', my - my / d * 80); sqTxt.style.fontSize = '28px'; sqTxt.textContent = '□ 0°12′'; }
+// 不動宮の四角（牡牛・獅子・蠍・水瓶の中央を結ぶ）
+const FIX = [1, 4, 7, 10];
+const fixSq = drawable(path('M' + FIX.map(i => pt(i * 30 + 15, R.signIn - 4).join(',')).join('L') + 'Z',
+  { stroke: '#BB965B', 'stroke-width': 1.6, 'stroke-dasharray': '' }));
+const sunPt = [(P('sun')[0] + P('moon')[0]) / 2, (P('sun')[1] + P('moon')[1]) / 2];
+
+/* ============ カメラ ============ */
+const HOME = { fx: 0, fy: 0, s: .94, sx: 760, sy: 505 };
+const VM = { fx: -175, fy: 120, s: 1.34, sx: 700, sy: 520 };   // 金星と火星を一緒に
+const SHOTS = [
+  [S(1) + .2, 2.4, VM],
+  [S(6) + .1, 2.2, HOME],
+  [S(7) + .1, 2.0, VM],
+  [S(9) - .8, .1, HOME],
+  [S(14) - .8, .1, HOME],
+];
+let cam = { ...HOME };
+function camAt(t) {
+  let c = { ...HOME };
+  for (const [a, d, tg] of SHOTS) {
+    if (t < a) break;
+    const p = ease(prog(t, a, d));
+    c = { fx: lerp(c.fx, tg.fx, p), fy: lerp(c.fy, tg.fy, p), s: lerp(c.s, tg.s, p), sx: lerp(c.sx, tg.sx, p), sy: lerp(c.sy, tg.sy, p) };
+  }
+  return c;
+}
+const proj = ([x, y]) => [cam.sx + cam.s * (x - cam.fx), cam.sy + cam.s * (y - cam.fy)];
+
+/* ============ チャート上の注釈（画面座標で追従） ============ */
+const scr = $('screen');
+function callout(id, html, anchorFn, x, y) {
+  const d = document.createElement('div'); d.className = 'callout'; d.id = id; d.innerHTML = html; $('callouts').appendChild(d);
+  const ld = el('line', { stroke: '#BB965B', 'stroke-width': 1.5, opacity: 0 }, scr);
+  const dot = el('circle', { r: 5, fill: '#BB965B', opacity: 0 }, scr);
+  return { d, ld, dot, anchorFn, x, y };
+}
+function placeCallout(c, v) {
+  const [ax, ay] = proj(c.anchorFn());
+  const x = c.x, y = c.y;
+  c.d.style.left = x + 'px'; c.d.style.top = y + 'px'; rise(c.d, v, 10);
+  const w = c.d.offsetWidth, h = c.d.offsetHeight;
+  const bx = ax < x ? x : x + w, by = y + h / 2;
+  c.ld.setAttribute('x1', ax); c.ld.setAttribute('y1', ay); c.ld.setAttribute('x2', bx); c.ld.setAttribute('y2', by);
+  c.ld.setAttribute('opacity', v * .9); c.dot.setAttribute('cx', ax); c.dot.setAttribute('cy', ay); c.dot.setAttribute('opacity', v);
+}
+const CO = {
+  newmoon: callout('co-nm', '<div class="n">新月</div><div class="v">天秤座 17°21′</div><div class="s">太陽と月が 0°00′</div>', () => sunPt, 48, 640),
+  libra: callout('co-li', '<div class="n">天秤座の支配星</div><div class="v"><span class="g">♀</span> 金星</div>', () => pt(195, (R.signIn + R.out) / 2), 48, 640),
+  venus: callout('co-ve', '<div class="n"><span class="g">♀</span> 金星</div><div class="v">蠍座 7°25′ R</div><div class="s">10/3から逆行中</div>', () => P(V), 48, 640),
+  mars: callout('co-ma', '<div class="n"><span class="g">♂</span> 火星</div><div class="v">獅子座 7°13′</div><div class="s">第12ハウス</div>', () => P(M), 48, 150),
+};
+
+/* ============ 右のパネル ============ */
+function panel(id, html) { const d = document.createElement('div'); d.className = 'panel'; d.id = id; d.innerHTML = html; $('panels').appendChild(d); return d; }
+const PN = {
+  deg: panel('p-deg', `<div class="ph">度数を比べる</div>
+    <div class="row" id="r-dv"><div class="big"><span class="g hl">♀</span> 金星 <span class="sub">蠍座</span> <span id="d7v">7°</span>25′</div></div>
+    <div class="row" id="r-dm" style="margin-top:18px"><div class="big"><span class="g hl">♂</span> 火星 <span class="sub">獅子座</span> <span id="d7m">7°</span>13′</div></div>
+    <div class="row" id="r-ds" style="margin-top:26px"><div class="sub">サインは違っても、度数はほぼ同じ</div></div>`),
+  orb: panel('p-orb', `<div class="ph">角度とオーブ</div>
+    <div class="row" id="r-o1"><div class="mid">実際の角度差　<b class="big" style="font-size:42px">90°12′</b></div></div>
+    <div class="row" id="r-o2" style="margin-top:10px"><div class="mid">スクエア　90°00′ との差</div></div>
+    <div class="row" id="r-o3" style="margin-top:14px"><div class="big">オーブ <span class="hl" style="font-size:64px">0°12′</span></div></div>`),
+  rank: panel('p-rank', `<div class="ph">オーブの小さい順</div><div id="bars"></div>
+    <div class="row" id="r-rk" style="margin-top:18px"><div class="sub">今回は3°以内を中心、5°までを補足として扱います</div></div>`),
+  ruler: panel('p-ruler', `<div class="ph">近づいていく途中の角度</div><svg id="rulersvg" width="610" height="470" viewBox="0 0 610 470"></svg>`),
+  fixed: panel('p-fix', `<div class="ph">不動宮</div>
+    <div class="row" id="r-f1"><div class="mid">牡牛座 ・ 獅子座 ・ 蠍座 ・ 水瓶座</div></div>
+    <div class="row" id="r-f2" style="margin-top:16px"><div class="sub">一度決めたこと、大切にしているものを<br>簡単には手放さない</div></div>
+    <div class="row" id="r-f3" style="margin-top:26px"><div class="mid"><span class="hl">蠍座の金星</span> と <span class="hl">獅子座の火星</span><br>が 90° で向き合う</div></div>`),
+  meaning: panel('p-mean', `<div class="ph">金星と火星の働き</div>
+    <div class="row" id="r-m1"><div class="mid"><span class="g hl" style="font-size:40px">♀</span> 金星　何を大切にしたいか<br><span style="padding-left:2.1em">何を受け取りたいか</span></div></div>
+    <div class="row" id="r-m2" style="margin-top:20px"><div class="mid"><span class="g hl" style="font-size:40px">♂</span> 火星　それをどう求め<br><span style="padding-left:2.1em">どう行動に移すか</span></div></div>
+    <div class="row" id="r-m3" style="margin-top:28px;padding-top:18px;border-top:1px solid rgba(187,150,91,.4)"><div class="mid"><span class="hl">90°</span>　欲しいものと動き方が<br>かみ合いにくい</div></div>`),
+  loop: panel('p-loop', `<div class="ph" id="loop-h">支配星の輪</div><svg id="loopsvg" width="610" height="470" viewBox="0 0 610 470"></svg>
+    <div class="row" id="r-c2" style="margin-top:6px"><div class="mid">輪の中で <span class="g hl">♀ □ ♂</span> <b class="hl">0°12′</b></div><div class="sub">ここが、今回の新月の中心</div></div>`),
+  sum: panel('p-sum', `<div class="ph">まとめ</div>
+    <div class="row" id="r-s1"><div class="mid">新月の支配星　<span class="g hl">♀</span> 金星<br><span class="sub">蠍座7°25′・逆行中</span></div></div>
+    <div class="row" id="r-s2" style="margin-top:18px"><div class="mid"><span class="g hl">♀ □ ♂</span>　オーブ 0°12′<span class="sub">（接近）</span></div></div>
+    <div class="row" id="r-s3" style="margin-top:18px"><div class="mid">太陽 → 金星 → 火星 → 太陽</div></div>
+    <div class="row" id="r-s4" style="margin-top:26px"><div class="mid"><span class="hl">関係を大切にする気持ち</span>と<br><span class="hl">自分の動き方</span>を、結び直す</div></div>`),
+};
+// オーブの棒グラフ（01_チャートデータと出典.md の中心アスペクトの値）
+const RANK = [['太陽 ☌ 月', 0, 0], ['金星 □ 火星', 0, 12], ['海王星 ✶ 冥王星', 0, 28], ['太陽・月 ✶ ASC', 1, 21], ['金星 ☍ MC', 1, 29], ['火星 □ MC', 1, 41]];
+const bars = $('bars'); const barEls = [];
+RANK.forEach(([n, d, m], i) => {
+  const hl = i === 1;
+  const r = document.createElement('div'); r.className = 'row'; r.style.cssText = 'display:flex;align-items:center;height:52px';
+  r.innerHTML = `<div class="gothic" style="width:230px;font-size:24px;font-weight:${hl ? 700 : 500};color:${hl ? 'var(--gold)' : 'var(--white)'}">${n}</div>
+    <div style="position:relative;width:250px;height:14px"><div class="bar" style="position:absolute;left:0;top:0;height:14px;width:0;background:${hl ? 'var(--gold)' : 'rgba(250,248,244,.45)'}"></div>
+    <div style="position:absolute;left:0;top:-8px;width:1px;height:30px;background:rgba(250,248,244,.3)"></div></div>
+    <div class="gothic" style="width:120px;text-align:right;font-size:26px;font-weight:700;color:${hl ? 'var(--gold)' : 'var(--white)'}">${d}°${String(m).padStart(2, '0')}′</div>`;
+  bars.appendChild(r); barEls.push({ r, bar: r.querySelector('.bar'), w: (d + m / 60) / 3 * 250 });
+});
+// 度数の定規（1° = 480px）
+const rs = $('rulersvg');
+function ruler(y, sign, glyph) {
+  const g = el('g', {}, rs);
+  el('line', { x1: 60, y1: y, x2: 540, y2: y, stroke: '#BB965B', 'stroke-width': 2 }, g);
+  for (let m = 0; m <= 60; m += 5) {
+    const x = 60 + m * 8, big = m % 30 === 0;
+    el('line', { x1: x, y1: y - (big ? 14 : 7), x2: x, y2: y, stroke: '#BB965B', 'stroke-width': big ? 2 : 1 }, g);
+    if (big) { const t = el('text', { x, y: y + 30, 'text-anchor': 'middle', class: 'deg-label' }, g); t.style.fontSize = '20px'; t.textContent = m === 60 ? '8°00′' : `7°${String(m).padStart(2, '0')}′`; }
+  }
+  const lab = el('text', { x: 0, y: y - 96, class: 'deg-label' }, g); lab.style.fontSize = '24px'; lab.textContent = sign;
+  const mk = el('g', {}, g);
+  el('line', { x1: 0, y1: y - 30, x2: 0, y2: y + 4, stroke: '#FAF8F4', 'stroke-width': 3 }, mk);
+  const gt = el('text', { x: 0, y: y - 48, 'text-anchor': 'middle', class: 'glyph', fill: '#FAF8F4' }, mk); gt.style.fontSize = '34px'; gt.textContent = glyph;
+  const vt = el('text', { x: 0, y: y + 58, 'text-anchor': 'middle', class: 'deg-label' }, mk); vt.style.fontSize = '24px'; vt.style.fill = '#BB965B';
+  return { g, mk, vt };
+}
+const rV = ruler(130, '蠍座（金星・逆行中）', '♀'), rM = ruler(330, '獅子座（火星・順行）', '♂');
+const aV = el('text', { x: 0, y: 0, class: 'deg-label' }, rs); aV.style.fontSize = '26px'; aV.textContent = '←';
+const aM = el('text', { x: 0, y: 0, class: 'deg-label' }, rs); aM.style.fontSize = '26px'; aM.textContent = '→';
+const exact = el('line', { x1: 0, y1: 86, x2: 0, y2: 340, stroke: '#BB965B', 'stroke-width': 2, 'stroke-dasharray': '6 6', opacity: 0 }, rs);
+const clock = el('text', { x: 305, y: 436, 'text-anchor': 'middle', class: 'deg-label' }, rs); clock.style.fontSize = '30px';
+const clockSub = el('text', { x: 305, y: 468, 'text-anchor': 'middle', class: 'deg-label' }, rs); clockSub.style.fontSize = '22px'; clockSub.style.fill = '#BB965B';
+
+/* ============ 支配星の輪の図 ============ */
+const ls = $('loopsvg');
+ls.innerHTML = `<defs><marker id="ah2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#BB965B"/></marker></defs>`;
+const NODES = { a: [305, 110, '☉☽', '天秤座', '17°21′'], b: [505, 340, '♀', '蠍座', '7°25′R'], c: [105, 340, '♂', '獅子座', '7°13′'] };
+const nodeEl = {};
+for (const k in NODES) {
+  const [x, y, g, sign, deg] = NODES[k];
+  const grp = el('g', { opacity: 0 }, ls);
+  el('circle', { cx: x, cy: y, r: 46, fill: '#1b1428', stroke: '#BB965B', 'stroke-width': 2 }, grp);
+  const gt = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'glyph', fill: '#FAF8F4' }, grp); gt.style.fontSize = g.length > 1 ? '30px' : '38px'; gt.textContent = g;
+  const st = el('text', { x, y: k === 'a' ? y - 68 : y + 74, 'text-anchor': 'middle', class: 'deg-label' }, grp); st.style.fontSize = '24px'; st.textContent = sign + ' ' + deg;
+  nodeEl[k] = grp;
+}
+function arrowPath(p, q, bend) {
+  const dx = q[0] - p[0], dy = q[1] - p[1], d = Math.hypot(dx, dy), ux = dx / d, uy = dy / d;
+  const a = [p[0] + ux * 58, p[1] + uy * 58], b = [q[0] - ux * 58, q[1] - uy * 58];
+  const cx = (a[0] + b[0]) / 2 - uy * bend, cy = (a[1] + b[1]) / 2 + ux * bend;
+  return [`M${a[0]},${a[1]} Q${cx},${cy} ${b[0]},${b[1]}`, [(a[0] + b[0]) / 2 - uy * bend * .55, (a[1] + b[1]) / 2 + ux * bend * .55]];
+}
+const ARW = [['a', 'b', '天秤座の支配星'], ['b', 'c', '蠍座の支配星'], ['c', 'a', '獅子座の支配星']].map(([p, q, lab]) => {
+  const [d, mid] = arrowPath(NODES[p], NODES[q], -100);
+  const pth = el('path', { d, fill: 'none', stroke: '#BB965B', 'stroke-width': 3, 'marker-end': 'url(#ah2)' }, ls);
+  drawable(pth);
+  const fl = el('path', { d, fill: 'none', stroke: '#FAF8F4', 'stroke-width': 3, 'stroke-dasharray': '3 20', opacity: 0 }, ls);
+  const tx = el('text', { x: mid[0], y: mid[1], 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'deg-label', opacity: 0 }, ls);
+  tx.style.fontSize = '22px'; tx.style.fill = '#BB965B'; tx.textContent = lab;
+  return { pth, fl, tx };
+});
+// 金星と火星のあいだのスクエア（輪の内側に直線で）
+const sqD = el('line', { x1: NODES.b[0] - 58, y1: NODES.b[1], x2: NODES.c[0] + 58, y2: NODES.c[1], stroke: '#BB965B', 'stroke-width': 4 }, ls);
+drawable(sqD);
+const sqDt = el('text', { x: 305, y: 318, 'text-anchor': 'middle', class: 'deg-label' }, ls); sqDt.style.fontSize = '28px'; sqDt.textContent = '□ 0°12′'; sqDt.setAttribute('opacity', 0);
+
+/* ============ 水と火の場面 ============ */
+const es = $('elemsvg');
+es.innerHTML = `<defs>
+  <linearGradient id="lsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#15142b"/><stop offset=".55" stop-color="#1f1c3a"/><stop offset="1" stop-color="#0c0b18"/></linearGradient>
+  <linearGradient id="lwater" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b1a33"/><stop offset="1" stop-color="#07070f"/></linearGradient>
+  <radialGradient id="moonglow"><stop offset="0" stop-color="#FAF8F4" stop-opacity=".38"/><stop offset=".3" stop-color="#FAF8F4" stop-opacity=".09"/><stop offset="1" stop-color="#FAF8F4" stop-opacity="0"/></radialGradient>
+  <radialGradient id="moonface" cx=".42" cy=".4" r=".7"><stop offset="0" stop-color="#fffdf7"/><stop offset=".7" stop-color="#ece5d6"/><stop offset="1" stop-color="#d9d0bd"/></radialGradient>
+  <radialGradient id="refl" cx=".5" cy=".15" r=".85"><stop offset="0" stop-color="#FAF8F4" stop-opacity=".16"/><stop offset=".6" stop-color="#FAF8F4" stop-opacity=".05"/><stop offset="1" stop-color="#FAF8F4" stop-opacity="0"/></radialGradient>
+  <linearGradient id="rsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c1320"/><stop offset="1" stop-color="#0d0910"/></linearGradient>
+  <radialGradient id="fireglow"><stop offset="0" stop-color="#e7b56a" stop-opacity=".75"/><stop offset=".3" stop-color="#BB965B" stop-opacity=".35"/><stop offset="1" stop-color="#443049" stop-opacity="0"/></radialGradient>
+  <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#f3d7a0"/><stop offset=".5" stop-color="#d9a55c"/><stop offset="1" stop-color="#BB965B" stop-opacity="0"/></linearGradient>
+</defs>
+<rect x="0" y="0" width="960" height="1080" fill="url(#lsky)"/>
+<rect x="0" y="600" width="960" height="480" fill="url(#lwater)"/>
+<circle cx="700" cy="300" r="260" fill="url(#moonglow)"/>
+<circle cx="700" cy="300" r="54" fill="url(#moonface)"/>
+<ellipse cx="700" cy="760" rx="120" ry="230" fill="url(#refl)"/>
+<line x1="0" y1="600" x2="960" y2="600" stroke="#FAF8F4" stroke-opacity=".18"/>
+<g id="ripples"></g>
+<rect x="960" y="0" width="960" height="1080" fill="url(#rsky)"/>
+<circle id="fg" cx="1440" cy="690" r="340" fill="url(#fireglow)"/>
+<g id="flames"></g><g id="embers"></g>
+<line x1="960" y1="120" x2="960" y2="960" stroke="#BB965B" stroke-width="1.5" stroke-opacity=".8"/>
+<rect x="936" y="516" width="48" height="48" fill="#120e1c" stroke="#BB965B" stroke-width="1.5"/>
+<text x="960" y="541" text-anchor="middle" dominant-baseline="central" class="deg-label" style="font-size:20px">90°</text>`;
+const rip = $('ripples'), RIPS = [];
+let sd = 7; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+for (let i = 0; i < 46; i++) {
+  const k = i / 46, y = 612 + k * k * 360 + rnd() * 6;
+  const w = 10 + rnd() * (18 + k * 70), off = (rnd() - .5) * (30 + k * 110);
+  RIPS.push({ y, w, off, k, ph: rnd() * 6, n: el('line', { y1: y, y2: y, stroke: '#FAF8F4', 'stroke-width': 1 + k * 1.6, 'stroke-linecap': 'round' }, rip) });
+}
+const flames = $('flames'), FL = [];
+[[0, 150, 1], [-46, 110, .8], [48, 118, .85], [-18, 80, .6], [22, 86, .6]].forEach(([dx, h, o], i) => {
+  FL.push({ dx, h, o, n: el('path', { fill: 'url(#flame)', 'fill-opacity': o }, flames), ph: i * 1.7 });
+});
+const emb = $('embers'), EMB = [];
+for (let i = 0; i < 18; i++) EMB.push({ x0: 1440 + ((i * 73) % 160) - 80, sp: 40 + (i * 37) % 50, ph: (i * 0.618) % 1, n: el('circle', { r: 2 + (i % 3), fill: '#e7c48a' }, emb) });
+function elemFrame(t) {
+  RIPS.forEach(r => { const s = Math.sin(t * .8 + r.ph) * (4 + r.k * 10), w = r.w * (.75 + .25 * Math.sin(t * .6 + r.ph * 2));
+    r.n.setAttribute('x1', 700 + r.off - w / 2 + s); r.n.setAttribute('x2', 700 + r.off + w / 2 + s);
+    r.n.setAttribute('stroke-opacity', ((.55 - r.k * .4) * (.6 + .4 * Math.sin(t * 1.3 + r.ph * 3))).toFixed(3)); });
+  FL.forEach(f => { const k = 1 + .05 * Math.sin(t * 5.1 + f.ph) + .03 * Math.sin(t * 8.3 + f.ph * 2), h = f.h * k, x = 1440 + f.dx, y = 780;
+    f.n.setAttribute('d', `M${x - h * .32},${y} C${x - h * .36},${y - h * .5} ${x - h * .06},${y - h * .7} ${x},${y - h} C${x + h * .06},${y - h * .7} ${x + h * .36},${y - h * .5} ${x + h * .32},${y} Z`); });
+  $('fg').setAttribute('r', (340 + 14 * Math.sin(t * 3.3)).toFixed(1));
+  EMB.forEach(e => { const p = (t * e.sp / 500 + e.ph) % 1; e.n.setAttribute('cx', e.x0 + Math.sin(p * 6 + e.ph * 9) * 18); e.n.setAttribute('cy', 760 - p * 520); e.n.setAttribute('opacity', (Math.sin(p * Math.PI) * .8).toFixed(3)); });
+}
+
+/* ============ スマホの場面 ============ */
+function typeText(t, a, str, cps = 9) { const n = Math.floor(clamp((t - a) * cps, 0, str.length)); return str.slice(0, n); }
+
+/* ============ 1コマを描く ============ */
+function setScene(id, v) { $(id).style.opacity = v.toFixed(3); $(id).style.visibility = v > 0 ? 'visible' : 'hidden'; }
+function segFill(i, v) { refs.signSeg[i].setAttribute('fill-opacity', (v * .75).toFixed(3)); }
+function halo(k, v) { refs.planet[k].halo.setAttribute('stroke-opacity', v.toFixed(3)); refs.planet[k].halo.setAttribute('fill-opacity', (v * .6).toFixed(3)); }
+function rows(t, spec) { spec.forEach(([id, a, b]) => rise($(id), win(t, a, b, .7, .5))); }
+
+window.render = function (t) {
+  const T = window.DURATION;
+  // 場面（クロスフェード 0.8秒）
+  const eIn = S(8), eOut = E(8), pIn = S(11), pOut = E(13);
+  const vElem = win(t, eIn - .4, eOut + .4, .8, .8), vPhone = win(t, pIn - .4, pOut + .4, .8, .8);
+  setScene('sc-elem', vElem); setScene('sc-phone', vPhone);
+  setScene('sc-chart', clamp(1 - Math.max(vElem, vPhone)));
+
+  // 見出し
+  const u = UNITS.findIndex(x => t < x.end);
+  const chap = t < S(1) ? UNITS[0] : UNITS[1];
+  $('h-no').textContent = chap.ch; $('h-tt').textContent = chap.title;
+  const hv = t < S(1) ? win(t, 0, S(1), .6, .5) : win(t, S(1), T + 1, .6, .6);
+  rise($('heading'), hv, 8);
+
+  // 字幕
+  let st = '';
+  for (const x of UNITS) x.sent.forEach((s, k) => { if (t >= x.ss[k] - .05 && t < (x.sent[k + 1] ? x.ss[k + 1] : x.end) - .05) st = s; });
+  $('subtext').textContent = st;
+
+  // ワイプ：挿絵の場面では下げる
+  const wv = clamp(1 - Math.max(vElem, vPhone) * 1.2);
+  $('wipe').style.opacity = wv.toFixed(3); $('wipe').style.transform = `translateY(${((1 - wv) * 16).toFixed(1)}px)`;
+
+  // ---- チャート ----
+  cam = camAt(t);
+  $('cam').setAttribute('transform', `translate(${cam.sx},${cam.sy}) scale(${cam.s}) translate(${-cam.fx},${-cam.fy})`);
+
+  // U0：新月 → 天秤座 → 金星
+  halo('sun', win(t, SS(0, 1), S(1) + 1.2, .6, .8)); halo('moon', win(t, SS(0, 1), S(1) + 1.2, .6, .8));
+  segFill(6, Math.max(win(t, SS(0, 2), SS(0, 3) + .6, .8, .8), win(t, SS(9, 1), E(10), .6, .8) * .6));
+  placeCallout(CO.newmoon, win(t, SS(0, 1) + .2, SS(0, 2) + .3, .6, .4));
+  placeCallout(CO.libra, win(t, SS(0, 2) + .5, SS(0, 3) + .1, .5, .4));
+  const venusHalo = Math.max(win(t, SS(0, 3), E(5) + .5, .6, .8), win(t, S(7), E(10), .6, .6));
+  halo(V, venusHalo);
+  placeCallout(CO.venus, win(t, SS(0, 3) + .3, S(2) + .3, .5, .5));
+  // U1：火星
+  const marsHalo = Math.max(win(t, SS(1, 1) - .2, E(5) + .5, .6, .8), win(t, S(7), E(10), .6, .6));
+  halo(M, marsHalo);
+  placeCallout(CO.mars, win(t, SS(1, 1), S(2) + .3, .6, .5));
+  // U2：同じ7°台
+  const d7 = win(t, SS(2, 1) - .2, E(3), .5, .6);
+  deg7V.setAttribute('opacity', d7); deg7M.setAttribute('opacity', d7);
+  rows(t, [['r-dv', SS(2, 0), E(2)], ['r-dm', SS(2, 0) + 1.6, E(2)], ['r-ds', SS(2, 1) + .4, E(2)]]);
+  const glow7 = win(t, SS(2, 1), E(2), .4, .4);
+  $('d7v').style.color = $('d7m').style.color = glow7 > .5 ? '#BB965B' : '';
+  PN.deg.style.opacity = win(t, S(2), E(2), .6, .5);
+  // U3：半径・角度・線
+  const vr = win(t, S(3), E(3) + .6, .4, .8);
+  draw(radV, prog(t, S(3) + .1, 1)); draw(radM, prog(t, S(3) + .4, 1));
+  radV.style.opacity = radM.style.opacity = vr;
+  draw(angArc, ease(prog(t, S(3) + 1.2, 1.4))); angArc.style.opacity = vr;
+  angTxt.setAttribute('opacity', win(t, S(3) + 2.2, E(3) + .6, .5, .8));
+  draw(sqLine, ease(prog(t, SS(3, 1), 1.4)));
+  const glowSq = Math.max(win(t, SS(6, 2) + 2, E(6), .6, .6) * .35, win(t, SS(10, 1), E(10), .6, .8) * .4, win(t, S(14), T + 1, .8, .1) * .3);
+  sqGlow.setAttribute('stroke-opacity', glowSq);
+  sqTxt.setAttribute('opacity', Math.max(win(t, SE(3, 1), E(5), .5, .6), win(t, SS(10, 1), T + 1, .6, .1)));
+  PN.orb.style.opacity = win(t, S(3) + .2, E(3), .6, .5);
+  rows(t, [['r-o1', S(3) + .8, E(3)], ['r-o2', SS(3, 1), E(3)], ['r-o3', SS(3, 1) + 1.4, E(3)]]);
+  // U4：オーブの順位
+  PN.rank.style.opacity = win(t, S(4), E(4), .6, .5);
+  barEls.forEach((b, i) => { const a = S(4) + .4 + i * .35; rise(b.r, win(t, a, E(4), .5, .5)); b.bar.style.width = (b.w * ease(prog(t, a + .2, .9))).toFixed(1) + 'px'; });
+  rise($('r-rk'), win(t, S(4) + 3, E(4), .6, .5));
+  // U5：定規で接近を見せる
+  PN.ruler.style.opacity = win(t, S(5), E(5), .6, .5);
+  const mv = ease(prog(t, SS(5, 1) + .5, 7.5));
+  const vMin = lerp(25, 21, mv), mMin = lerp(13, 21, mv);
+  rV.mk.setAttribute('transform', `translate(${60 + vMin * 8},0)`); rM.mk.setAttribute('transform', `translate(${60 + mMin * 8},0)`);
+  rV.vt.textContent = `7°${String(Math.ceil(vMin - 1e-6)).padStart(2, '0')}′`; rM.vt.textContent = `7°${String(Math.floor(mMin + 1e-6)).padStart(2, '0')}′`;
+  const arrV = win(t, SS(5, 0) + .4, SS(5, 1) + 7.8, .5, .5);
+  aV.setAttribute('x', 60 + vMin * 8 - 44); aV.setAttribute('y', 139); aV.setAttribute('opacity', arrV);
+  aM.setAttribute('x', 60 + mMin * 8 + 16); aM.setAttribute('y', 339); aM.setAttribute('opacity', arrV);
+  exact.setAttribute('x1', 60 + 21 * 8); exact.setAttribute('x2', 60 + 21 * 8); exact.setAttribute('opacity', win(t, SS(5, 1) + 7.8, E(5), .6, .5));
+  const mins = Math.floor(lerp(50, 6 * 60 + 31, mv) + 1e-6);
+  clock.textContent = `10/11　${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`;
+  clockSub.textContent = mv < .02 ? '新月の瞬間' : mv >= 1 ? 'ぴったり 90°00′' : '';
+  // U6：不動宮
+  PN.fixed.style.opacity = win(t, SS(6, 1) - .6, E(6), .6, .5);
+  rows(t, [['r-f1', SS(6, 1) - .4, E(6)], ['r-f2', SS(6, 1) + 1.2, E(6)], ['r-f3', SS(6, 2) + 4.5, E(6)]]);
+  const f0 = SS(6, 2);
+  [[1, f0], [4, f0 + .9], [7, f0 + 1.6], [10, f0 + 2.3]].forEach(([i, a]) => {
+    const keep = (i === 4 || i === 7);
+    const v = keep ? Math.max(win(t, S(6) + .3, SS(6, 1), .6, .4) , win(t, a, E(6), .5, .6)) : win(t, a, SS(6, 2) + 4.5, .5, .8);
+    segFill(i, Math.max(v, i === 4 ? win(t, SS(9, 3), E(10), .6, .8) * .6 : 0));
+  });
+  draw(fixSq, ease(prog(t, f0 + 2.6, 1.4))); fixSq.style.opacity = win(t, f0 + 2.6, SS(6, 2) + 5, .3, .8);
+  // U7：意味
+  PN.meaning.style.opacity = win(t, S(7) + .6, E(7), .6, .5);
+  rows(t, [['r-m1', SS(7, 0), E(7)], ['r-m2', SS(7, 1), E(7)], ['r-m3', SS(7, 2) + 1, E(7)]]);
+  // U8：水と火
+  elemFrame(t);
+  rise($('el-l'), win(t, SS(8, 0) - .2, E(8) + .4, .7, .6)); rise($('el-r'), win(t, SS(8, 1) - .2, E(8) + .4, .7, .6));
+  rise($('el-c'), win(t, SS(8, 2), E(8) + .4, .7, .6));
+  // U9〜U10：支配星の輪（右の図）とチャート上の強調を同期
+  const steps = [SS(9, 1), SS(9, 2), SS(9, 3)];
+  PN.loop.style.opacity = win(t, SS(9, 0) + .3, E(10), .6, .5);
+  const nodeOn = { a: steps[0] - .4, b: steps[0] + .8, c: steps[1] + .8 };
+  for (const k in nodeOn) nodeEl[k].setAttribute('opacity', ease(prog(t, nodeOn[k], .6)));
+  ARW.forEach((w, i) => {
+    draw(w.pth, ease(prog(t, steps[i] + .4, 1.4)));
+    w.tx.setAttribute('opacity', ease(prog(t, steps[i] + 1.2, .6)));
+    w.fl.setAttribute('opacity', win(t, SS(9, 4), E(10), .8, .5) * .9);
+    w.fl.style.strokeDashoffset = (-t * 36).toFixed(1);
+  });
+  draw(sqD, ease(prog(t, SS(10, 1) + .3, 1.2))); sqDt.setAttribute('opacity', ease(prog(t, SS(10, 1) + 1.2, .6)));
+  rise($('r-c2'), win(t, SS(10, 2) - .2, E(10), .7, .5));
+  $('loop-h').textContent = t < SS(10, 2) ? '支配星の輪' : '今回の新月の中心';
+  const hSun = Math.max(win(t, steps[0], E(10), .6, .6));
+  halo('sun', Math.max(+refs.planet.sun.halo.getAttribute('stroke-opacity'), hSun));
+  halo('moon', Math.max(+refs.planet.moon.halo.getAttribute('stroke-opacity'), hSun));
+  segFill(7, Math.max(+refs.signSeg[7].getAttribute('fill-opacity') / .75, win(t, steps[1], E(10), .6, .8) * .6));
+  // U11〜U13：スマホ
+  rise($('m1'), win(t, SS(11, 0) + .6, E(13) + 1, .6, .1));
+  const tp1 = SS(11, 1) + .8;
+  const out1 = t >= tp1 + 1.2;
+  rise($('m2'), win(t, tp1 + 1.2, E(13) + 1, .5, .1));
+  rise($('t1'), win(t, SS(11, 1) + .4, E(11), .7, .5));
+  rise($('t2'), win(t, SS(11, 2), E(11), .7, .5));
+  rise($('m3'), win(t, SS(11, 3) + .4, E(13) + 1, .6, .1));
+  rise($('t3'), win(t, SS(11, 3) + 2.2, E(11), .7, .5));
+  rise($('note'), win(t, S(11) + .6, E(13), .8, .5));
+  const harsh = 'もう無理。';
+  let typed = '';
+  if (t < tp1 + 1.2) typed = typeText(t, tp1, '大丈夫だよ', 6);
+  else if (t < SS(11, 3) + 2.6) typed = '';
+  else if (t < S(12) + 1.8) typed = typeText(t, SS(11, 3) + 2.6, harsh, 7);
+  else if (t < SS(13, 1)) typed = harsh.slice(0, Math.max(0, harsh.length - Math.floor((t - S(12) - 1.8) * 3)));
+  else if (t < SS(13, 1) + 4.6) typed = typeText(t, SS(13, 1), '今週は難しいけれど、来週の日曜なら行けるよ', 5);
+  $('typed').textContent = typed;
+  $('typed').style.color = typed === harsh.slice(0, typed.length) && typed.length ? '#fff' : '';
+  $('typed').style.fontWeight = (t > SS(11, 3) && t < SS(13, 1)) ? 700 : 400;
+  $('cursor').style.opacity = (Math.floor(t * 2) % 2 === 0) ? 1 : .15;
+  rise($('m4'), win(t, SS(13, 1) + 4.8, E(13) + 1, .5, .1));
+  rise($('t4'), win(t, S(12) + .3, E(12), .7, .5));
+  $('memo').style.opacity = win(t, SS(12, 1) - .2, E(13), .7, .5);
+  $('memo-u').style.width = (ease(prog(t, SS(12, 1) + .6, 1.6)) * 100) + '%';
+  rise($('t5'), win(t, S(13) + .3, E(13), .7, .5));
+  rise($('t6'), win(t, SS(13, 2), E(13), .7, .5));
+  $('memo').style.top = (t > S(13) ? 640 : 600) + 'px';
+  // U14：まとめ
+  PN.sum.style.opacity = win(t, S(14) + .4, T + 1, .7, .1);
+  rows(t, [['r-s1', S(14) + .6, T + 1], ['r-s2', S(14) + 1.6, T + 1], ['r-s3', S(14) + 2.6, T + 1], ['r-s4', SS(14, 1), T + 1]]);
+  halo(V, Math.max(+refs.planet[V].halo.getAttribute('stroke-opacity'), win(t, S(14), T + 1, .8, .1)));
+  halo(M, Math.max(+refs.planet[M].halo.getAttribute('stroke-opacity'), win(t, S(14), T + 1, .8, .1)));
+  // パネルが出ている間はチャートの右端をぼかす
+  const panelOn = Math.max(...Object.values(PN).map(p => +p.style.opacity || 0));
+  const mx = lerp(2400, 1190, clamp(panelOn * 1.4));
+  $('chartsvg').style.webkitMaskImage = $('chartsvg').style.maskImage = `linear-gradient(90deg,#000 0,#000 ${mx}px,transparent ${mx + 110}px)`;
+};
+
+/* ブラウザで開いたときは再生（?t=秒 で停止表示） */
+const q = new URLSearchParams(location.search);
+if (!navigator.webdriver) {
+  document.fonts.ready.then(() => {
+    if (q.has('t')) { window.render(+q.get('t')); return; }
+    const t0 = performance.now();
+    const loopFn = () => { const t = ((performance.now() - t0) / 1000) % window.DURATION; window.render(t); requestAnimationFrame(loopFn); };
+    loopFn();
+  });
+}
+</script>
+</body>
+</html>

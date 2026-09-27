@@ -1,0 +1,21 @@
+/* おます ブランド近似色（Instagramの目視に基づく近似。公式指定色ではない） */
+:root{
+  --purple:#443049;
+  --white:#FAF8F4;
+  --gold:#BB965B;
+  --gold-soft:rgba(187,150,91,.55);
+  --night:#0e0b18;
+  --night-2:#1b1428;
+  --dim:rgba(250,248,244,.62);
+  --mincho:'Noto Serif JP','Yu Mincho','Hiragino Mincho ProN',serif;
+  --gothic:'Noto Sans JP','Yu Gothic','Hiragino Sans','Meiryo',sans-serif;
+  --glyph:'DejaVu Sans','Segoe UI Symbol','Noto Sans Symbols 2','Noto Sans Symbols',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+.glyph{font-family:var(--glyph);font-variant-emoji:text}
+.sign-glyph{font-size:30px;fill:var(--gold)}
+.planet-glyph{font-size:34px;fill:var(--white)}
+.deg-label{font-family:var(--gothic);font-size:19px;font-weight:500;fill:var(--white);paint-order:stroke;stroke:#110d1c;stroke-width:4px;stroke-linejoin:round}
+.deg-label .retro,.deg-label.retro{fill:var(--gold);font-weight:700}
+.house-num{font-family:var(--gothic);font-size:17px;fill:var(--white);fill-opacity:.5}
+.axis-label{font-family:var(--gothic);font-size:20px;font-weight:700;fill:var(--gold);letter-spacing:.04em}

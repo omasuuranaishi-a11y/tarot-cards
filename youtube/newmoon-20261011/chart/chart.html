@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>天秤座新月 チャート</title>
+<!-- 2000x2000で書き出す静止画のチャート。値は ../lib/chart-data.js（計算値）のみ -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../lib/style.css">
+<style>
+html,body{width:2000px;height:2000px;overflow:hidden}
+body{background:radial-gradient(circle at 50% 46%, #231a33 0%, var(--night-2) 45%, var(--night) 100%)}
+svg{position:absolute;inset:0}
+.title{position:absolute;left:80px;top:64px;font-family:var(--mincho);font-weight:600;font-size:54px;color:var(--white);letter-spacing:.08em}
+.meta{position:absolute;left:84px;top:146px;font-family:var(--gothic);font-size:28px;color:var(--dim);line-height:1.6}
+.note{position:absolute;right:80px;bottom:60px;font-family:var(--gothic);font-size:24px;color:var(--gold);text-align:right;line-height:1.6}
+</style>
+</head>
+<body>
+<svg viewBox="0 0 2000 2000"><g id="chart" transform="translate(1000,1060) scale(1.78)"></g></svg>
+<div class="title">2026年10月11日　天秤座新月</div>
+<div class="meta">00:50 JST ／ 東京 35°42′N 139°46′E ／ トロピカル・プラシーダス</div>
+<div class="note">Swiss Ephemeris の計算値から作図（承認前）<br>アスペクト線：オーブ3°以内</div>
+<script src="../lib/chart-data.js"></script>
+<script src="../lib/chart.js"></script>
+<script>
+const g = document.getElementById('chart');
+const { el, pt, R, lonOf, sep } = Chart;
+// オーブ3°以内のメジャーアスペクト（合は線にしない）
+Chart.build(g);
+const asp = el('g', {}, g);
+const keys = Chart.PLANETS.map(p => p.key).concat(['asc', 'mc']);
+for (let i = 0; i < keys.length; i++) for (let j = i + 1; j < keys.length; j++) {
+  const a = keys[i], b = keys[j];
+  if ((a === 'asc' || a === 'mc') && (b === 'asc' || b === 'mc')) continue;
+  const d = sep(lonOf(a), lonOf(b));
+  for (const ang of [60, 90, 120, 180]) if (Math.abs(d - ang) <= 3) {
+    const [x1, y1] = pt(lonOf(a), R.asp), [x2, y2] = pt(lonOf(b), R.asp);
+    const hard = ang === 90 || ang === 180;
+    el('line', { x1, y1, x2, y2, stroke: hard ? 'var(--gold)' : 'var(--white)', 'stroke-width': 1.6,
+      'stroke-opacity': hard ? .9 : .6, 'stroke-dasharray': hard ? '' : '6 5' }, asp);
+  }
+}
+</script>
+</body>
+</html>

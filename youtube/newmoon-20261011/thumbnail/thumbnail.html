@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>天秤座新月 サムネイル</title>
+<!-- YouTubeサムネイル 1280x720。チャートは ../lib/chart-data.js の計算値から作図 -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../lib/style.css">
+<style>
+html,body{width:1280px;height:720px;overflow:hidden}
+body{position:relative;background:
+  radial-gradient(ellipse 60% 80% at 78% 55%, rgba(68,48,73,.95) 0%, rgba(68,48,73,0) 70%),
+  radial-gradient(ellipse 90% 100% at 20% 40%, #1d1530 0%, var(--night) 100%)}
+svg{position:absolute;inset:0}
+.copy{position:absolute;left:64px;top:0;height:720px;display:flex;flex-direction:column;justify-content:center}
+.date{font-family:var(--gothic);font-weight:700;font-size:52px;color:var(--white);letter-spacing:.04em}
+.date small{font-size:30px;color:var(--gold);margin-left:14px;letter-spacing:.06em}
+.title{font-family:var(--mincho);font-weight:700;font-size:118px;line-height:1.12;letter-spacing:.04em;white-space:nowrap;
+  color:var(--white);text-shadow:0 4px 18px rgba(0,0,0,.7)}
+.title span{color:var(--gold)}
+.rule{width:430px;height:2px;margin:22px 0 20px;background:linear-gradient(90deg,var(--gold),rgba(187,150,91,0))}
+.tag{font-family:var(--mincho);font-weight:600;font-size:52px;color:var(--white);letter-spacing:.1em;text-shadow:0 3px 12px rgba(0,0,0,.8)}
+.chip{margin-top:26px;align-self:flex-start;padding:10px 24px;border:1.5px solid var(--gold);background:rgba(14,11,24,.8);
+  font-family:var(--gothic);font-weight:700;font-size:30px;color:var(--gold);letter-spacing:.06em}
+.chip .g{font-family:var(--glyph)}
+.brand{position:absolute;left:66px;bottom:44px;font-family:var(--mincho);font-weight:600;font-size:26px;color:var(--white);letter-spacing:.2em;opacity:.9}
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1280 720">
+  <g transform="translate(1068,362) scale(.8)"><g id="chart"></g><g id="asp"></g></g>
+</svg>
+<div class="copy">
+  <div class="date">10.11<small>（日）0:50</small></div>
+  <div class="title"><span>天秤座</span>新月</div>
+  <div class="rule"></div>
+  <div class="tag">関係を、結び直す。</div>
+  <div class="chip">金星逆行 <span class="g">♀□♂</span> 0°12′</div>
+</div>
+<div class="brand">星よみ専門家　おます</div>
+<script src="../lib/chart-data.js"></script>
+<script src="../lib/chart.js"></script>
+<script>
+const refs = Chart.build(document.getElementById('chart'));
+const { el, pt, R, lonOf } = Chart;
+const a = document.getElementById('asp');
+el('line', Object.fromEntries([['x1', pt(lonOf('venus'), R.asp)[0]], ['y1', pt(lonOf('venus'), R.asp)[1]], ['x2', pt(lonOf('mars'), R.asp)[0]], ['y2', pt(lonOf('mars'), R.asp)[1]],
+  ['stroke', '#BB965B'], ['stroke-width', 6], ['stroke-linecap', 'round']]), a);
+for (const k of ['sun', 'moon', 'venus', 'mars']) { refs.planet[k].halo.setAttribute('stroke-opacity', 1); refs.planet[k].halo.setAttribute('fill-opacity', .6); }
+refs.signSeg[6].setAttribute('fill-opacity', .7);
+</script>
+</body>
+</html>

@@ -2,3 +2,4 @@ node_modules
 .render-tmp*.html
 .stills*.html
 tools/.stills*.mjs
+stock/

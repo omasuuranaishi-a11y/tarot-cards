@@ -346,10 +346,11 @@
   window.render = function (t) {
     // 場面の見え方（0.8秒のクロスフェード）
     let maxV = 0, hideWipe = 0;
+    const pend = []; // 画像の読み込みを待つ場面（実写）は Promise を返す
     for (const L of layers) {
       const v = win(t, L.c.a - .4, L.c.b + .4, .8, .8);
       L.layer.style.opacity = v.toFixed(3); L.layer.style.visibility = v > 0 ? 'visible' : 'hidden';
-      if (v > 0 && L.obj.frame) L.obj.frame(t, v);
+      if (v > 0 && L.obj.frame) { const r = L.obj.frame(t, v); if (r && typeof r.then === 'function') pend.push(r); }
       maxV = Math.max(maxV, v);
       if (!(L.c.p && L.c.p.wipe)) hideWipe = Math.max(hideWipe, v);
     }
@@ -404,6 +405,7 @@
     // 瞬き：3〜5秒ごとに0.15秒
     const k = Math.floor(t / 4.1), bt = k * 4.1 + 1.6 + 1.2 * Math.sin(k * 1.7);
     document.getElementById('blink').setAttribute('opacity', (t >= bt && t < bt + .15) ? 1 : 0);
+    if (pend.length) return Promise.all(pend);
   };
 
   E.scene = (name, fn) => { E.scenes[name] = fn; };

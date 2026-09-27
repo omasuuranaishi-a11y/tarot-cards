@@ -2,6 +2,7 @@
 
     python tools/make_review.py            # full（全編 v1）
     python tools/make_review.py full-v2    # 全編 v2
+    python tools/make_review.py full-v3    # 全編 v3（一部の挿絵を実写素材に差し替えた版）
 """
 import html
 import json
@@ -10,7 +11,7 @@ import sys
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 folder = sys.argv[1] if len(sys.argv) > 1 else "full"
-ver = "v2" if folder == "full-v2" else "v1"
+ver = folder.split("-")[-1] if folder.startswith("full-v") else "v1"
 data = json.load(open(os.path.join(root, folder, "timeline.json"), encoding="utf-8"))
 
 
@@ -20,6 +21,8 @@ def mmss(t):
 
 
 total = data[-1]["end"]
+note = ("<br>「実写（イメージ）」の場面は、Mixkit の無料素材（素材名を画面の欄に記載）で、当日の空や本人の体験ではありません。"
+        if any(u["scene"].startswith("実写") for c in data for u in c["units"]) else "")
 nav = "".join(f'<button data-time="{c["start"]:.2f}">{c["no"]}　{mmss(c["start"])}</button>' for c in data)
 secs = []
 for c in data:
@@ -48,7 +51,7 @@ th{{color:#a79fb0;font-weight:500}}td:first-child{{white-space:nowrap}}td.sc{{co
 <main>
 <h1>2026年10月11日 天秤座新月　全編 {ver}</h1>
 <p class="lead">全編の仮編集｜約{mmss(total)}・無音・仮タイミング。章ボタンや各場面の時刻で移動できます。
-字幕は読む文の仮表示です。録音後に、単位ごとの長さを実際の音声に合わせて組み直します。</p>
+字幕は読む文の仮表示です。録音後に、単位ごとの長さを実際の音声に合わせて組み直します。{note}</p>
 <video id="film" controls preload="metadata" src="newmoon-full-{ver}.mp4"></video>
 <nav>{nav}</nav>
 {''.join(secs)}

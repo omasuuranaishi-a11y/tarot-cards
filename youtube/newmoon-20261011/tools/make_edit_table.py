@@ -1,14 +1,18 @@
 """<版のフォルダ>/timeline.json から 03_編集表.md を作り直す（全編の実装に合わせた編集表）。
 
-    python tools/make_edit_table.py full-v2    # いまの版（全編 v2）
+    python tools/make_edit_table.py full-v3    # いまの版（全編 v3）
+    python tools/make_edit_table.py full-v2    # 全編 v2
 """
 import json
 import os
 import sys
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-folder = sys.argv[1] if len(sys.argv) > 1 else "full-v2"
-V2 = folder == "full-v2"
+folder = sys.argv[1] if len(sys.argv) > 1 else "full-v3"
+ver = folder.split("-")[-1] if folder.startswith("full-v") else "v1"
+V = int(ver[1:])
+V2 = V >= 2
+V3 = V >= 3
 data = json.load(open(os.path.join(root, folder, "timeline.json"), encoding="utf-8"))
 MOVE = {"cam": "拡大・移動", "halo": "天体に丸", "seg": "サインの帯", "house": "ハウスの範囲", "line": "線を描く",
         "arc": "角度・度数の弧", "wedge": "範囲の表示", "text": "数値", "poly": "形を塗る", "callout": "注釈", "panel": "説明パネル"}
@@ -30,13 +34,19 @@ def mmss(t):
     return f"{t // 60}:{t % 60:02d}"
 
 
-ver = "v2" if V2 else "v1"
 out = [f"# 2026年10月11日 天秤座新月｜編集表（全編 {ver} の実装）", "",
        f"`{folder}/index.html` の全編（約{mmss(data[-1]['end'])}・{sum(len(c['units']) for c in data)}場面）を、場面ごとに書き出した表です。",
-       f"`tools/make_edit_table.py {folder}` で `{folder}/timeline.json` から作っているので、画面の定義（`full/chapters.js`、`full-v2/v2.js`）を変えたら作り直してください。",
+       f"`tools/make_edit_table.py {folder}` で `{folder}/timeline.json` から作っているので、画面の定義（`full/chapters.js`、`full-v2/v2.js`" + ("、`full-v3/v3.js`、`tools/stock.tsv`" if V3 else "") + "）を変えたら作り直してください。",
        "", "## 共通ルール", ""]
+if V3:
+    out += ["v3 で変えたこと：",
+            "- 挿絵のうち6か所（04-3、05-7、09-4、09-6、11-8〜11-9、13-4）を、Mixkit の無料の実写素材に差し替えた。文字・字幕・ワイプ・時刻は v2 と同じ",
+            "- 実写の場面には、左上の見出しの下に小さく「イメージ」と入れる。当日の空や本人の体験ではない",
+            "- 実写は彩度を少し下げ、暗い紫のグラデーション（上 .25 → 下 .55）と周辺減光を重ね、1.00→1.05 倍へゆっくり寄る。場面のつなぎは今までと同じクロスフェード",
+            "- 素材より場面が長いところは 0.5〜0.7 倍のゆっくり再生にし、足りない分は最後のコマで止める（ループはしない）",
+            "- 素材は GitHub に入れていない。`tools/fetch_stock.sh` で `stock/` に取得してから書き出す（一覧は `tools/stock.tsv`）", ""]
 if V2:
-    out += ["v2 で変えたこと（`reference/参考動画の分析.md` の提案から）：",
+    out += [("v2 で変えたこと（v3 も同じ。`reference/参考動画の分析.md` の提案から）：" if V3 else "v2 で変えたこと（`reference/参考動画の分析.md` の提案から）："),
             "- 字幕は太いゴシック48px（画面の高さの約4.4%）。読点で区切り、1行24字・2行までの塊で出す。かぎかっこの中では区切らない",
             "- 第2章からは、章の頭に2.6秒の章タイトル（「第○章」と明朝68pxの題、金の細い線）を入れる。この間は読む文がない",
             "- 冒頭（01-1〜01-2）はサムネイルと同じ表紙の画面で、あいさつと今回のテーマを読む",
@@ -58,17 +68,29 @@ for c in data:
     out += [f"## {c['no']} {c['title']}（{mmss(c['start'])}〜{mmss(c['end'])}）", "",
             "| # | 時刻 | 長さ | 画面 | 注目対象 | 動き | 読む文 |", "|---|---|---:|---|---|---|---|"]
     for i, u in enumerate(c["units"], 1):
-        moves = "・".join(MOVE[p] for p in u["parts"] if p in MOVE) or SCENE_MOVE.get(u["scene"], "—")
+        moves = "・".join(MOVE[p] for p in u["parts"] if p in MOVE) or SCENE_MOVE.get(u["scene"], "実写がゆっくり寄る・「イメージ」・文字" if u["scene"].startswith("実写") else "—")
         if u["labels"]:
             moves += "（" + " / ".join(u["labels"]) + "）"
         focus = "・".join(u["focus"]) or "—"
         text = u["text"] if len(u["text"]) <= 60 else u["text"][:58] + "…"
         out.append(f"| {c['no']}-{i} | {mmss(u['start'])} | {u['end'] - u['start']:.0f}秒 | {u['scene']} | {focus} | {moves} | {text} |")
     out.append("")
-out += ["## 実写素材に差し替えられる場面", "",
-        "今回の挿絵はすべて自作です。満月のときの `stock/`（Mixkitの月・水面・二人・焚き火）が使える場合は、次の場面を差し替え候補にします。実写は当日の空や本人の体験として扱わず、必要なら「イメージ」と入れます。", "",
-        "| 場面 | いまの挿絵 | 差し替え候補 |", "|---|---|---|",
-        ("| 13-4 | 夜空 | 月の実写 |" if V2 else "| 01-1、13-4 | 夜空 | 月の実写 |"), "| 04-3、09-6 | 二人の会話 | 二人の実写（街路の素材は「小道」の説明には使わない） |",
-        "| 09-4 | 火 | 焚き火の実写 |", "| 11-8〜11-9、11-11 | 湖面の月 | 月と水面の実写 |", ""]
+if V3:
+    out += ["## 実写素材に差し替えた場面（v3）", "",
+            "Mixkit の Stock Video Free License の素材だけを使っています（出典と利用条件は `04_素材出典と利用条件.md`、切り出し方は `tools/stock.tsv`）。どれも「イメージ」で、当日の空や本人の体験ではありません。", "",
+            "| 場面 | v2 の挿絵 | v3 の実写 | 扱い |", "|---|---|---|---|",
+            "| 04-3 | 二人の会話 | Two friends looking at the cell phone in a coffee shop | 左右反転・0.7倍 |",
+            "| 05-7 | 窓明かり | Steaming mug（日常の場面） | 左右反転 |",
+            "| 09-4 | 火 | Campfire burning wood logs in the dark | 左右反転・0.6倍 |",
+            "| 09-6 | 二人の会話 | A young woman on a dater listening to the man's conversation amidst the candlelights | そのまま |",
+            "| 11-8〜11-9 | 湖面の月 | The moon and the stars at sea | 左右反転・1.4倍に拡大して水面を字幕の上へ・0.5倍 |",
+            "| 13-4 | 夜空 | Full moon with a soft haze | 1.4倍に拡大して月を右上へ（締めの文字・問いかけ・ワイプはそのまま） |", "",
+            "挿絵のまま残した場面：11-11（湖面の月。波で映り方が変わる図解なので）、11-6・12-3〜12-6（手帳。文字で問いを並べる場面なので）、スマホの場面（文面が主役なので）。", ""]
+else:
+    out += ["## 実写素材に差し替えられる場面", "",
+            "今回の挿絵はすべて自作です。満月のときの `stock/`（Mixkitの月・水面・二人・焚き火）が使える場合は、次の場面を差し替え候補にします。実写は当日の空や本人の体験として扱わず、必要なら「イメージ」と入れます。", "",
+            "| 場面 | いまの挿絵 | 差し替え候補 |", "|---|---|---|",
+            ("| 13-4 | 夜空 | 月の実写 |" if V2 else "| 01-1、13-4 | 夜空 | 月の実写 |"), "| 04-3、09-6 | 二人の会話 | 二人の実写（街路の素材は「小道」の説明には使わない） |",
+            "| 09-4 | 火 | 焚き火の実写 |", "| 11-8〜11-9、11-11 | 湖面の月 | 月と水面の実写 |", ""]
 open(os.path.join(root, "03_編集表.md"), "w", encoding="utf-8").write("\n".join(out))
 print("ok", len(out))

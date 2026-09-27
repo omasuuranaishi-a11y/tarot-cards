@@ -260,7 +260,7 @@
     const sb = div('', `<div id="subtext"></div>`, stage); sb.id = 'sub';
     // ワイプ：本人のアイコン（1080x1080）の顔まわりを丸く切り出し、口と目だけを重ねて動かす
     const FACE = '#FFFFFB', LINE = '#645F54', DARK = '#3D3C42';
-    const wp = div('', `<div class="ring"><svg viewBox="290 205 500 500">
+    const wp = div('', `<div class="ring"><svg viewBox="40 40 1000 1000">
       <image href="${E.ICON || '../lib/icon.png'}" x="0" y="0" width="1080" height="1080"/>
       <g id="blink" opacity="0">
         <ellipse cx="442" cy="504" rx="26" ry="21" fill="${FACE}"/><ellipse cx="590" cy="503" rx="27" ry="22" fill="${FACE}"/>
@@ -312,9 +312,9 @@
     }
     const syl = Math.max(0, .55 * Math.sin(2 * Math.PI * 4.1 * t) + .35 * Math.sin(2 * Math.PI * 6.7 * t + 1.3) + .2 * Math.sin(2 * Math.PI * 2.3 * t + .4));
     const open = clamp(speaking * syl);
-    document.getElementById('mouth').setAttribute('ry', (4.5 + open * 6).toFixed(2));
+    document.getElementById('mouth').setAttribute('ry', (4.5 + open * 7.5).toFixed(2));
     document.getElementById('mouth').setAttribute('rx', (8 + open * 1.5).toFixed(2));
-    document.getElementById('mouthIn').setAttribute('ry', Math.max(0, open * 6 - 1.5).toFixed(2));
+    document.getElementById('mouthIn').setAttribute('ry', Math.max(0, open * 7.5 - 1.5).toFixed(2));
     // 瞬き：3〜5秒ごとに0.15秒
     const k = Math.floor(t / 4.1), bt = k * 4.1 + 1.6 + 1.2 * Math.sin(k * 1.7);
     document.getElementById('blink').setAttribute('opacity', (t >= bt && t < bt + .15) ? 1 : 0);

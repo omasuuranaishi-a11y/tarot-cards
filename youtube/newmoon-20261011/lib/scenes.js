@@ -45,6 +45,35 @@
     } };
   });
 
+  /* 表紙（冒頭）：サムネイルと同じ画面。チャートは計算値から作図（thumbnail/thumbnail.html と同じ配置を 1920x1080 に拡大） */
+  E.scene('cover', (layer, p) => {
+    div('', '', layer, `position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 78% 55%, rgba(68,48,73,.95) 0%, rgba(68,48,73,0) 70%),radial-gradient(ellipse 90% 100% at 20% 40%, #1d1530 0%, #0e0b18 100%)`);
+    const svg = full(layer);
+    const API = Chart.make(window.CHARTS.nm);
+    const wrap = svgEl('g', {}, svg), g = svgEl('g', {}, wrap), a = svgEl('g', {}, wrap);
+    const refs = API.build(g);
+    const [vx, vy] = API.pt(API.lonOf('venus'), API.R.asp), [mx, my] = API.pt(API.lonOf('mars'), API.R.asp);
+    const ln = drawable(svgEl('line', { x1: vx, y1: vy, x2: mx, y2: my, stroke: GOLD, 'stroke-width': 6, 'stroke-linecap': 'round' }, a));
+    const dots = [[vx, vy], [mx, my]].map(([x, y]) => svgEl('circle', { cx: x, cy: y, r: 9, fill: GOLD, opacity: 0 }, a));
+    const box = div('cover-copy', `<div class="cv-date">10.11<small>（日）0:50</small></div><div class="cv-title"><span>天秤座</span>新月</div>
+      <div class="cv-rule"></div><div class="cv-tag">関係を、結び直す。</div><div class="cv-chip">金星逆行 <span class="g">♀□♂</span> 0°12′</div>`, layer);
+    const parts = ['.cv-date', '.cv-title', '.cv-tag', '.cv-chip'].map(q => box.querySelector(q));
+    const rule = box.querySelector('.cv-rule');
+    const at = p.at || {};
+    return { frame(t) {
+      const k = t - p.a;
+      const s = 1.2 + k * .004;
+      wrap.setAttribute('transform', `translate(1602,543) scale(${s.toFixed(4)})`);
+      const hl = ease(prog(t, at.halo ?? p.a + 1, 1));
+      ['sun', 'moon', 'venus', 'mars'].forEach(q => { refs.planet[q].halo.setAttribute('stroke-opacity', hl.toFixed(3)); refs.planet[q].halo.setAttribute('fill-opacity', (hl * .6).toFixed(3)); });
+      refs.signSeg[6].setAttribute('fill-opacity', (.7 * hl).toFixed(3));
+      draw(ln, ease(prog(t, at.line ?? p.a + 1.6, 1.2)));
+      dots.forEach((d, i) => d.setAttribute('opacity', ease(prog(t, (at.line ?? p.a + 1.6) + i * 1, .35)).toFixed(3)));
+      [at.date ?? p.a + .2, at.title ?? p.a + .5, at.tag ?? p.a + 1.2, at.chip ?? p.a + 1.8].forEach((a0, i) => rise(parts[i], ease(prog(t, a0, .8)), 14));
+      rule.style.transform = `scaleX(${ease(prog(t, (at.tag ?? p.a + 1.2) - .3, .9)).toFixed(3)})`;
+    } };
+  });
+
   /* 太陽・地球・月の並び（新月＝同じ方向／満月＝180°） */
   E.scene('align', (layer, p) => {
     const svg = full(layer), id = 'al' + (uid++);

@@ -33,11 +33,54 @@
   function draw(node, p) { node.style.strokeDashoffset = (node._len * (1 - p)).toFixed(2); }
   const U = { clamp, ease, easeOut, prog, lerp, win, rise, svgEl, div, drawable, draw, W, H };
 
-  const E = { RATE: 5.5, LEAD: .35, units: [], chapters: [], cues: [], scenes: {}, sceneCues: [], charts: {}, U };
+  const E = { RATE: 5.5, LEAD: .35, units: [], chapters: [], cues: [], scenes: {}, sceneCues: [], charts: {}, U, opts: {} };
+  /* E.opts（v2 以降で使う。指定しなければ v1 と同じ動き）
+     subMax：字幕を読点で区切り、この字数以内の塊で出す／card：各章の頭に入れる章タイトルの秒数
+     mark：アスペクト線の両端に点、重なる天体を金の輪で囲む／badge：右上の表示 */
   window.E = E;
 
   /* ---------- 時間 ---------- */
   function len(s) { return s.replace(/\s/g, '').length; }
+  // 字幕の塊：読点・句点で区切った句を、max 字以内にまとめる（長すぎる句は助詞の後ろで割る）
+  function subChunks(s, max) {
+    // かぎかっこの中では区切らない
+    const raw = s.match(/[^、。？！]+[、。？！」』]*|[、。？！」』]+/g) || [s], quoted = [];
+    let buf = '', depth = 0;
+    for (const r of raw) {
+      buf += r; depth += (r.match(/[「『]/g) || []).length - (r.match(/[」』]/g) || []).length;
+      if (depth <= 0) { quoted.push(buf); buf = ''; depth = 0; }
+    }
+    if (buf) quoted.push(buf);
+    const parts = quoted.flatMap(p => splitLong(p, max));
+    const out = [];
+    for (const p of parts) {
+      const last = out[out.length - 1];
+      if (last !== undefined && len(last + p) <= max) out[out.length - 1] = last + p; else out.push(p);
+    }
+    // 最後の塊が短すぎるときは前とまとめる
+    if (out.length > 1 && len(out[out.length - 1]) < 7 && len(out[out.length - 2] + out[out.length - 1]) <= max + 8) out.splice(-2, 2, out[out.length - 2] + out[out.length - 1]);
+    return out;
+  }
+  function splitLong(p, max) {
+    if (len(p) <= max) return [p];
+    const mid = p.length / 2; let best = -1;
+    for (let i = 4; i < p.length - 4; i++) if (/[はがをにでともてへや]/.test(p[i]) && !/[はがをにでともてへやのっ]/.test(p[i + 1]) && (best < 0 || Math.abs(i + 1 - mid) < Math.abs(best - mid))) best = i + 1;
+    if (best < 0) best = Math.round(mid);
+    return [...splitLong(p.slice(0, best), max), ...splitLong(p.slice(best), max)];
+  }
+  E.subChunks = subChunks;
+  // 見る場所の印：天体どうしを結ぶ線の両端に点、同じ度数で重なる天体を金の輪で囲む（続く場面の輪は1本にまとめる）
+  function addMarks() {
+    const rings = [];
+    for (const c of E.cues) {
+      if (c.k === 'line' && typeof c.p1 === 'string' && typeof c.p2 === 'string' && !c.dash && (c.op ?? 1) >= 1) { c.dots = true; c.w = Math.max(c.w ?? 3, 4.5); }
+      if (c.k === 'halo' && c.keys.length === 2 && c.keys.includes('sun') && c.keys.includes('moon')) {
+        const prev = rings.find(r => (r.on || 'nm') === (c.on || 'nm') && c.a <= r.b + .8 && c.a >= r.a);
+        if (prev) prev.b = Math.max(prev.b, c.b); else rings.push({ k: 'ring', keys: ['sun', 'moon'], a: c.a + .3, b: c.b, on: c.on, _u: c._u });
+      }
+    }
+    E.cues.push(...rings);
+  }
   function mkT(u, ch) {
     const idx = k => k < 0 ? u.ss.length + k : k;
     return {
@@ -49,14 +92,23 @@
   }
   E.build = function (chapters) {
     let t = 0;
-    chapters.forEach(ch => {
+    const O = E.opts;
+    chapters.forEach((ch, ci) => {
       ch.start = t;
+      if (O.card && ci > 0) { ch.cardA = t; t += O.card; ch.cardB = t; }
       ch.units.forEach((u, i) => {
         u.sent = u.text.split(/(?<=。)/).filter(s => s.trim());
         u.start = t; u.speech = len(u.text) / E.RATE;
         u.dur = E.LEAD + u.speech + (u.pad ?? 1.2); u.end = t + u.dur; t = u.end;
         let s0 = u.start + E.LEAD; u.ss = []; u.se = [];
         u.sent.forEach(s => { u.ss.push(s0); s0 += len(s) / E.RATE; u.se.push(s0); });
+        if (O.subMax) {
+          u.chunks = [];
+          u.sent.forEach((s, k) => {
+            let done = 0; const n = len(s);
+            subChunks(s, O.subMax).forEach(c => { u.chunks.push({ text: c, a: u.ss[k] + (u.se[k] - u.ss[k]) * done / n }); done += len(c); });
+          });
+        }
         u.ch = ch; u.idx = i; E.units.push(u);
       });
       ch.end = t;
@@ -64,6 +116,7 @@
     E.DURATION = t; window.DURATION = t;
     E.chapters = chapters;
     chapters.forEach(ch => ch.units.forEach(u => (u.cues ? u.cues(mkT(u, ch)) : []).forEach(c => { c._u = u; E.cues.push(c); })));
+    if (O.mark) addMarks();
     init();
   };
 
@@ -148,12 +201,24 @@
         if (c.dash) { p.style.strokeDasharray = c.dash; p._dash = true; }
         let glow = null;
         if (c.glow) glow = el('path', { d, fill: 'none', stroke: COLORS.gold, 'stroke-width': (c.w ?? 3) * 3.2, 'stroke-linecap': 'round', opacity: 0 });
+        const dots = c.dots ? [a, b].map(q => el('circle', { cx: q[0], cy: q[1], r: 8, fill: COLORS.gold, opacity: 0 })) : [];
         inst.items.push({ up: t => {
           const v = vis(t);
+          dots.forEach((d, i) => d.setAttribute('opacity', (v * ease(prog(t, c.a + (i ? (c.draw ?? 1.2) * .85 : 0), .35))).toFixed(3)));
           if (!p._dash) draw(p, ease(prog(t, c.a, c.draw ?? 1.2)));
           p.style.opacity = (p._dash ? v * ease(prog(t, c.a, .6)) : (t < c.a || t > c.b ? 0 : Math.min(1, win(t, c.a, c.b, .05, fo)))) * (c.op ?? 1);
           if (glow) glow.setAttribute('opacity', (win(t, c.glow[0], c.glow[1], .6, .6) * .28).toFixed(3));
         } });
+        return;
+      }
+      case 'ring': {
+        const pts = c.keys.map(k => [inst.refs.planet[k].gx, inst.refs.planet[k].gy]);
+        const cx = pts.reduce((q, p) => q + p[0], 0) / pts.length, cy = pts.reduce((q, p) => q + p[1], 0) / pts.length;
+        const r = Math.max(...pts.map(p => Math.hypot(p[0] - cx, p[1] - cy))) + (c.pad ?? 34);
+        if (r > 110) return; // 離れている天体（満月の図など）は囲まない
+        const ring = el('circle', { cx, cy, r, fill: 'none', stroke: COLORS.gold, 'stroke-width': c.w ?? 3.5, transform: `rotate(-90 ${cx} ${cy})` });
+        drawable(ring);
+        inst.items.push({ up: t => { draw(ring, ease(prog(t, c.a, c.draw ?? .9))); ring.style.opacity = vis(t).toFixed(3); } });
         return;
       }
       case 'arc': {
@@ -256,7 +321,12 @@
     E.cues.filter(c => c.k !== 'scene').forEach(c => addChartCue(E.charts[c.on || 'nm'], c));
     // 共通の表示
     const hd = div('', `<span class="no"></span><span class="tt"></span><span class="rule"></span>`, stage); hd.id = 'heading';
-    const bd = div('', '無音・仮タイミング ｜ 全編 v1', stage); bd.id = 'badge';
+    const bd = div('', E.opts.badge || '無音・仮タイミング ｜ 全編 v1', stage); bd.id = 'badge';
+    if (E.opts.card) {
+      const cd = div('', `<svg class="full" viewBox="0 0 ${W} ${H}"><g class="wheel" transform="translate(960 540)"><circle r="400" fill="none" stroke="#BB965B" stroke-width="1.5" opacity=".22"/><circle r="340" fill="none" stroke="#BB965B" stroke-width="1" opacity=".14"/>${Array.from({ length: 12 }, (_, i) => `<line x1="0" y1="-340" x2="0" y2="-400" stroke="#BB965B" stroke-width="1" opacity=".22" transform="rotate(${i * 30})"/>`).join('')}</g></svg>
+        <div class="in"><div class="no"></div><div class="tt"></div><div class="rule"></div></div>`, stage);
+      cd.id = 'card';
+    }
     const sb = div('', `<div id="subtext"></div>`, stage); sb.id = 'sub';
     // ワイプ：本人のアイコン（1080x1080）の顔まわりを丸く切り出し、口と目だけを重ねて動かす
     const FACE = '#FFFFFB', LINE = '#645F54', DARK = '#3D3C42';
@@ -291,12 +361,28 @@
     const ch = E.chapters.find(c => t < c.end) || E.chapters[E.chapters.length - 1];
     const hd = document.getElementById('heading');
     hd.querySelector('.no').textContent = ch.no; hd.querySelector('.tt').textContent = ch.title;
-    rise(hd, Math.min(ease(prog(t, ch.start + .1, .8)), 1 - ease(prog(t, ch.end - .5, .5)) * (ch === E.chapters[E.chapters.length - 1] ? 0 : 1)), 8);
+    rise(hd, Math.min(ease(prog(t, (ch.cardB ?? ch.start) + .1, .8)), 1 - ease(prog(t, ch.end - .5, .5)) * (ch === E.chapters[E.chapters.length - 1] ? 0 : 1)), 8);
+
+    // 章タイトル（章の頭の数秒）
+    if (E.opts.card) {
+      const cd = document.getElementById('card');
+      const cc = E.chapters.find(c => c.cardA !== undefined && t >= c.cardA - .3 && t < c.cardB + .4);
+      const v = cc ? win(t, cc.cardA - .3, cc.cardB + .4, .5, .6) : 0;
+      cd.style.opacity = v.toFixed(3); cd.style.visibility = v > 0 ? 'visible' : 'hidden';
+      if (cc) {
+        cd.querySelector('.no').textContent = `第${+cc.no}章`; cd.querySelector('.tt').textContent = cc.title;
+        rise(cd.querySelector('.no'), ease(prog(t, cc.cardA - .1, .6)), 10);
+        rise(cd.querySelector('.tt'), ease(prog(t, cc.cardA + .15, .7)), 14);
+        cd.querySelector('.rule').style.transform = `scaleX(${ease(prog(t, cc.cardA + .5, .9)).toFixed(3)})`;
+        cd.querySelector('.wheel').setAttribute('transform', `translate(960 540) rotate(${((t - cc.cardA) * 2).toFixed(2)})`);
+      }
+    }
 
     // 字幕（仮）
     let st = '';
     for (const u of E.units) {
       if (t < u.start - .1 || t >= u.end) continue;
+      if (u.chunks) { u.chunks.forEach(c => { if (t >= c.a - .05) st = c.text; }); continue; }
       u.sent.forEach((s, k) => { if (t >= u.ss[k] - .05 && t < (u.sent[k + 1] ? u.ss[k + 1] : u.end) - .05) st = s; });
     }
     document.getElementById('subtext').textContent = st;

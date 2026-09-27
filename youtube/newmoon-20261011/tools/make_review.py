@@ -1,13 +1,17 @@
-"""full/timeline.json から、動画と台本を並べて確認するページ full/review.html を作る。
+"""<版のフォルダ>/timeline.json から、動画と台本を並べて確認するページ <版のフォルダ>/review.html を作る。
 
-    python tools/make_review.py
+    python tools/make_review.py            # full（全編 v1）
+    python tools/make_review.py full-v2    # 全編 v2
 """
 import html
 import json
 import os
+import sys
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-data = json.load(open(os.path.join(root, "full", "timeline.json"), encoding="utf-8"))
+folder = sys.argv[1] if len(sys.argv) > 1 else "full"
+ver = "v2" if folder == "full-v2" else "v1"
+data = json.load(open(os.path.join(root, folder, "timeline.json"), encoding="utf-8"))
 
 
 def mmss(t):
@@ -42,10 +46,10 @@ th{{color:#a79fb0;font-weight:500}}td:first-child{{white-space:nowrap}}td.sc{{co
 @media(max-width:650px){{main{{padding:16px}}td.sc{{white-space:normal}}}}
 </style>
 <main>
-<h1>2026年10月11日 天秤座新月　全編 v1</h1>
+<h1>2026年10月11日 天秤座新月　全編 {ver}</h1>
 <p class="lead">全編の仮編集｜約{mmss(total)}・無音・仮タイミング。章ボタンや各場面の時刻で移動できます。
 字幕は読む文の仮表示です。録音後に、単位ごとの長さを実際の音声に合わせて組み直します。</p>
-<video id="film" controls preload="metadata" src="newmoon-full-v1.mp4"></video>
+<video id="film" controls preload="metadata" src="newmoon-full-{ver}.mp4"></video>
 <nav>{nav}</nav>
 {''.join(secs)}
 </main>
@@ -55,5 +59,5 @@ document.querySelectorAll('[data-time]').forEach(b=>b.addEventListener('click',e
 </script>
 </html>
 """
-open(os.path.join(root, "full", "review.html"), "w", encoding="utf-8").write(page)
+open(os.path.join(root, folder, "review.html"), "w", encoding="utf-8").write(page)
 print("ok", len(page))

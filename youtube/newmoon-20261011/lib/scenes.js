@@ -59,7 +59,15 @@
       <div class="cv-rule"></div><div class="cv-tag">関係を、結び直す。</div><div class="cv-chip">金星逆行 <span class="g">♀□♂</span> 0°12′</div>`, layer);
     const parts = ['.cv-date', '.cv-title', '.cv-tag', '.cv-chip'].map(q => box.querySelector(q));
     const rule = box.querySelector('.cv-rule');
-    const at = p.at || {};
+    const at = p.at || {}, sf = p.soft; // soft：{ date, title, rule, tag, chip }（出るのにかける秒）。あれば、ゆっくりふんわり出す
+    if (sf) parts.forEach(el => { el.style.transformOrigin = '0 50%'; });
+    // ふんわり出す：薄く・ぼんやり・少し小さい → くっきり・等倍（上下にはほとんど動かさない）
+    const bloom = (el, q) => {
+      const v = .5 - .5 * Math.cos(Math.PI * q), o = 1 - Math.pow(1 - q, 3);
+      el.style.opacity = v.toFixed(3); el.style.visibility = v > 0 ? 'visible' : 'hidden';
+      el.style.filter = q < 1 ? `blur(${(12 * (1 - q) * (1 - q)).toFixed(2)}px)` : 'none';
+      el.style.transform = `translateY(${((1 - o) * 8).toFixed(2)}px) scale(${(.965 + .035 * o).toFixed(4)})`;
+    };
     return { frame(t) {
       const k = t - p.a;
       const s = 1.2 + k * .004;
@@ -69,8 +77,11 @@
       refs.signSeg[6].setAttribute('fill-opacity', (.7 * hl).toFixed(3));
       draw(ln, ease(prog(t, at.line ?? p.a + 1.6, 1.2)));
       dots.forEach((d, i) => d.setAttribute('opacity', ease(prog(t, (at.line ?? p.a + 1.6) + i * 1, .35)).toFixed(3)));
-      [at.date ?? p.a + .2, at.title ?? p.a + .5, at.tag ?? p.a + 1.2, at.chip ?? p.a + 1.8].forEach((a0, i) => rise(parts[i], ease(prog(t, a0, .8)), 14));
-      rule.style.transform = `scaleX(${ease(prog(t, (at.tag ?? p.a + 1.2) - .3, .9)).toFixed(3)})`;
+      [at.date ?? p.a + .2, at.title ?? p.a + .5, at.tag ?? p.a + 1.2, at.chip ?? p.a + 1.8].forEach((a0, i) => {
+        if (sf) bloom(parts[i], prog(t, a0, sf[['date', 'title', 'tag', 'chip'][i]]));
+        else rise(parts[i], ease(prog(t, a0, .8)), 14);
+      });
+      rule.style.transform = `scaleX(${ease(sf ? prog(t, at.rule, sf.rule) : prog(t, (at.tag ?? p.a + 1.2) - .3, .9)).toFixed(3)})`;
     } };
   });
 

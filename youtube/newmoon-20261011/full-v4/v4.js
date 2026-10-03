@@ -101,6 +101,15 @@
     [12, 7, 'timeline', false, T => [{ src: 'laptop_memo', x: 1194, y: 36, w: 700, a: T.s(0) + .8, clip: 'inset(-10% -10% -10% 49.7%)' }], '新しい約束や申し込みは'],
   ];
   const C = window.CHAPTERS;
+  // 01-1 表紙：題の文字を、ゆっくりふんわり出す（ご本人の希望。速く出ると違和感があるため）
+  const u11 = C[0].units[0], f11 = u11.cues;
+  u11.cues = T => f11(T).map(c => {
+    if (c.k === 'scene' && c.name === 'cover') {
+      Object.assign(c.p.at, { date: T.a + .2, title: T.a + .8, rule: T.a + 1.9, tag: T.a + 2.3 });
+      c.p.soft = { date: 1.6, title: 2.2, rule: 1.6, tag: 2.0, chip: 1.8 };
+    }
+    return c;
+  });
   SET.forEach(([ch, no, from, replace, imgs, head]) => {
     const u = C[ch - 1].units[no - 1], f = u.cues;
     if (!u.text.startsWith(head) || !f) throw new Error(`v4: ${ch}-${no} が見つかりません`);

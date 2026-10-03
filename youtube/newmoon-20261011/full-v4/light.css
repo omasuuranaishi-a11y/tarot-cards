@@ -1,7 +1,17 @@
 /* 全編 v4 の明るいデザイン（試作）。参考：Maya Arika さんの2026年の動画（明るい挿絵・白い円盤のチャート・大きく縁取りした字幕）。
    色の役割はそのまま：--white＝文字の色（濃い紫に）、--night＝背景（生成りに）。ブランドの紫・金・白は守る */
 :root{--white:#3B2C42;--dim:rgba(59,44,66,.7);--gold:#A47B3A;--gold-soft:rgba(164,123,58,.5);--night:#F6F1EA;--ink:#3B2C42;--purple:#CDB6D6}
-#stage{background:radial-gradient(ellipse 75% 85% at 38% 45%, #FFFFFF 0%, #FAF6F0 50%, #EFE6DA 100%)}
+/* 背景：参考動画（Maya Arika さん 2023年）のピンク〜水色のパステルに、ぼかした光の粒（玉ボケ） */
+#stage{background:
+  radial-gradient(circle at 12% 18%, rgba(255,255,255,.75) 0, rgba(255,255,255,0) 7%),
+  radial-gradient(circle at 86% 14%, rgba(255,255,255,.6) 0, rgba(255,255,255,0) 9%),
+  radial-gradient(circle at 78% 72%, rgba(255,255,255,.55) 0, rgba(255,255,255,0) 11%),
+  radial-gradient(circle at 24% 84%, rgba(255,255,255,.5) 0, rgba(255,255,255,0) 8%),
+  radial-gradient(circle at 55% 40%, rgba(255,255,255,.35) 0, rgba(255,255,255,0) 14%),
+  radial-gradient(circle at 93% 48%, rgba(255,240,250,.6) 0, rgba(255,240,250,0) 6%),
+  radial-gradient(circle at 40% 8%, rgba(235,245,255,.7) 0, rgba(235,245,255,0) 6%),
+  linear-gradient(135deg, #FBE3EE 0%, #F2E6F6 40%, #E2EEFB 75%, #DCEBFA 100%)}
+#card{background:linear-gradient(135deg, #FBE3EE 0%, #F2E6F6 45%, #E2EEFB 100%)}
 #heading{background:linear-gradient(90deg,rgba(255,255,255,.96) 0%,rgba(255,255,255,.9) 75%,rgba(255,255,255,0) 100%)}
 #badge{background:rgba(255,255,255,.85)}
 .deg-label{stroke:#FFFFFF}
@@ -17,7 +27,6 @@
 .msg.in{background:#F0E8F2}
 .msg.out{background:#E4D6E8;border-color:var(--gold-soft)}
 .memo{background:rgba(255,255,255,.75);box-shadow:0 10px 30px rgba(68,48,73,.12)}
-#card{background:radial-gradient(ellipse 70% 80% at 50% 50%, #FFFFFF 0%, #FAF6F0 50%, #EDE3D6 100%)}
 #card .tt{text-shadow:none}
 .cover-copy .cv-title,.cover-copy .cv-tag{text-shadow:0 2px 14px rgba(255,255,255,.9)}
 .cover-copy .cv-chip{background:rgba(255,255,255,.85)}

@@ -1,7 +1,8 @@
 /* 全編 v4：線画の挿絵を、いらすとやのイラストに置き換える（または、スマホ・手帳の場面に添える）。
    画像は ../illust/ に置く（tools/fetch_illust.sh で取得。一覧は tools/illust.tsv。いらすとやの規約で再配布できないので GitHub には入れない）。
-   いらすとやの商用利用は1つの制作物につき20点まで（同じイラストの重複は1点）。いまは15点。
-   p.imgs：[{ src, x, y, w, a, b, night }]（a・b は出る時刻と消える時刻。省略すると場面と同じ。night は夜の色合い）
+   いらすとやの商用利用は1つの制作物につき20点まで（同じイラストの重複は1点）。いまは15点。いらすとんは点数の上限なし（いまは4点）。
+   p.imgs：[{ src, x, y, w, a, b, night, mul }]（a・b は出る時刻と消える時刻。省略すると場面と同じ。night は夜の色合い。
+           src は拡張子なしなら .png。いらすとんの絵は白い背景の jpg なので mul（乗算で白を背景になじませる）をつける）
            { moon: true, x, y, r, rx, ry } は月（と水面に映る月）を描く。p.amp があれば水面の揺れに合わせて映る月を崩す。 */
 (function () {
   const { div, rise, win, prog, ease, lerp } = E.U;
@@ -34,9 +35,10 @@
           return { m, i, els: [moon, refl].filter(Boolean), moon, refl };
         }
         const img = document.createElement('img');
-        img.className = 'il'; img.alt = ''; img.src = DIR + m.src + '.png';
+        img.className = 'il'; img.alt = ''; img.src = DIR + (m.src.includes('.') ? m.src : m.src + '.png');
         img.style.cssText = `left:${m.x}px;top:${m.y}px;width:${m.w}px`;
         if (m.night) img.classList.add('night'); // 昼の湖を、月夜の色合いにする
+        if (m.mul) img.classList.add('mul');
         layer.appendChild(img);
         return { m, i, els: [img], img };
       });
@@ -83,6 +85,10 @@
       { moon: true, x: 1560, y: 372, r: 30, rx: 1440, ry: 560, a: T.at(0, .55) }], '天秤座18度が、外に'],
     [11, 11, 'lake', true, T => [{ src: 'lake', x: 900, y: 200, w: 700, night: true }, { moon: true, x: 1430, y: 262, r: 40, rx: 1250, ry: 600 }], '心が通じていると'],
     [12, 3, 'memo', false, T => [{ src: 'write_smile', x: 1610, y: 430, w: 270 }], '今回の配置を'],
+    // いらすとん（水彩のやわらかい絵）：絵のなかった図解の場面に添える
+    [3, 5, 'cycle', false, T => [{ src: 'dandelion.jpg', x: 170, y: 330, w: 380, a: T.s(1), mul: true }], '新月は、月の満ち欠け'],
+    [8, 6, 'bars', false, T => [{ src: 'milkyway.jpg', x: 1240, y: 520, w: 560, a: T.s(1), mul: true }], 'ここは、とっても大事な違いです'],
+    [13, 3, 'align', false, T => [{ src: 'fullmoon.jpg', x: 1500, y: 170, w: 340, mul: true }, { src: 'cow.jpg', x: 1460, y: 560, w: 420, a: T.a + .8, mul: true }], '次は、10月26日'],
   ];
   const C = window.CHAPTERS;
   SET.forEach(([ch, no, from, replace, imgs, head]) => {

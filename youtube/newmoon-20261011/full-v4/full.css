@@ -129,3 +129,4 @@ svg.full{position:absolute;left:0;top:0;width:1920px;height:1080px}
 .il-refl{position:absolute;opacity:0;visibility:hidden;border-radius:50%;background:radial-gradient(ellipse,rgba(255,250,220,.95) 0,rgba(255,244,190,.6) 45%,rgba(255,244,190,0) 72%);transform-origin:50% 50%}
 .il.night{filter:brightness(.5) saturate(.75) hue-rotate(12deg) contrast(1.08) drop-shadow(0 6px 14px rgba(68,48,73,.14))}
 .il-moon{box-shadow:0 0 40px 12px rgba(255,246,200,.55)}
+.il.mul{mix-blend-mode:multiply;filter:none}

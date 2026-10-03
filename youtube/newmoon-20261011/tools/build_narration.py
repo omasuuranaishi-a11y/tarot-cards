@@ -26,7 +26,8 @@ import numpy as np
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NAR = os.environ.get('NARRATION_DIR') or os.path.join(root, 'narration')
-SR = 16000
+SR = 16000      # 対応づけ（無音の判定）に使う。軽くて十分
+SR_MIX = 48000  # 音声トラック（mix）はこちら。録音の音質を落とさない
 sys.path.insert(0, os.path.join(root, 'tools'))
 
 
@@ -96,8 +97,8 @@ def recordings():
     return fs
 
 
-def load(f):
-    raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', f, '-ac', '1', '-ar', str(SR), '-f', 'f32le', '-'],
+def load(f, sr=SR):
+    raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', f, '-ac', '1', '-ar', str(sr), '-f', 'f32le', '-'],
                          capture_output=True, check=True).stdout
     return np.frombuffer(raw, np.float32)
 
@@ -219,24 +220,24 @@ def align():
 def mix():
     clips = json.load(open(os.path.join(NAR, 'clips.json')))
     lay = json.load(open(os.path.join(NAR, 'layout.json')))
-    X = {}
-    out = np.zeros(int((lay['duration'] + 1) * SR), np.float32)
+    X, R = {}, SR_MIX
+    out = np.zeros(int((lay['duration'] + 1) * R), np.float32)
     starts = [s for u in lay['units'] for s in u['ss']]
     assert len(starts) == len(clips), '文の数が合いません'
     for c, t in zip(clips, starts):
         if c['fi'] not in X:
-            X[c['fi']] = load(os.path.join(NAR, c['file']))
-        seg = X[c['fi']][int(c['a'] * SR):int(c['b'] * SR)].copy()
-        f = min(len(seg), int(.015 * SR))  # つなぎ目のプチッを防ぐ
+            X[c['fi']] = load(os.path.join(NAR, c['file']), R)
+        seg = X[c['fi']][int(c['a'] * R):int(c['b'] * R)].copy()
+        f = min(len(seg), int(.015 * R))  # つなぎ目のプチッを防ぐ
         if f:
             seg[:f] *= np.linspace(0, 1, f); seg[-f:] *= np.linspace(1, 0, f)
-        p = int(t * SR); out[p:p + len(seg)] += seg
-    out = out[:int(lay['duration'] * SR)]
+        p = int(t * R); out[p:p + len(seg)] += seg
+    out = out[:int(lay['duration'] * R)]
     wav = os.path.join(NAR, 'narration.wav')
-    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 'f32le', '-ar', str(SR), '-ac', '1', '-i', '-', '-c:a', 'pcm_s16le', wav],
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 'f32le', '-ar', str(R), '-ac', '1', '-i', '-', '-c:a', 'pcm_s16le', wav],
                    input=out.tobytes(), check=True)
     # 口の開き：30fps ごとの音の大きさ（dB）を 0〜255 に。開くのは速く、閉じるのはゆっくり
-    fps, hop = 30, SR // 30
+    fps, hop = 30, R // 30
     n = len(out) // hop
     db = 20 * np.log10(np.sqrt((out[:n * hop].reshape(n, hop) ** 2).mean(1)) + 1e-6)
     top = np.percentile(db[db > -60], 95) if (db > -60).any() else -20
@@ -248,7 +249,7 @@ def mix():
     with open(os.path.join(root, 'full-v4', 'mouth.js'), 'w') as f:
         f.write('/* 口の開き（tools/build_narration.py mix が作る。声から作るので GitHub には入れない） */\n')
         f.write(f'window.MOUTH = {{ fps: {fps}, b64: "{base64.b64encode(data.tobytes()).decode()}" }};\n')
-    print('narration.wav', round(len(out) / SR, 2), '秒、mouth.js', n, 'コマ')
+    print('narration.wav', round(len(out) / R, 2), '秒（48kHz）、mouth.js', n, 'コマ')
 
 
 def mux(video, out):

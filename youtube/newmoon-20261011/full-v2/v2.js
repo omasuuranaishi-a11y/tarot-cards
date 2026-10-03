@@ -13,18 +13,16 @@
   };
   u2.cues = null;
 
-  // 13-3：次回の告知に、チャンネル登録のひとこと（文字だけ）
-  const u133 = C[12].units[2], f133 = u133.cues;
-  u133.cues = T => f133(T).map(c => {
-    if (c.k === 'scene') c.p.texts = [...(c.p.texts || []), tx('<div class="cta">よろしければ、チャンネル登録をお願いします</div>', T.s(0) + 2.4, T.b, 'left:124px;top:300px')];
-    return c;
-  });
-  // 13-4：締めの問いかけとコメント欄への誘い（読む文の2文目に合わせて出す）
-  const u134 = C[12].units[3], f134 = u134.cues;
-  u134.cues = T => f134(T).map(c => {
+  // 締め（最後の単位）：問いかけとコメント欄への誘い（読む文の2文目に合わせて出す）と、チャンネル登録のひとこと（文字だけ）。
+  // 次回の告知（「次は、10月26日の牡牛座の満月でお会いしましょう。」）は、次回を出せるかわからないので台本から外した（2026-10-03 ご本人の指定）。
+  // チャンネル登録のひとことは、その告知の画面から、ここ（名前の下）に移した
+  const uEnd = C[12].units[C[12].units.length - 1], fEnd = uEnd.cues;
+  if (!uEnd.text.startsWith('最後まで')) throw new Error('v2: 締めの単位が見つかりません');
+  uEnd.cues = T => fEnd(T).map(c => {
     if (c.k === 'scene') c.p.texts = [...(c.p.texts || []),
       tx('<div class="q">あなたがこの関係で、守りたいものは何ですか？</div>', T.s(1) + .2, T.b + 2, 'left:120px;top:450px'),
-      tx('よければ、コメント欄で一言教えてください', T.s(1) + 1.0, T.b + 2, 'left:124px;top:520px', 's')];
+      tx('よければ、コメント欄で一言教えてください', T.s(1) + 1.0, T.b + 2, 'left:124px;top:520px', 's'),
+      tx('<div class="cta">よろしければ、チャンネル登録をお願いします</div>', T.s(2) + 1.0, T.b + 2, 'left:124px;top:720px')];
     return c;
   });
 })();

@@ -3,3 +3,9 @@ node_modules
 .stills*.html
 tools/.stills*.mjs
 stock/
+# 録音そのもの・声から作ったもの・音声付きの動画は GitHub に入れない
+narration/
+full-v4/mouth.js
+full-v4/*.mp4
+full-v4/*.wav
+full-v4/*.m4a

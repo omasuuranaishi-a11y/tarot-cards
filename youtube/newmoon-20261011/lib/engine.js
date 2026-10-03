@@ -1,6 +1,6 @@
 /* 全編の仮編集エンジン
    台本の「単位」ごとに読む文を持ち、画面の動き（cue）を各文の開始時刻に結びつける。
-   単位の長さ = 文字数 ÷ 5.5字/秒（毎分330字）＋ 図を見せる間（pad）。録音後は dur を実測に置き換える。
+   単位の長さ = 文字数 ÷ 5.5字/秒（毎分330字）＋ 図を見せる間（pad）。録音後は E.opts.narration で実測に置き換える。
    window.render(t) で任意の時刻の1コマを描く（tools/render.mjs で書き出す）。 */
 (function () {
   const W = 1920, H = 1080, NS = 'http://www.w3.org/2000/svg';
@@ -36,7 +36,11 @@
   const E = { RATE: 5.5, LEAD: .35, units: [], chapters: [], cues: [], scenes: {}, sceneCues: [], charts: {}, U, opts: {} };
   /* E.opts（v2 以降で使う。指定しなければ v1 と同じ動き）
      subMax：字幕を読点で区切り、この字数以内の塊で出す／card：各章の頭に入れる章タイトルの秒数
-     mark：アスペクト線の両端に点、重なる天体を金の輪で囲む／badge：右上の表示 */
+     mark：アスペクト線の両端に点、重なる天体を金の輪で囲む／badge：右上の表示
+     narration：録音の実測（v4）。{ units: [{ d: [各文の長さ], g: [文と文の間] }, …（全単位）], card: 章タイトルの秒数 }
+       指定すると、各単位の長さ＝LEAD＋実測の文の長さと間＋pad、各文の開始・終了も実測になる
+     mouth：口の開き（v4）。{ fps, data: 0〜255 の並び }。指定すると読む文の時刻ではなく音声の大きさで口を動かす
+     wipeNote：ワイプの名前の下の注記（'' で消す） */
   window.E = E;
 
   /* ---------- 時間 ---------- */
@@ -91,17 +95,22 @@
     };
   }
   E.build = function (chapters) {
-    let t = 0;
-    const O = E.opts;
+    let t = 0, gi = 0;
+    const O = E.opts, N = O.narration;
+    if (N && N.units.length !== chapters.reduce((n, ch) => n + ch.units.length, 0)) throw new Error('narration: 単位の数が合いません');
     chapters.forEach((ch, ci) => {
       ch.start = t;
-      if (O.card && ci > 0) { ch.cardA = t; t += O.card; ch.cardB = t; }
+      if (O.card && ci > 0) { ch.cardA = t; t += (N && N.card) || O.card; ch.cardB = t; }
       ch.units.forEach((u, i) => {
         u.sent = u.text.split(/(?<=。)/).filter(s => s.trim());
-        u.start = t; u.speech = len(u.text) / E.RATE;
+        const m = N && N.units[gi++];
+        if (m && m.d.length !== u.sent.length) throw new Error(`narration: ${ch.no}-${i + 1} の文の数が合いません`);
+        u.start = t; u.ss = []; u.se = [];
+        let s0 = u.start + E.LEAD;
+        if (m) u.sent.forEach((s, k) => { u.ss.push(s0); s0 += m.d[k]; u.se.push(s0); if (k < u.sent.length - 1) s0 += m.g[k]; });
+        else u.sent.forEach(s => { u.ss.push(s0); s0 += len(s) / E.RATE; u.se.push(s0); });
+        u.speech = s0 - (u.start + E.LEAD);
         u.dur = E.LEAD + u.speech + (u.pad ?? 1.2); u.end = t + u.dur; t = u.end;
-        let s0 = u.start + E.LEAD; u.ss = []; u.se = [];
-        u.sent.forEach(s => { u.ss.push(s0); s0 += len(s) / E.RATE; u.se.push(s0); });
         if (O.subMax) {
           u.chunks = [];
           u.sent.forEach((s, k) => {
@@ -339,7 +348,7 @@
       <ellipse cx="505" cy="584.5" rx="13" ry="10" fill="${FACE}"/>
       <ellipse id="mouth" cx="505" cy="585" rx="8" ry="4.5" fill="${LINE}"/>
       <ellipse id="mouthIn" cx="505" cy="586" rx="4.5" ry="0" fill="${DARK}"/>
-    </svg></div><div class="nm">おます</div><div class="ph">口の動きは仮（音声未収録）</div>`, stage);
+    </svg></div><div class="nm">おます</div>${(E.opts.wipeNote ?? '口の動きは仮（音声未収録）') ? `<div class="ph">${E.opts.wipeNote ?? '口の動きは仮（音声未収録）'}</div>` : ''}`, stage);
     wp.id = 'wipe';
   }
 
@@ -391,14 +400,21 @@
     // ワイプ：挿絵・比較図の場面では下げる
     const wv = clamp(1 - hideWipe * 1.2), wp = document.getElementById('wipe');
     wp.style.opacity = wv.toFixed(3); wp.style.transform = `translateY(${((1 - wv) * 16).toFixed(1)}px)`;
-    // 口：読んでいる文の間だけ開閉（仮。録音後は音声の大きさで動かす）
-    let speaking = 0;
-    for (const u of E.units) {
-      if (t < u.start || t > u.end) continue;
-      u.ss.forEach((a, k) => { speaking = Math.max(speaking, Math.min(clamp((t - a) / .12), clamp((u.se[k] - .05 - t) / .12))); });
+    // 口：E.opts.mouth があれば音声の大きさで、なければ読んでいる文の間だけ開閉（仮）
+    let open;
+    if (E.opts.mouth) {
+      const M = E.opts.mouth, f = t * M.fps, i0 = Math.floor(f), fr = f - i0;
+      const at = i => (M.data[Math.min(Math.max(i, 0), M.data.length - 1)] || 0) / 255;
+      open = clamp(at(i0) * (1 - fr) + at(i0 + 1) * fr);
+    } else {
+      let speaking = 0;
+      for (const u of E.units) {
+        if (t < u.start || t > u.end) continue;
+        u.ss.forEach((a, k) => { speaking = Math.max(speaking, Math.min(clamp((t - a) / .12), clamp((u.se[k] - .05 - t) / .12))); });
+      }
+      const syl = Math.max(0, .55 * Math.sin(2 * Math.PI * 4.1 * t) + .35 * Math.sin(2 * Math.PI * 6.7 * t + 1.3) + .2 * Math.sin(2 * Math.PI * 2.3 * t + .4));
+      open = clamp(speaking * syl);
     }
-    const syl = Math.max(0, .55 * Math.sin(2 * Math.PI * 4.1 * t) + .35 * Math.sin(2 * Math.PI * 6.7 * t + 1.3) + .2 * Math.sin(2 * Math.PI * 2.3 * t + .4));
-    const open = clamp(speaking * syl);
     document.getElementById('mouth').setAttribute('ry', (4.5 + open * 7.5).toFixed(2));
     document.getElementById('mouth').setAttribute('rx', (8 + open * 1.5).toFixed(2));
     document.getElementById('mouthIn').setAttribute('ry', Math.max(0, open * 7.5 - 1.5).toFixed(2));

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>天秤座新月 全編 v4</title>
+<!-- 全編 v4：v3 の画面に、本人の録音（ナレーション）の実測の時刻を当てる版。
+     narration.js（各文の長さと文の間。tools/build_narration.py が作る。声そのものは含まない）があれば実測の時刻、なければ v3 と同じ仮の時刻。
+     mouth.js（口の開き。声から作るので GitHub には入れない）があれば、口を音声の大きさで動かす。
+     実写の素材は先に tools/fetch_stock.sh で ../stock/ に取得する。1920x1080。window.render(t) で1コマを描く。
+     ブラウザで開くと再生（?t=秒 で停止表示）。書き出しは tools/render.mjs、音を重ねるのは tools/build_narration.py mux -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../lib/style.css">
+<link rel="stylesheet" href="full.css">
+</head>
+<body>
+<div id="stage"></div>
+<script src="../lib/chart-data.js"></script>
+<script src="../lib/chart.js"></script>
+<script src="../lib/engine.js"></script>
+<script src="../lib/scenes.js"></script>
+<script src="../stock/manifest.js"></script>
+<script src="../lib/footage.js"></script>
+<script src="../full/chapters.js"></script>
+<script src="../full-v2/v2.js"></script>
+<script src="../full-v3/v3.js"></script>
+<script src="narration.js" onerror="void 0"></script>
+<script src="mouth.js" onerror="void 0"></script>
+<script>
+const NAR = window.NARRATION;
+E.opts = { subMax: 40, card: 2.6, mark: true,
+  badge: NAR ? '全編 v4' : '録音前・仮タイミング ｜ 全編 v4',
+  narration: NAR, wipeNote: NAR ? '' : undefined,
+  mouth: window.MOUTH ? { fps: window.MOUTH.fps, data: Uint8Array.from(atob(window.MOUTH.b64), c => c.charCodeAt(0)) } : undefined };
+E.build(window.CHAPTERS);
+// 字幕が大きくなった分、画面の下に置いた文字を少し上げる（一番下の注意書きは右の空いた所へ）
+document.querySelectorAll('.stext').forEach(el => {
+  const tp = parseFloat(el.style.top);
+  if (tp >= 940) { Object.assign(el.style, { top: '840px', left: '1520px', width: '360px', lineHeight: '1.5' }); return; }
+  if (!(tp >= 835)) return;
+  el.style.top = (tp - 32) + 'px';
+  // 横いっぱいに置いた一行は、文字の幅の暗い下地をつけて中央に（図の線と重なっても読めるように）
+  if (el.style.left === '0px' && el.style.right === '0px' && !el.style.background) {
+    Object.assign(el.style, { width: 'fit-content', marginLeft: 'auto', marginRight: 'auto' }); el.classList.add('bgd');
+  }
+});
+window.CHAPTER_TIMES = E.chapters.map(c => ({ no: c.no, title: c.title, start: c.start, end: c.end }));
+const q = new URLSearchParams(location.search);
+if (!navigator.webdriver) {
+  document.fonts.ready.then(() => {
+    if (q.has('t')) { window.render(+q.get('t')); return; }
+    const t0 = performance.now() - (+(q.get('from') || 0)) * 1000;
+    const loop = () => { window.render(((performance.now() - t0) / 1000) % window.DURATION); requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>

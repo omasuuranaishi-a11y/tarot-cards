@@ -26,9 +26,11 @@ function make(C) {
   const lonOf = key => C.bodies[key].lon;
 
   /* 分未満は切り捨て（承認済みチャートと同じ表記） */
-  function dm(x) { const d = Math.floor(x + 1e-9); return [d, Math.floor((x - d) * 60 + 1e-9)]; }
-  function fmtDeg(lon) { const [d, m] = dm(((lon % 30) + 30) % 30); return `${d}°${String(m).padStart(2, '0')}′`; }
-  function fmtPos(lon) { return SIGNS[Math.floor(lon / 30)] + fmtDeg(lon); }
+  // 度と分。分は四捨五入（astro.com などの一般的な表示。2026-10-03 に切り捨てから変更）
+  function dm(x) { const t = Math.round(x * 60); return [Math.floor(t / 60), t % 60]; }
+  const tot = lon => ((Math.round(lon * 60) % 21600) + 21600) % 21600; // 四捨五入で 30° に届いたら次のサインにする
+  function fmtDeg(lon) { const t = tot(lon) % 1800; return `${Math.floor(t / 60)}°${String(t % 60).padStart(2, '0')}′`; }
+  function fmtPos(lon) { return SIGNS[Math.floor(tot(lon) / 1800)] + fmtDeg(lon); }
   function fmtOrb(x) { const [d, m] = dm(Math.abs(x)); return `${d}°${String(m).padStart(2, '0')}′`; }
   function sep(a, b) { return Math.abs(((a - b + 540) % 360) - 180); }
 
@@ -140,7 +142,7 @@ function make(C) {
       gt.textContent = p.glyph;
       // 度数は2行（上に度、下に分）。どの位置でも上から読める向きにする
       const lt = el('g', { class: 'deg-stack' }, grp);
-      const [dd, mm] = dm(((lon % 30) + 30) % 30);
+      const t30 = tot(lon) % 1800, dd = Math.floor(t30 / 60), mm = t30 % 60;
       const [lx, ly] = pt(dl, R.label);
       const t1 = el('text', { x: lx, y: ly - 12, class: 'deg-label', 'text-anchor': 'middle', 'dominant-baseline': 'central' }, lt);
       t1.textContent = dd + '°';

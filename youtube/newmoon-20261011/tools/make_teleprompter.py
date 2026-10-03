@@ -37,7 +37,7 @@ section {{ page-break-before: always; }}
 .end {{ text-align: center; color: #999; font-size: 11pt; margin-top: 6mm; }}
 </style></head><body>
 <div class="cover"><h1>録音用の台本</h1>
-<p>2026年10月11日 天秤座新月の解説 ／ 全13章・7,345字</p>
+<p>2026年10月11日 天秤座新月の解説 ／ 全13章・7,764字（話し言葉の版）</p>
 <ul>
 <li>中身は <b>02_録音台本.md</b> と同じです（1文ごとに改行しています）。</li>
 <li><b>章ごとに1つのファイル</b>で録音してください。ファイル名は章の番号（01〜13）にします。</li>

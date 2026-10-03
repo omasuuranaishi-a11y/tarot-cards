@@ -1,8 +1,10 @@
 /* 全編 v4：線画の挿絵を、いらすとやのイラストに置き換える（または、スマホ・手帳の場面に添える）。
    画像は ../illust/ に置く（tools/fetch_illust.sh で取得。一覧は tools/illust.tsv。いらすとやの規約で再配布できないので GitHub には入れない）。
    いらすとやの商用利用は1つの制作物につき20点まで（同じイラストの重複は1点）。いまは15点。いらすとんは点数の上限なし（いまは4点）。
-   p.imgs：[{ src, x, y, w, a, b, night, mul }]（a・b は出る時刻と消える時刻。省略すると場面と同じ。night は夜の色合い。
-           src は拡張子なしなら .png。いらすとんの絵は白い背景の jpg なので mul（乗算で白を背景になじませる）をつける）
+   イラストナビは30点以上使う商用デザインだと有償（いまは3点）。
+   p.imgs：[{ src, x, y, w, a, b, night, mul, clip }]（a・b は出る時刻と消える時刻。省略すると場面と同じ。night は夜の色合い。
+           src は拡張子なしなら .png。いらすとんの絵は白い背景の jpg なので mul（乗算で白を背景になじませる）をつける。
+           clip は CSS の clip-path（1枚に2つの絵が並んでいるときに片方だけ見せる、絵の中の文字を隠す、など）。x・y・w は画像全体の位置と幅）
            { moon: true, x, y, r, rx, ry } は月（と水面に映る月）を描く。p.amp があれば水面の揺れに合わせて映る月を崩す。 */
 (function () {
   const { div, rise, win, prog, ease, lerp } = E.U;
@@ -39,6 +41,7 @@
         img.style.cssText = `left:${m.x}px;top:${m.y}px;width:${m.w}px`;
         if (m.night) img.classList.add('night'); // 昼の湖を、月夜の色合いにする
         if (m.mul) img.classList.add('mul');
+        if (m.clip) img.style.clipPath = m.clip;
         layer.appendChild(img);
         return { m, i, els: [img], img };
       });
@@ -89,6 +92,13 @@
     [3, 5, 'cycle', false, T => [{ src: 'dandelion.jpg', x: 170, y: 330, w: 380, a: T.s(1), mul: true }], '新月は、月の満ち欠け'],
     [8, 6, 'bars', false, T => [{ src: 'milkyway.jpg', x: 1240, y: 520, w: 560, a: T.s(1), mul: true }], 'ここは、とっても大事な違いです'],
     [13, 3, 'align', false, T => [{ src: 'fullmoon.jpg', x: 1500, y: 170, w: 340, mul: true }, { src: 'cow.jpg', x: 1460, y: 560, w: 420, a: T.a + .8, mul: true }], '次は、10月26日'],
+    // イラストナビ：年表の場面の空いているところに添える
+    [10, 6, 'timeline', false, T => [{ src: 'thinking', x: 1260, y: 96, w: 725, a: T.s(1) }], 'それから、冥王星は'],
+    // 案内する女性。右上の「ドーン」の文字は clip で隠す（手にはかからない）
+    [12, 1, 'timeline', false, T => [{ src: 'guide', x: 470, y: 140, w: 620, b: T.b + .3,
+      clip: 'polygon(-10% -10%, 63.2% -10%, 63.2% 52.4%, 78.2% 52.4%, 78.2% -10%, 110% -10%, 110% 110%, -10% 110%)' }], '最後に、新月からの'],
+    // 主線ありとなしの2枚が並んだ絵なので、右（主線なし）だけを見せる
+    [12, 7, 'timeline', false, T => [{ src: 'laptop_memo', x: 1194, y: 36, w: 700, a: T.s(0) + .8, clip: 'inset(-10% -10% -10% 49.7%)' }], '新しい約束や申し込みは'],
   ];
   const C = window.CHAPTERS;
   SET.forEach(([ch, no, from, replace, imgs, head]) => {

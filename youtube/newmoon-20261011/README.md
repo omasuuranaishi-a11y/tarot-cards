@@ -18,7 +18,7 @@
 | `05_概要欄の案.md` | YouTube の題と概要欄の下書き（チャプターの時刻は仮、Mixkit のクレジット入り）。投稿はしていない |
 | `06_録音のしかた.md` | 全編 v4 の録音のしかた（章ごとに1ファイル、読み直しは文の頭から）と、録音を動画に合わせる手順・確かめたこと |
 | `recording/台本_録音用.pdf`、`recording/台本_録音用.html` | スマホで読みやすい録音用の台本（大きな文字・1文1行・章ごとに改ページ）。`tools/make_teleprompter.py`・`tools/html2pdf.mjs` で作る |
-| `full-v4/v4.js`、`tools/illust.tsv`、`tools/fetch_illust.sh` | 線画の挿絵を、いらすとやのイラスト（15点。上限20点）に置き換え、図解の場面にいらすとんの水彩の絵（4点）を添える。画像は `illust/`（GitHub に入れない） |
+| `full-v4/v4.js`、`tools/illust.tsv`、`tools/fetch_illust.sh` | 線画の挿絵を、いらすとやのイラスト（15点。上限20点）に置き換え、図解の場面にいらすとんの水彩の絵（4点）、年表の場面にイラストナビの絵（3点）を添える。画像は `illust/`（GitHub に入れない） |
 | `full-v4/astro.js` | 新月（東京）の図を、ご本人の astro.com の図そのものにして、金の強調を重ねる。画像は `astro/astro-chart.png`（GitHub に入れない） |
 | `full-v4/light.css`、`full-v4/light.js` | 明るいデザイン（白〜生成りの背景・濃い紫の文字・大きく縁取りした字幕） |
 | `full-v4/index.html`、`full-v4/full.css` | v4 の作り。v3 の画面に、`full-v4/narration.js`（実測の時刻。声は含まない）と `full-v4/mouth.js`（口の開き。GitHub に入れない）を当てる |

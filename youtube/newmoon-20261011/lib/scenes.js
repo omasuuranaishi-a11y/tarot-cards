@@ -467,15 +467,16 @@
       const y = ev.y ?? 560;
       const c = svgEl('circle', { cx: X(ev.v), cy: y, r: 0, fill: ev.gold === false ? WHITE : '#f3d9a4', stroke: '#0e0b18', 'stroke-width': 3 }, svg);
       const d = div('tl-ev' + (ev.below ? ' below' : ''), `<div class="d">${ev.label}</div><div class="s">${ev.sub || ''}</div>`, layer, `left:${X(ev.v) - 120}px;top:${ev.below ? y + 26 + (ev.drop || 0) : y - 118 - (ev.lift || 0)}px`);
-      if (ev.lift || ev.drop) svgEl('line', { x1: X(ev.v), y1: y, x2: X(ev.v), y2: ev.below ? y + 26 + ev.drop : y - 30 - ev.lift, stroke: 'rgba(187,150,91,.5)', 'stroke-dasharray': '3 4' }, svg);
-      return { ev, c, d };
+      // ラベルを上下にずらしたときの引き出し線（ラベルと一緒に出す）
+      const ln = (ev.lift || ev.drop) ? svgEl('line', { x1: X(ev.v), y1: y, x2: X(ev.v), y2: ev.below ? y + 26 + ev.drop : y - 30 - ev.lift, stroke: 'rgba(187,150,91,.5)', 'stroke-dasharray': '3 4', opacity: 0 }, svg) : null;
+      return { ev, c, d, ln };
     });
     const T = texts(layer, p.texts || []);
     return { frame(t) {
       axes.forEach(({ ax, ln, lab }) => { const q = ease(prog(t, ax.at ?? p.a, 1.2)); ln.setAttribute('x2', X0 + (X1 - X0) * q); if (lab) rise(lab, win(t, ax.at ?? p.a, p.b, .6, .5)); });
       ticks.forEach(({ tk, l, d }) => { const v = win(t, tk.at ?? p.a + .6, p.b, .5, .5); l.setAttribute('opacity', v); rise(d, v, 6); });
       ranges.forEach(({ r, rect, d }) => { const q = ease(prog(t, r.at, 1.2)); rect.setAttribute('width', Math.max(0, (X(r.v1) - X(r.v0)) * q)); rect.setAttribute('opacity', win(t, r.at, r.until ?? p.b, .3, .5)); rise(d, win(t, r.at + .4, r.until ?? p.b, .6, .5)); });
-      evs.forEach(({ ev, c, d }) => { const v = win(t, ev.at, ev.until ?? p.b, .4, .5); c.setAttribute('r', (11 * easeOut(v)).toFixed(1)); rise(d, v, 10); d.classList.toggle('hl', ev.hlA !== undefined && t >= ev.hlA); });
+      evs.forEach(({ ev, c, d, ln }) => { const v = win(t, ev.at, ev.until ?? p.b, .4, .5); c.setAttribute('r', (11 * easeOut(v)).toFixed(1)); rise(d, v, 10); d.classList.toggle('hl', ev.hlA !== undefined && t >= ev.hlA); if (ln) ln.setAttribute('opacity', v.toFixed(3)); });
       showTexts(t, T, p.b);
     } };
   });

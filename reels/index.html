@@ -105,7 +105,7 @@ button,.file{font:inherit;cursor:pointer;letter-spacing:.08em}
           <button id="chara-clear" class="link" type="button" hidden>外す</button>
         </div>
       </div>
-      <p class="hint">選んだ画像はこの端末に保存され、次からも使われます。</p>
+      <p class="hint">正方形のイラストがおすすめです。選んだ画像はこの端末に保存され、次からも使われます。</p>
     </div>
     <div class="field"><label for="f-title">見出し</label><input id="f-title" type="text"></div>
     <div class="field"><label for="f-date">日付</label><input id="f-date" type="text"></div>
@@ -148,7 +148,7 @@ const DEFAULTS = {
   title :"今日の1枚",
   intro :"今日のカード、めくってみるね",
   ready :"せーの…",
-  from  :"おますより",
+  name  :"おます",              // 会話ウィンドウの名前
   outro :"保存して、夜にもう一度読み返してね",
   handle:"@omasu_horoscope"
 };
@@ -251,7 +251,9 @@ const MAJOR = [
 const CARD_FILES = ["00-fool","01-magician","02-high-priestess","03-empress","04-emperor","05-hierophant","06-lovers","07-chariot","08-strength","09-hermit","10-wheel-of-fortune","11-justice","12-hanged-man","13-death","14-temperance","15-devil","16-tower","17-star","18-moon","19-sun","20-judgement","21-world"];
 
 /* ================= 描画 ================= */
-const W=1080,H=1920,FPS=30,RATIO=527/300;
+/* 流れ：キャラの前でシャッフル → 1枚引いて差し出す → 画面いっぱいにめくる
+   → 会話ウィンドウでメッセージ → いいね・コメント・保存の締め画面 */
+const W=1080,H=1920,FPS=30,RATIO=527/300,CPS=15;
 const $=id=>document.getElementById(id);
 const cv=$("cv"),ctx=cv.getContext("2d");
 ctx.imageSmoothingQuality="high";
@@ -259,18 +261,28 @@ ctx.imageSmoothingQuality="high";
 const THEMES={
   sage:{bgTop:"#c7d1bf",bgBot:"#a6b59f",glow:"rgba(255,252,240,.5)",grainA:16,
         ink:"#3b4a3f",inkDim:"#5d6c60",accent:"#a87f39",doodle:"rgba(252,250,242,.9)",
-        paper:"rgba(249,246,238,.94)",paperLine:"rgba(79,107,90,.28)",cardGlow:"rgba(255,249,228,.95)",
-        back:"#4f6b5a",backLine:"#efe6cf",backStar:"#dcb86e",chip:"#4f6b5a",chipInk:"#f6f1e4",ring:"#f9f6ee",
+        paper:"rgba(249,246,238,.9)",box:"rgba(250,247,240,.96)",boxLine:"#4f6b5a",tab:"#4f6b5a",tabInk:"#f6f1e4",
+        table:"#5f7c69",lace:"#f3eedf",dim:"rgba(36,50,41,.66)",cardGlow:"rgba(255,249,228,.95)",
+        back:"#4f6b5a",backLine:"#efe6cf",backStar:"#dcb86e",mark:"rgba(250,248,240,.9)",
+        endTop:"#4a6655",endBot:"#2c4135",endInk:"#f6f1e4",endDim:"rgba(220,230,214,.75)",ring:"#f3eedf",
         jp:"Klee One",jpW:600},
   night:{bgTop:"#232a58",bgBot:"#0b0e1e",glow:"rgba(140,120,220,.22)",grainA:8,
         ink:"#ece6d8",inkDim:"#a9a293",accent:"#d8b46a",doodle:"rgba(240,214,154,.85)",
-        paper:"rgba(26,31,69,.93)",paperLine:"rgba(216,180,106,.4)",cardGlow:"rgba(240,214,154,.5)",
-        back:"#1c2148",backLine:"#d8b46a",backStar:"#f0d69a",chip:"#d8b46a",chipInk:"#131735",ring:"#d8b46a",
+        paper:"rgba(26,31,69,.88)",box:"rgba(22,26,60,.95)",boxLine:"#d8b46a",tab:"#d8b46a",tabInk:"#131735",
+        table:"#2a2150",lace:"#d8b46a",dim:"rgba(8,10,25,.66)",cardGlow:"rgba(240,214,154,.5)",
+        back:"#1c2148",backLine:"#d8b46a",backStar:"#f0d69a",mark:"rgba(240,214,154,.85)",
+        endTop:"#1a1f45",endBot:"#07091a",endInk:"#ece6d8",endDim:"rgba(240,214,154,.7)",ring:"#d8b46a",
         jp:"Noto Serif JP",jpW:500}
 };
-const BIG={cx:540,cy:900,w:460}, ROW={cx:240,cy:680,w:280};
-const AV_INTRO={cx:540,cy:860,s:600,r:44}, AV_READY={cx:170,cy:1420,s:156,r:78}, AV_ROW={cx:160,cy:1008,s:144,r:72};
-const PANEL={x:80,y:1000,w:920,h:490}, MSG={x:130,y:1100,w:820,h:350};
+const CTA=[["いいね","#e8a3ab","heart"],["コメント","#9ccfbd","talk"],["保存","#ecd395","mark"]];
+
+const IMG={y:250,s:1080};           /* キャラのイラスト（横幅いっぱい） */
+const TABLE_Y=1180;                 /* テーブルクロスの上端 */
+const DECK={cx:540,cy:1090,w:190,n:8};
+const BIG={cx:540,cy:930,w:600};
+const THUMB={cx:140,cy:292,w:96};
+const INFO={x:60,y:190,w:960,h:206};
+const BOX={x:60,y:1290,w:960,h:262}, TXT={x:110,y:1338,w:860,size:44,lh:70,lines:3};
 const NO_START="、。，．,.・：:；;？?！!ー－）)」』】〕〉》’”ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ…‥〜";
 const NO_END="（(「『【〔〈《‘“";
 
@@ -286,6 +298,7 @@ function th(){return THEMES[S.theme];}
 function jp(size,w){const T=th();return `${w||T.jpW} ${size}px "${T.jp}","Noto Serif JP",serif`;}
 function en(size,it){return `${it?"italic ":""}500 ${size}px "Cormorant Garamond",serif`;}
 function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rgba=(c,a)=>`rgba(${c[0]},${c[1]},${c[2]},${a})`;
 
 function rr(c,x,y,w,h,r){r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
 function star4(c,x,y,s){c.beginPath();c.moveTo(x,y-s);c.quadraticCurveTo(x,y,x+s,y);c.quadraticCurveTo(x,y,x,y+s);c.quadraticCurveTo(x,y,x-s,y);c.quadraticCurveTo(x,y,x,y-s);c.closePath();}
@@ -297,6 +310,14 @@ function spaced(s,x,y,sp){
   let cx=x-(ws.reduce((a,b)=>a+b,0)+sp*(cs.length-1))/2;
   ctx.textAlign="left";cs.forEach((ch,i)=>{ctx.fillText(ch,cx,y);cx+=ws[i]+sp;});ctx.textAlign="center";
 }
+/* [文字, font, 色] の並びを続けて描く。align は "center" か "left" */
+function runs(parts,x,y,align){
+  const ws=parts.map(([s,f])=>{ctx.font=f;return ctx.measureText(s).width;});
+  let cx=align==="left"?x:x-ws.reduce((a,b)=>a+b,0)/2;ctx.textAlign="left";
+  parts.forEach(([s,f,col],i)=>{ctx.font=f;ctx.fillStyle=col;ctx.fillText(s,cx,y);cx+=ws[i];});
+  ctx.textAlign="center";return cx;
+}
+function fitSize(s,font,max,min,maxW){let z=max;for(;z>min;z-=2){ctx.font=font(z);if(ctx.measureText(s).width<=maxW)break;}return z;}
 /* 禁則つきの折り返し（ctx.font は呼び出し側で設定） */
 function wrap(s,maxW){
   const out=[];
@@ -313,14 +334,21 @@ function wrap(s,maxW){
   });
   return out;
 }
-/* [文字, font, 色] の並びを中央揃えで続けて描く */
-function runs(parts,x,y){
-  const ws=parts.map(([s,f])=>{ctx.font=f;return ctx.measureText(s).width;});
-  let cx=x-ws.reduce((a,b)=>a+b,0)/2;ctx.textAlign="left";
-  parts.forEach(([s,f,col],i)=>{ctx.font=f;ctx.fillStyle=col;ctx.fillText(s,cx,y);cx+=ws[i];});
-  ctx.textAlign="center";
+/* 会話ウィンドウ用：文の切れ目でページを分け、1ページ maxLines 行に収める */
+function paginate(s,maxW,maxLines){
+  const sents=(s.match(/[^。！？!?\n]*(?:[。！？!?]+[」』）)]*|\n|$)/g)||[]).map(x=>x.trim()).filter(Boolean);
+  const pages=[];let cur="";
+  sents.forEach(x=>{
+    if(cur&&wrap(cur+x,maxW).length<=maxLines){cur+=x;return;}
+    if(cur)pages.push(wrap(cur,maxW));
+    const ls=wrap(x,maxW);cur="";
+    for(let i=0;i<ls.length;i+=maxLines){
+      if(i+maxLines<ls.length)pages.push(ls.slice(i,i+maxLines));else cur=ls.slice(i).join("");
+    }
+  });
+  if(cur)pages.push(wrap(cur,maxW));
+  return pages.length?pages:[[""]];
 }
-function fitSize(s,font,max,min,maxW){let z=max;for(;z>min;z-=2){ctx.font=font(z);if(ctx.measureText(s).width<=maxW)break;}return z;}
 
 /* 紙のざらつき（テーマごとに一度だけ作る） */
 const grainCache={};
@@ -336,8 +364,8 @@ function grain(){
 let backCache={};
 function cardBack(){
   if(backCache[S.theme])return backCache[S.theme];
-  const T=th(),w=BIG.w,h=Math.round(BIG.w*RATIO);
-  const c=document.createElement("canvas");c.width=w;c.height=h;const g=c.getContext("2d");
+  const T=th(),w=460,h=Math.round(460*RATIO),k=BIG.w/460;
+  const c=document.createElement("canvas");c.width=Math.round(w*k);c.height=Math.round(h*k);const g=c.getContext("2d");g.scale(k,k);
   rr(g,0,0,w,h,26);g.fillStyle=T.back;g.fill();
   g.strokeStyle=T.backLine;g.lineWidth=3;rr(g,18,18,w-36,h-36,16);g.stroke();
   g.globalAlpha=.55;g.lineWidth=1.5;rr(g,30,30,w-60,h-60,10);g.stroke();
@@ -360,27 +388,27 @@ function cardBack(){
   return backCache[S.theme]=c;
 }
 
-/* 背景のらくがき星 */
-const DOODLES=[[130,300,26,4],[955,250,20,5],[925,560,15,4],[105,700,18,5],[985,1200,22,4],[70,1530,16,4],[1000,1600,18,5],[240,175,12,4],[860,400,10,4],[150,1050,12,5]];
-function doodles(t){
-  const T=th();ctx.strokeStyle=ctx.fillStyle=T.doodle;ctx.lineWidth=3;ctx.lineJoin=ctx.lineCap="round";
-  DOODLES.forEach(([x,y,s,k],i)=>{
-    ctx.globalAlpha=.45+.45*Math.sin(t*1.7+i*1.3);
+/* 背景のらくがき星（イラストがないとき） */
+const DOODLES=[[130,300,26,4],[955,250,20,5],[925,560,15,4],[105,700,18,5],[985,1000,22,4],[90,1080,16,4],[240,175,12,4],[860,420,10,4]];
+function doodles(t,col,all,fade=1){
+  ctx.strokeStyle=ctx.fillStyle=col;ctx.lineWidth=3;ctx.lineJoin=ctx.lineCap="round";
+  if(all)DOODLES.forEach(([x,y,s,k],i)=>{
+    ctx.globalAlpha=(.45+.45*Math.sin(t*1.7+i*1.3))*fade;
     if(k===4){star4(ctx,x,y,s);ctx.fill();}else{star5(ctx,x,y,s);ctx.stroke();}
   });
-  /* 小さな星座 */
-  const pts=[[780,175],[838,150],[905,188],[965,160]];
-  ctx.globalAlpha=.6;ctx.lineWidth=2;ctx.setLineDash([6,8]);ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();ctx.setLineDash([]);
+  const pts=[[780,140],[838,115],[905,153],[965,125]];
+  ctx.globalAlpha=.6*fade;ctx.lineWidth=2;ctx.setLineDash([6,8]);ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();ctx.setLineDash([]);
   pts.forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.fill();});
   ctx.globalAlpha=1;
 }
 
-function drawCard(cx,cy,w,flip,alpha){
-  const T=th(),h=w*RATIO,ang=flip*Math.PI,sx=Math.abs(Math.cos(ang)),lift=1+.07*Math.sin(ang);
+function drawCard(cx,cy,w,flip,alpha,rot,shadow){
+  if(alpha<=0)return;
+  const T=th(),h=w*RATIO,ang=flip*Math.PI,sx=Math.abs(Math.cos(ang)),lift=1+.06*Math.sin(ang);
   const front=ang>Math.PI/2&&S.img;
-  ctx.save();ctx.globalAlpha=alpha;ctx.translate(cx,cy);ctx.scale(Math.max(sx,.002)*lift,lift);
+  ctx.save();ctx.globalAlpha=alpha;ctx.translate(cx,cy);ctx.rotate(rot||0);ctx.scale(Math.max(sx,.002)*lift,lift);
   ctx.transform(1,.1*Math.sin(ang)*(ang>Math.PI/2?-1:1),0,1,0,0);
-  ctx.shadowColor="rgba(30,40,32,.32)";ctx.shadowBlur=46;ctx.shadowOffsetY=20;
+  if(shadow!==false){ctx.shadowColor="rgba(20,28,22,.35)";ctx.shadowBlur=w*.1;ctx.shadowOffsetY=w*.04;}
   rr(ctx,-w/2,-h/2,w,h,w*.056);ctx.fillStyle=front?"#1d1d1d":T.back;ctx.fill();
   ctx.shadowColor="transparent";
   if(front){if(S.rev)ctx.rotate(Math.PI);ctx.drawImage(S.img,-w/2,-h/2,w,h);}
@@ -388,171 +416,241 @@ function drawCard(cx,cy,w,flip,alpha){
   ctx.restore();
 }
 
+/* キャラの場面：イラストを上に、手前にテーブルクロス */
+function scene(t){
+  const T=th(),L=TL;
+  if(S.chara){
+    const c=S.charaTop;ctx.fillStyle=rgba(c,1);ctx.fillRect(0,0,W,H);
+    const im=S.chara,k=Math.min(im.width,im.height),sx=(im.width-k)/2,sy=(im.height-k)/2;
+    const z=IMG.s*(1+.05*prog(t,0,L.endIn)),y=IMG.y+IMG.s/2-z/2;
+    ctx.drawImage(im,sx,sy,k,k,W/2-z/2,y,z,z);
+    const f=ctx.createLinearGradient(0,y,0,y+80);f.addColorStop(0,rgba(c,1));f.addColorStop(1,rgba(c,0));
+    ctx.fillStyle=f;ctx.fillRect(0,y,W,80);
+    doodles(t,T.doodle,false);
+  }else{
+    const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,T.bgTop);g.addColorStop(1,T.bgBot);
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    const rg=ctx.createRadialGradient(540,760,60,540,760,900);rg.addColorStop(0,T.glow);rg.addColorStop(1,"rgba(255,255,255,0)");
+    ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+    doodles(t,T.doodle,true);
+  }
+  /* テーブルクロス */
+  ctx.save();
+  ctx.shadowColor="rgba(20,28,22,.25)";ctx.shadowBlur=30;ctx.shadowOffsetY=-6;
+  ctx.fillStyle=T.table;ctx.fillRect(0,TABLE_Y,W,H-TABLE_Y);ctx.shadowColor="transparent";
+  const r=mulberry(5);ctx.fillStyle=T.lace;
+  for(let i=0;i<40;i++){ctx.globalAlpha=.12+r()*.2;star4(ctx,r()*W,TABLE_Y+60+r()*(H-TABLE_Y-60),4+r()*7);ctx.fill();}
+  ctx.globalAlpha=1;
+  for(let x=0;x<=W+36;x+=36){ctx.beginPath();ctx.arc(x,TABLE_Y,18,0,Math.PI);ctx.fill();}
+  ctx.globalAlpha=.6;ctx.strokeStyle=T.lace;ctx.lineWidth=2;ctx.setLineDash([4,8]);
+  ctx.beginPath();ctx.moveTo(0,TABLE_Y+34);ctx.lineTo(W,TABLE_Y+34);ctx.stroke();ctx.setLineDash([]);
+  ctx.restore();
+}
+
+/* シャッフル（左右に割って重ね直す） */
+function deck(t){
+  const L=TL,N=DECK.n,inP=easeOut(prog(t,L.deckIn,L.deckIn+.6)),fade=1-prog(t,L.rise+.6,L.exit);
+  if(inP<=0||fade<=0)return;
+  const p=t>=L.shuf&&t<L.shufEnd?((t-L.shuf)%L.cyc)/L.cyc:0,s=Math.sin(Math.PI*p);
+  for(let i=0;i<N;i++){
+    if(i===N-1&&t>=L.rise)continue;
+    const side=i%2?-1:1,mid=1-Math.abs(i-N/2)/N;
+    drawCard(DECK.cx+side*s*135+(i-N/2)*1.5,DECK.cy+(1-inP)*460-s*28*mid-i*2,DECK.w,0,inP*fade,side*s*.16,i===0);
+  }
+}
+
+/* 会話ウィンドウ（名前タブつき・1文字ずつ） */
+function dialog(t){
+  const T=th(),L=TL;
+  const a=Math.max(prog(t,L.introIn,L.introIn+.3)*(1-prog(t,L.rise,L.rise+.35)),prog(t,L.pagesIn,L.pagesIn+.3));
+  if(a<=0)return;
+  const oy=(1-easeOut(a))*30;
+  ctx.save();ctx.globalAlpha=a;
+  ctx.font=jp(32);const tw=ctx.measureText(DEFAULTS.name).width+60;
+  rr(ctx,BOX.x+34,BOX.y-50+oy,tw,74,18);ctx.fillStyle=T.box;ctx.fill();ctx.strokeStyle=T.boxLine;ctx.lineWidth=5;ctx.stroke();
+  ctx.fillStyle=T.boxLine;ctx.textAlign="left";ctx.textBaseline="middle";ctx.fillText(DEFAULTS.name,BOX.x+64,BOX.y-14+oy);
+  ctx.shadowColor="rgba(20,28,22,.25)";ctx.shadowBlur=30;ctx.shadowOffsetY=10;
+  ctx.fillStyle=T.box;rr(ctx,BOX.x,BOX.y+oy,BOX.w,BOX.h,22);ctx.fill();ctx.shadowColor="transparent";
+  ctx.strokeStyle=T.boxLine;ctx.lineWidth=5;rr(ctx,BOX.x,BOX.y+oy,BOX.w,BOX.h,22);ctx.stroke();
+  ctx.globalAlpha=a*.5;ctx.lineWidth=1.5;rr(ctx,BOX.x+12,BOX.y+12+oy,BOX.w-24,BOX.h-24,14);ctx.stroke();ctx.globalAlpha=a;
+  const b=[...L.beats].reverse().find(x=>x.start<=t&&t<x.end);
+  if(b){
+    let left=Math.floor((t-b.start)*CPS);const total=[...b.lines.join("")].length;
+    ctx.font=jp(TXT.size,400);ctx.fillStyle=T.ink;ctx.textBaseline="top";
+    b.lines.forEach((line,i)=>{
+      if(left<=0)return;const cs=[...line];
+      ctx.fillText(cs.slice(0,left).join(""),TXT.x,TXT.y+i*TXT.lh+oy);left-=cs.length;
+    });
+    if((t-b.start)*CPS>=total&&Math.sin(t*9)>-.3){
+      const x=BOX.x+BOX.w-52,y=BOX.y+BOX.h-46+oy+Math.sin(t*6)*3;
+      ctx.fillStyle=T.boxLine;ctx.beginPath();ctx.moveTo(x-14,y-9);ctx.lineTo(x+14,y-9);ctx.lineTo(x,y+9);ctx.closePath();ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+/* 上の情報ボックス：最初は見出し、めくった後はカード名とキーワード */
+function info(t){
+  const T=th(),L=TL,c=MAJOR[S.card];
+  const a1=prog(t,.1,.6)*(1-prog(t,L.rise,L.rise+.4)),a2=prog(t,L.exitEnd-.45,L.exitEnd+.15);
+  const a=Math.max(a1,a2);if(a<=0)return;
+  ctx.save();ctx.globalAlpha=a;
+  ctx.shadowColor="rgba(20,28,22,.18)";ctx.shadowBlur=24;ctx.shadowOffsetY=8;
+  ctx.fillStyle=T.paper;rr(ctx,INFO.x,INFO.y,INFO.w,INFO.h,28);ctx.fill();ctx.shadowColor="transparent";
+  ctx.textAlign="center";ctx.textBaseline="alphabetic";
+  if(a1>0){
+    ctx.globalAlpha=a1;
+    ctx.fillStyle=T.accent;ctx.font=en(30);spaced("TODAY'S CARD",540,252,9);
+    ctx.fillStyle=T.ink;ctx.font=jp(60);ctx.fillText(S.title,540,328);
+    if(S.date){ctx.fillStyle=T.inkDim;ctx.font=jp(30,400);ctx.fillText(S.date,540,374);}
+  }
+  if(a2>0){
+    ctx.globalAlpha=a2;const x=222;
+    ctx.textAlign="left";ctx.fillStyle=T.accent;ctx.font=en(34);ctx.fillText(`No. ${c.num}　${c.en}`,x,250);
+    const end=runs([[c.name,jp(LAY.nameSize),T.ink]],x,316,"left");ctx.textAlign="left";
+    const ori=S.rev?"逆位置":"正位置";ctx.font=jp(28);const pw=ctx.measureText(ori).width+40;
+    ctx.fillStyle=T.tab;rr(ctx,end+20,276,pw,48,24);ctx.fill();
+    ctx.fillStyle=T.tabInk;ctx.textBaseline="middle";ctx.fillText(ori,end+40,301);ctx.textBaseline="alphabetic";
+    ctx.fillStyle=T.inkDim;ctx.font=jp(LAY.kwSize,400);ctx.fillText(LAY.kw,x,368);
+  }
+  ctx.restore();
+}
+
 function sparkles(cx,cy,w,amt,burst,t){
   if(amt<=0&&burst<=.01)return;
   const T=th(),h=w*RATIO,r=mulberry(11+S.card);ctx.fillStyle=T.cardGlow;
-  for(let i=0;i<16;i++){
-    const a=r()*Math.PI*2,k=.62+r()*.22,ph=r()*6,sz=8+r()*14;
-    const d=1+burst*.18;
-    const x=cx+Math.cos(a)*w*k*d,y=cy+Math.sin(a)*h*.5*d;
+  for(let i=0;i<18;i++){
+    const a=r()*Math.PI*2,k=.62+r()*.22,ph=r()*6,sz=10+r()*16,d=1+burst*.16;
     ctx.globalAlpha=clamp(amt*(.35+.65*Math.abs(Math.sin(t*2.1+ph)))+burst);
-    star4(ctx,x,y,sz*(1+burst*.6));ctx.fill();
+    star4(ctx,cx+Math.cos(a)*w*k*d,cy+Math.sin(a)*h*.5*d,sz*(1+burst*.6));ctx.fill();
+  }
+  ctx.globalAlpha=1;
+}
+/* めくった後に舞い落ちる光 */
+function snow(t,amt){
+  if(amt<=0)return;
+  const T=th(),r=mulberry(29);ctx.fillStyle=T.cardGlow;
+  for(let i=0;i<34;i++){
+    const x0=r()*W,sp=70+r()*90,ph=r()*H,sz=5+r()*9,sw=r()*6;
+    const y=(ph+t*sp)%(H+80)-40,x=x0+Math.sin(t*1.3+sw)*24;
+    ctx.globalAlpha=amt*(.45+.55*Math.abs(Math.sin(t*2+sw)));star4(ctx,x,y,sz);ctx.fill();
   }
   ctx.globalAlpha=1;
 }
 
-function avatar(cx,cy,s,r,alpha){
-  if(!S.chara||alpha<=0)return;
-  const T=th(),im=S.chara,k=Math.min(im.width,im.height),sx=(im.width-k)/2,sy=(im.height-k)/2;
-  ctx.save();ctx.globalAlpha=alpha;
-  ctx.shadowColor="rgba(30,40,32,.22)";ctx.shadowBlur=30;ctx.shadowOffsetY=12;
-  rr(ctx,cx-s/2,cy-s/2,s,s,r);ctx.fillStyle=T.ring;ctx.fill();ctx.shadowColor="transparent";
-  ctx.save();rr(ctx,cx-s/2,cy-s/2,s,s,r);ctx.clip();ctx.drawImage(im,sx,sy,k,k,cx-s/2,cy-s/2,s,s);ctx.restore();
-  ctx.lineWidth=Math.max(4,s*.035);ctx.strokeStyle=T.ring;rr(ctx,cx-s/2,cy-s/2,s,s,r);ctx.stroke();
+function icon(kind,x,y,s,col){
+  ctx.save();ctx.translate(x,y);ctx.strokeStyle=col;ctx.lineWidth=7;ctx.lineJoin=ctx.lineCap="round";
+  if(kind==="heart"){
+    ctx.beginPath();ctx.moveTo(0,s*.42);ctx.bezierCurveTo(-s*.95,-s*.12,-s*.45,-s*.8,0,-s*.28);ctx.bezierCurveTo(s*.45,-s*.8,s*.95,-s*.12,0,s*.42);ctx.stroke();
+  }else if(kind==="talk"){
+    rr(ctx,-s*.5,-s*.42,s,s*.68,s*.22);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(-s*.2,s*.27);ctx.lineTo(-s*.32,s*.5);ctx.lineTo(s*.04,s*.27);ctx.stroke();
+  }else{
+    ctx.beginPath();ctx.moveTo(-s*.32,-s*.46);ctx.lineTo(s*.32,-s*.46);ctx.lineTo(s*.32,s*.46);ctx.lineTo(0,s*.2);ctx.lineTo(-s*.32,s*.46);ctx.closePath();ctx.stroke();
+  }
   ctx.restore();
 }
 
-/* 吹き出し。tail="up" は下から上のキャラへ、"left" は左のキャラへ */
-function bubble(x,y,text,size,alpha,tail,shown){
-  if(alpha<=0||!text)return;
-  const T=th();ctx.font=jp(size);
-  const tw=ctx.measureText(text).width,w=tw+size*1.6,h=size*2.1;
-  const bx=tail==="up"?x-w/2:x,by=y-h/2;
-  ctx.save();ctx.globalAlpha=alpha;
-  ctx.shadowColor="rgba(30,40,32,.16)";ctx.shadowBlur=24;ctx.shadowOffsetY=8;
-  ctx.fillStyle=T.paper;rr(ctx,bx,by,w,h,h/2);ctx.fill();
-  ctx.beginPath();
-  if(tail==="up"){ctx.moveTo(x-16,by+2);ctx.lineTo(x+4,by-26);ctx.lineTo(x+18,by+2);}
-  else{ctx.moveTo(bx+2,y-14);ctx.lineTo(bx-24,y+4);ctx.lineTo(bx+2,y+14);}
-  ctx.fill();ctx.shadowColor="transparent";
-  ctx.fillStyle=T.ink;ctx.textAlign="left";ctx.textBaseline="middle";
-  ctx.fillText([...text].slice(0,shown).join(""),bx+size*.8,y+2);
+/* 締め画面：アイコン・アカウント名・ひとこと・カード・いいね/コメント/保存 */
+function ending(t){
+  const T=th(),L=TL,e=prog(t,L.endIn,L.endIn+.6);if(e<=0)return;
+  const a=k=>e*easeOut(prog(t,L.endIn+.3+k*.25,L.endIn+.9+k*.25));
+  ctx.save();ctx.globalAlpha=e;
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,T.endTop);g.addColorStop(1,T.endBot);
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  doodles(t,T.endDim,true,e);
+  /* アイコン */
+  ctx.globalAlpha=a(0);const ax=540,ay=470,ar=160;
+  ctx.save();ctx.beginPath();ctx.arc(ax,ay,ar,0,7);ctx.clip();
+  if(S.chara){const im=S.chara,k=Math.min(im.width,im.height);ctx.drawImage(im,(im.width-k)/2,(im.height-k)/2,k,k,ax-ar,ay-ar,ar*2,ar*2);}
+  else{const b=cardBack(),k=b.width*.62;ctx.drawImage(b,(b.width-k)/2,(b.height-k)/2,k,k,ax-ar,ay-ar,ar*2,ar*2);}
+  ctx.restore();
+  ctx.strokeStyle=T.ring;ctx.lineWidth=8;ctx.beginPath();ctx.arc(ax,ay,ar,0,7);ctx.stroke();
+  ctx.lineWidth=2;ctx.setLineDash([3,9]);ctx.beginPath();ctx.arc(ax,ay,ar+18,0,7);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=T.ring;star4(ctx,ax+ar+30,ay-ar+30,20);ctx.fill();star4(ctx,ax-ar-24,ay+ar-50,12);ctx.fill();
+  /* アカウント名とひとこと */
+  ctx.textAlign="center";ctx.textBaseline="alphabetic";
+  ctx.globalAlpha=a(1);ctx.fillStyle=T.ring;ctx.font=en(54);ctx.fillText(S.handle,540,720);
+  ctx.fillStyle=T.endInk;ctx.font=jp(46);LAY.outro.forEach((line,i)=>ctx.fillText(line,540,806+i*72));
+  /* 引いたカードを扇に */
+  const fy=1110+(LAY.outro.length-1)*36;
+  [-.34,-.13,.08,.26].forEach((r,i)=>{
+    const front=i===3;
+    drawCard(540+(i-1.5)*104,fy+Math.abs(i-1.5)*16-(front?18:0),150,front?1:0,a(2),r,true);
+  });
+  /* いいね・コメント・保存 */
+  CTA.forEach(([label,col,kind],i)=>{
+    const x=300+i*240,y=fy+250;ctx.globalAlpha=a(3+i*.4);
+    icon(kind,x,y,84,col);ctx.fillStyle=col;ctx.font=jp(34);ctx.fillText(label,x,y+96);
+  });
   ctx.restore();
 }
 
 /* 文字の配置と尺は、文面やテーマが変わったときだけ計算する */
 function relayout(){
-  const c=MAJOR[S.card];
+  const c=MAJOR[S.card],L={};
   LAY={};
-  let z=44;
-  for(;z>=28;z-=2){ctx.font=jp(z);LAY.msg=wrap(S.msg,MSG.w);if(LAY.msg.length*z*1.72<=MSG.h)break;}
-  LAY.msgSize=Math.max(z,28);ctx.font=jp(LAY.msgSize);LAY.msg=wrap(S.msg,MSG.w);
-  ctx.font=jp(44);LAY.outro=wrap(S.outro,760);
-  LAY.kw=(S.rev?c.kwR:c.kwU).split(/\s*・\s*/).slice(0,3);
-  LAY.nameSize=fitSize(c.name,s=>jp(s),92,48,560);
-  const has=!!S.chara,T={has};
-  if(has){T.charaIn=.3;T.bubbleIn=1.0;T.toAv=3.0;T.toAvEnd=3.8;T.backIn=3.0;}
-  else{T.backIn=.5;}
-  T.backInEnd=T.backIn+.9;T.flip=T.backInEnd+1.1;T.flipEnd=T.flip+.9;
-  T.toRow=T.flipEnd+1.9;T.rowEnd=T.toRow+1.0;T.msg=T.rowEnd;
-  const n=[...S.msg].length,lineIn=LAY.msg.length*.35+.6;
-  T.outro=T.msg+Math.min(16,Math.max(6,lineIn+n*.07+1.5));T.end=T.outro+3.2;
-  TL=T;
-  $("seek").max=T.end.toFixed(2);
+  ctx.font=jp(TXT.size,400);
+  const introL=wrap(S.intro,TXT.w).slice(0,TXT.lines),readyL=wrap(DEFAULTS.ready,TXT.w).slice(0,TXT.lines);
+  const pages=paginate(S.msg,TXT.w,TXT.lines);
+  ctx.font=jp(46);LAY.outro=wrap(S.outro,880).slice(0,3);
+  LAY.kw=(S.rev?c.kwR:c.kwU).split(/\s*・\s*/).slice(0,3).join("・");
+  LAY.kwSize=fitSize(LAY.kw,s=>jp(s,400),30,22,770);
+  ctx.font=jp(28);
+  LAY.nameSize=fitSize(c.name,s=>jp(s),54,36,770-ctx.measureText("逆位置").width-60);
+  L.introIn=.3;L.deckIn=.5;L.shuf=1.1;L.cyc=1.1;
+  const introAt=.7,need=Math.max(2.2,introAt+[...introL.join("")].length/CPS+.9-L.shuf);
+  L.shufEnd=L.shuf+Math.ceil(need/L.cyc-1e-6)*L.cyc;
+  L.ready=L.shufEnd;L.rise=L.ready+.7;L.riseEnd=L.rise+1.4;
+  L.exit=L.riseEnd+2.4;L.exitEnd=L.exit+1.0;L.pagesIn=L.exitEnd-.3;
+  L.beats=[{lines:introL,start:introAt,end:L.ready},{lines:readyL,start:L.ready,end:L.rise+.4}];
+  let s=L.exitEnd;
+  pages.forEach(p=>{const n=[...p.join("")].length,d=n/CPS+Math.max(1.6,n*.05+.9);L.beats.push({lines:p,start:s,end:s+d});s+=d;});
+  L.endIn=s;L.end=s+3.8;
+  TL=L;
+  $("seek").max=L.end.toFixed(2);
 }
 
 function render(t){
   const T=th(),L=TL,c=MAJOR[S.card];
   ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.shadowColor="transparent";ctx.textBaseline="alphabetic";ctx.textAlign="center";
-  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,T.bgTop);g.addColorStop(1,T.bgBot);
-  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  const rg=ctx.createRadialGradient(540,820,60,540,820,980);rg.addColorStop(0,T.glow);rg.addColorStop(1,"rgba(255,255,255,0)");
-  ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
-  ctx.drawImage(grain(),0,0);
-  doodles(t);
+  scene(t);
+  deck(t);
+  /* 透かしのアカウント名 */
+  ctx.globalAlpha=.85;ctx.fillStyle=T.mark;ctx.font=en(36,true);ctx.textAlign="left";ctx.fillText(S.handle,70,452);ctx.textAlign="center";ctx.globalAlpha=1;
+  info(t);
+  dialog(t);
 
-  /* 見出し */
-  ctx.globalAlpha=easeOut(prog(t,0,.7));
-  ctx.fillStyle=T.accent;ctx.font=en(32);spaced("TODAY'S CARD",540,252,9);
-  ctx.fillStyle=T.ink;ctx.font=jp(64);ctx.fillText(S.title,540,334);
-  if(S.date){ctx.fillStyle=T.inkDim;ctx.font=jp(32,400);ctx.fillText(S.date,540,392);}
-  ctx.globalAlpha=1;
-
-  const toRow=easeIO(prog(t,L.toRow,L.rowEnd));
-
-  /* カード */
-  if(t>=L.backIn){
-    const a=easeOut(prog(t,L.backIn,L.backInEnd)),fp=easeIO(prog(t,L.flip,L.flipEnd));
-    const float=Math.sin((t-L.backIn)*2.2)*10*(1-prog(t,L.flip-.5,L.flip));
-    const cx=lerp(BIG.cx,ROW.cx,toRow),cy=lerp(BIG.cy,ROW.cy,toRow)+(1-a)*460+float,w=lerp(BIG.w,ROW.w,toRow);
-    const glow=prog(t,L.flip+.35,L.flipEnd+.4)*(1-toRow*.7);
+  /* めくる場面：背景を落として、カードを画面いっぱいに */
+  const dim=prog(t,L.rise,L.rise+.8)*(1-prog(t,L.exit,L.exitEnd));
+  if(dim>0){ctx.globalAlpha=dim;ctx.fillStyle=T.dim;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;}
+  if(t>=L.rise){
+    const r=easeIO(prog(t,L.rise,L.riseEnd)),x=easeIO(prog(t,L.exit,L.exitEnd)),fp=easeIO(prog(t,L.rise+.5,L.riseEnd));
+    const top={cx:DECK.cx+(DECK.n/2-1)*1.5,cy:DECK.cy-(DECK.n-1)*2};
+    let cx=lerp(top.cx,BIG.cx,r),cy=lerp(top.cy,BIG.cy,r)-Math.sin(Math.PI*r)*70,w=lerp(DECK.w,BIG.w,r);
+    cy+=Math.sin((t-L.riseEnd)*2)*8*(t>L.riseEnd?1:0)*(1-x);
+    const glow=prog(t,L.rise+.9,L.riseEnd+.3)*(1-x);
     if(glow>0){
-      const gg=ctx.createRadialGradient(cx,cy,w*.2,cx,cy,w*1.25);gg.addColorStop(0,T.cardGlow);gg.addColorStop(1,"rgba(255,255,255,0)");
-      ctx.globalAlpha=glow*.85;ctx.fillStyle=gg;ctx.fillRect(cx-w*1.3,cy-w*1.9,w*2.6,w*3.8);ctx.globalAlpha=1;
+      const gg=ctx.createRadialGradient(cx,cy,w*.2,cx,cy,w*1.2);gg.addColorStop(0,T.cardGlow);gg.addColorStop(1,"rgba(255,255,255,0)");
+      ctx.globalAlpha=glow*.7;ctx.fillStyle=gg;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;
     }
-    drawCard(cx,cy,w,fp,a);
-    const amt=prog(t,L.backInEnd,L.backInEnd+.5)*(1-prog(t,L.toRow,L.toRow+.5));
-    const burst=Math.exp(-Math.pow((t-(L.flip+.5))/.28,2));
-    sparkles(cx,cy,w,amt*.8,burst,t);
-  }
-
-  /* めくった直後のカード名 */
-  const nameA=easeOut(prog(t,L.flipEnd+.1,L.flipEnd+.8))*(1-prog(t,L.toRow,L.toRow+.35));
-  if(nameA>0){
-    ctx.globalAlpha=nameA;const dy=(1-nameA)*16;
-    ctx.fillStyle=T.ink;ctx.font=jp(Math.min(76,LAY.nameSize));ctx.fillText(c.name,540,1392+dy);
-    runs([[c.en,en(42,true),T.inkDim],["　・　",jp(30,400),T.inkDim],[S.rev?"逆位置":"正位置",jp(32),T.ink]],540,1452+dy);
-    ctx.globalAlpha=1;
-  }
-
-  /* 右の列：カード名・向き・キーワード */
-  const colA=easeOut(prog(t,L.toRow+.4,L.rowEnd+.25));
-  if(colA>0){
-    const x=420+(1-colA)*30;ctx.globalAlpha=colA;ctx.textAlign="left";
-    ctx.fillStyle=T.accent;ctx.font=en(40);ctx.fillText(`No. ${c.num}`,x,486);
-    ctx.fillStyle=T.ink;ctx.font=jp(LAY.nameSize);ctx.fillText(c.name,x,486+LAY.nameSize+12);
-    ctx.fillStyle=T.inkDim;ctx.font=en(44,true);ctx.fillText(c.en,x,652);
-    const ori=S.rev?"逆位置":"正位置";ctx.font=jp(32);
-    const pw=ctx.measureText(ori).width+52;
-    ctx.fillStyle=T.chip;rr(ctx,x,680,pw,58,29);ctx.fill();
-    ctx.fillStyle=T.chipInk;ctx.textBaseline="middle";ctx.fillText(ori,x+26,710);ctx.textBaseline="alphabetic";
-    ctx.fillStyle=T.ink;
-    LAY.kw.forEach((k,i)=>{const z=fitSize("・"+k,s=>jp(s,400),38,26,580);ctx.font=jp(z,400);ctx.fillText("・"+k,x,808+i*56);});
-    ctx.textAlign="center";ctx.globalAlpha=1;
-  }
-
-  /* メッセージの紙 */
-  const panA=easeOut(prog(t,L.toRow+.5,L.rowEnd+.35));
-  if(panA>0){
-    const oy=(1-panA)*40;
-    ctx.save();ctx.globalAlpha=panA;
-    ctx.shadowColor="rgba(30,40,32,.18)";ctx.shadowBlur=36;ctx.shadowOffsetY=14;
-    ctx.fillStyle=T.paper;rr(ctx,PANEL.x,PANEL.y+oy,PANEL.w,PANEL.h,36);ctx.fill();ctx.shadowColor="transparent";
-    ctx.strokeStyle=T.paperLine;ctx.lineWidth=2;ctx.setLineDash([12,10]);rr(ctx,PANEL.x+14,PANEL.y+14+oy,PANEL.w-28,PANEL.h-28,26);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle=T.inkDim;ctx.font=jp(30,400);ctx.textAlign="left";
-    ctx.fillText(DEFAULTS.from,S.chara?268:MSG.x,PANEL.y+62+oy);
-    const msgOut=1-prog(t,L.outro,L.outro+.5),z=LAY.msgSize,lh=z*1.72;
-    ctx.font=jp(z,400);ctx.fillStyle=T.ink;ctx.textBaseline="top";
-    LAY.msg.forEach((line,i)=>{
-      const a=easeOut(prog(t,L.msg+i*.35,L.msg+i*.35+.6))*msgOut;if(a<=0)return;
-      ctx.globalAlpha=panA*a;ctx.fillText(line,MSG.x,MSG.y+i*lh+(1-a)*12+oy);
-    });
-    /* 締め */
-    const oa=easeOut(prog(t,L.outro+.45,L.outro+1.2));
-    if(oa>0){
-      ctx.globalAlpha=panA*oa;ctx.textAlign="center";ctx.font=jp(44);ctx.fillStyle=T.ink;
-      const lh2=44*1.7,blockH=LAY.outro.length*lh2+96,y0=MSG.y+(MSG.h-blockH)/2+(1-oa)*12;
-      LAY.outro.forEach((line,i)=>ctx.fillText(line,540,y0+i*lh2));
-      ctx.textBaseline="alphabetic";ctx.fillStyle=T.accent;ctx.font=en(50);
-      const hy=y0+LAY.outro.length*lh2+70;ctx.fillText(S.handle,540,hy);
-      ctx.font=en(50);const hw=ctx.measureText(S.handle).width;
-      star4(ctx,540-hw/2-40,hy-16,14);ctx.fill();star4(ctx,540+hw/2+40,hy-16,14);ctx.fill();
+    snow(t,prog(t,L.rise+.9,L.riseEnd+.4)*(1-prog(t,L.exit,L.exit+.6)));
+    const burst=Math.exp(-Math.pow((t-(L.rise+.95))/.28,2));
+    sparkles(cx,cy,w,prog(t,L.riseEnd,L.riseEnd+.5)*(1-x)*.8,burst,t);
+    drawCard(lerp(cx,THUMB.cx,x),lerp(cy,THUMB.cy,x),lerp(w,THUMB.w,x),fp,1,-.2*Math.sin(Math.PI*r),true);
+    /* カード名の札 */
+    const la=easeOut(prog(t,L.riseEnd-.2,L.riseEnd+.4))*(1-prog(t,L.exit,L.exit+.35));
+    if(la>0){
+      ctx.globalAlpha=la;const ori=S.rev?"逆位置":"正位置";
+      const parts=[[`No.${c.num}　`,en(40),T.accent],[c.name,jp(Math.min(56,LAY.nameSize+6)),T.ink],["　"+ori,jp(36),T.inkDim]];
+      const pw=parts.reduce((s,[x,f])=>{ctx.font=f;return s+ctx.measureText(x).width;},0)+90;
+      ctx.fillStyle=T.paper;rr(ctx,540-pw/2,248,pw,96,48);ctx.fill();
+      runs(parts,540,314);
+      ctx.globalAlpha=1;
     }
-    ctx.restore();
   }
-
-  /* キャラクター */
-  if(L.has){
-    const inA=easeOut(prog(t,L.charaIn,L.charaIn+.8)),m=easeIO(prog(t,L.toAv,L.toAvEnd));
-    let cx=lerp(AV_INTRO.cx,AV_READY.cx,m),cy=lerp(AV_INTRO.cy,AV_READY.cy,m),s=lerp(AV_INTRO.s,AV_READY.s,m),r=lerp(AV_INTRO.r,AV_READY.r,m);
-    s*=lerp(.92+.08*inA,1,m);
-    cx=lerp(cx,AV_ROW.cx,toRow);cy=lerp(cy,AV_ROW.cy,toRow);
-    avatar(cx,cy,s,r,inA);
-    const bA=prog(t,L.bubbleIn,L.bubbleIn+.4)*(1-prog(t,L.toAv,L.toAv+.3));
-    bubble(540,1262,S.intro,44,bA,"up",Math.floor((t-L.bubbleIn-.15)*14));
-    const rA=prog(t,L.toAvEnd,L.toAvEnd+.3)*(1-prog(t,L.flip+.2,L.flip+.5));
-    bubble(AV_READY.cx+112,AV_READY.cy-6,DEFAULTS.ready,36,rA,"left",99);
-  }
+  ending(t);
+  ctx.globalAlpha=1;ctx.drawImage(grain(),0,0);
 }
 
 /* ================= 状態とUI ================= */
@@ -581,8 +679,16 @@ function randomCard(){setCard(Math.floor(Math.random()*MAJOR.length),Math.random
 async function setChara(src,persist){
   if(!src){S.chara=null;S.charaSrc=null;$("chara-thumb").removeAttribute("src");$("chara-clear").hidden=true;refresh();if(persist)savePrefs();return;}
   try{S.chara=await loadImg(src);}catch(e){return false;}
+  S.charaTop=edgeColor(S.chara);
   S.charaSrc=persist?src:S.charaSrc;$("chara-thumb").src=src;$("chara-clear").hidden=!persist;
   refresh();if(persist)savePrefs();return true;
+}
+/* イラストの上端の色。画面の上の余白をこの色で埋めてつなげる */
+function edgeColor(im){
+  const c=document.createElement("canvas");c.width=c.height=32;const g=c.getContext("2d");
+  g.drawImage(im,0,0,32,32);const d=g.getImageData(0,0,32,3).data,s=[0,0,0];
+  for(let i=0;i<d.length;i+=4){s[0]+=d[i];s[1]+=d[i+1];s[2]+=d[i+2];}
+  return s.map(v=>Math.round(v/(d.length/4)));
 }
 /* 端末で選んだ画像は縮小してから保存する */
 function shrink(file){
@@ -600,7 +706,7 @@ function shrink(file){
 /* 日本語フォントは分割配信なので、使う文字を渡して必要な分だけ読み込む */
 function loadFonts(){
   const c=MAJOR[S.card],T=th();
-  const text=[S.title,S.date,S.intro,S.msg,S.outro,S.handle,DEFAULTS.ready,DEFAULTS.from,"正位置逆位置・",c.name,c.kwU,c.kwR].join("");
+  const text=[S.title,S.date,S.intro,S.msg,S.outro,S.handle,DEFAULTS.ready,DEFAULTS.name,"正位置逆位置・",CTA.map(x=>x[0]).join(""),c.name,c.kwU,c.kwR].join("");
   const latin="TODAY'S CARD No.0123456789 IVXL·@_ "+c.en+"UprightReversedOMASU"+S.handle;
   return Promise.all([
     document.fonts.load(`${T.jpW} 40px "${T.jp}"`,text),

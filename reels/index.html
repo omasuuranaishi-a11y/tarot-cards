@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今日の1枚 リールメーカー</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#dfe5d9">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Klee+One:wght@400;600&family=Noto+Serif+JP:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#dfe5d9;
+  --paper:#f7f4ec;
+  --line:#c5cfbf;
+  --sage:#9fb19a;
+  --sage-deep:#4f6b5a;
+  --ink:#3b4a3f;
+  --ink-dim:#6c786d;
+  --gold:#b98f45;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Klee One','Noto Serif JP',serif;background:var(--bg);color:var(--ink);min-height:100dvh;letter-spacing:.03em}
+.top{text-align:center;padding:26px 16px 6px}
+.brand{font-family:'Cormorant Garamond',serif;font-size:.78rem;letter-spacing:.45em;color:var(--gold)}
+h1{font-weight:600;font-size:1.35rem;letter-spacing:.18em;margin-top:4px}
+.lead{font-size:.8rem;color:var(--ink-dim);line-height:1.9;margin-top:8px}
+.wrap{max-width:980px;margin:0 auto;padding:16px 16px 56px;display:grid;gap:22px}
+@media (min-width:820px){
+  .wrap{grid-template-columns:minmax(0,400px) minmax(0,1fr);align-items:start}
+  .stage{position:sticky;top:14px}
+}
+#cv{display:block;width:100%;max-width:calc(70vh * 9 / 16);height:auto;margin:0 auto;border-radius:18px;background:#b9c6b2;box-shadow:0 14px 34px rgba(59,74,63,.22)}
+.player{display:flex;align-items:center;gap:10px;max-width:calc(70vh * 9 / 16);margin:12px auto 0}
+.player input{flex:1;accent-color:var(--sage-deep)}
+#time{font-family:'Cormorant Garamond',serif;font-size:.95rem;min-width:3.6em;text-align:right;color:var(--ink-dim)}
+.controls{display:grid;gap:16px;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px 16px}
+.field{display:grid;gap:7px}
+.field>label,.lbl{font-size:.82rem;font-weight:600;color:var(--sage-deep)}
+input[type=text],select,textarea{font:inherit;font-size:16px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+textarea{line-height:1.7;resize:vertical}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,.file:focus-within{outline:2px solid var(--sage-deep);outline-offset:2px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row select{flex:1;min-width:0}
+.seg{display:flex;gap:8px}
+.seg label{flex:1;text-align:center;border:1px solid var(--line);border-radius:999px;padding:9px 0;font-size:.88rem;cursor:pointer;background:#fff}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label:has(input:checked){background:var(--sage-deep);border-color:var(--sage-deep);color:#f6f1e4}
+.seg label:has(input:focus-visible){outline:2px solid var(--sage-deep);outline-offset:2px}
+button,.file{font:inherit;cursor:pointer;letter-spacing:.08em}
+.btn-ghost{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--sage-deep);color:var(--sage-deep);background:transparent;border-radius:999px;padding:9px 16px;font-size:.85rem;text-decoration:none;white-space:nowrap}
+.btn-main{border:none;background:var(--sage-deep);color:#f6f1e4;border-radius:999px;padding:14px 18px;font-size:1rem;font-weight:600;width:100%}
+.btn-main:disabled{opacity:.5;cursor:default}
+.link{border:none;background:none;color:var(--ink-dim);font-size:.78rem;text-decoration:underline;justify-self:start;padding:2px 0}
+.hint{font-size:.74rem;color:var(--ink-dim);line-height:1.7}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.chara{display:flex;gap:12px;align-items:center}
+.chara img{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--sage);border:2px solid #fff;flex:none}
+.chara img:not([src]){background:transparent;border:2px dashed var(--line)}
+.chara .row{gap:4px 12px}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--sage-deep);transition:width .2s}
+#status{font-size:.8rem;color:var(--ink-dim);margin-top:8px}
+#result{display:grid;gap:12px}
+#result video{width:100%;max-width:240px;margin:0 auto;border-radius:12px;background:#000}
+#result .row>*{flex:1}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header class="top">
+  <p class="brand">OMASU REEL MAKER</p>
+  <h1>今日の1枚 リールメーカー</h1>
+  <p class="lead">カードと文面を選んで、縦型のリール動画を作ります。<br>音楽はInstagramの編集画面で付けてください。</p>
+</header>
+
+<main class="wrap">
+  <section class="stage" aria-label="プレビュー">
+    <canvas id="cv" width="1080" height="1920" role="img" aria-label="リールのプレビュー"></canvas>
+    <div class="player">
+      <button id="play" class="btn-ghost" type="button">▶ 再生</button>
+      <input id="seek" type="range" min="0" max="20" step="0.01" value="0" aria-label="再生位置">
+      <span id="time">0.0s</span>
+    </div>
+  </section>
+
+  <section class="controls" aria-label="設定">
+    <div class="field">
+      <label for="card">カード</label>
+      <div class="row"><select id="card"></select><button id="shuffle" class="btn-ghost" type="button">ランダムに引く</button></div>
+    </div>
+    <div class="field">
+      <span class="lbl" id="ori-lbl">向き</span>
+      <div class="seg" role="radiogroup" aria-labelledby="ori-lbl">
+        <label><input type="radio" name="ori" value="up" checked>正位置</label>
+        <label><input type="radio" name="ori" value="rev">逆位置</label>
+      </div>
+    </div>
+    <div class="field">
+      <span class="lbl">イラスト</span>
+      <div class="chara">
+        <img id="chara-thumb" alt="">
+        <div class="row">
+          <label class="btn-ghost file">画像を選ぶ<input id="chara-file" class="sr" type="file" accept="image/*"></label>
+          <button id="chara-clear" class="link" type="button" hidden>外す</button>
+        </div>
+      </div>
+      <p class="hint">選んだ画像はこの端末に保存され、次からも使われます。</p>
+    </div>
+    <div class="field"><label for="f-title">見出し</label><input id="f-title" type="text"></div>
+    <div class="field"><label for="f-date">日付</label><input id="f-date" type="text"></div>
+    <div class="field"><label for="f-intro">最初のひとこと</label><input id="f-intro" type="text"></div>
+    <div class="field">
+      <label for="f-msg">メッセージ</label>
+      <textarea id="f-msg" rows="5"></textarea>
+      <button id="msg-reset" class="link" type="button">カードの文面に戻す</button>
+    </div>
+    <div class="field"><label for="f-outro">締めのひとこと</label><input id="f-outro" type="text"></div>
+    <div class="field"><label for="f-handle">アカウント名</label><input id="f-handle" type="text"></div>
+    <div class="field">
+      <span class="lbl" id="theme-lbl">雰囲気</span>
+      <div class="seg" role="radiogroup" aria-labelledby="theme-lbl">
+        <label><input type="radio" name="theme" value="sage" checked>セージ</label>
+        <label><input type="radio" name="theme" value="night">夜空</label>
+      </div>
+    </div>
+
+    <button id="export" class="btn-main" type="button">動画を書き出す</button>
+    <div id="progress" hidden>
+      <div class="bar"><i id="bar"></i></div>
+      <p id="status" role="status"></p>
+    </div>
+    <div id="result" hidden>
+      <video id="out" controls playsinline muted loop></video>
+      <div class="row">
+        <button id="share" class="btn-main" type="button" hidden>保存・共有する</button>
+        <a id="download" class="btn-ghost">ダウンロード</a>
+      </div>
+      <p id="result-note" class="hint"></p>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js"></script>
+<script>
+/* ================= ▼ここだけ書き換える▼ ================= */
+const DEFAULTS = {
+  title :"今日の1枚",
+  intro :"今日のカード、めくってみるね",
+  ready :"せーの…",
+  from  :"おますより",
+  outro :"保存して、夜にもう一度読み返してね",
+  handle:"@omasu_horoscope"
+};
+/* このフォルダに置いた画像は、端末で選んだ画像がないときに使われる */
+const CHARA_FILES = ["chara.png","chara.jpg"];
+/* ================= ▲ここまで▲ ================= */
+
+/* カードの文面は spreads/index.html の MAJOR と同じもの。文面を直すときは両方直す */
+const MAJOR = [
+{num:"0",name:"愚者",en:"The Fool",sym:"☘",
+ kwU:"自由 ・ 出発 ・ まっさらな可能性",kwR:"見切り発車 ・ 足踏み ・ 根拠のない不安",
+ up:"何も決まっていないことは、何にでもなれるということです。経験や実績がまだ薄くても、この一歩には身軽さという武器があります。細かい計画より先に、まず踏み出したい気持ちの方を信じてよいときです。",
+ rev:"踏み出したい気持ちと、準備不足への不安が綱引きをしています。止まること自体は悪くありません。ただ「怖いから動かない」と「今は整える時期だから動かない」は別物です。どちらなのか、一度言葉にして確かめてください。"},
+{num:"I",name:"魔術師",en:"The Magician",sym:"∞",
+ kwU:"創造 ・ 手持ちの道具 ・ はじまりの意志",kwR:"空回り ・ 器用貧乏 ・ 言葉先行",
+ up:"必要な道具は、すでに卓の上に揃っています。足りないのは新しい何かではなく「これでやる」と決めることだけです。小さくてもいいので、意志を形にする最初の作業を今日始めてください。",
+ rev:"できることが多いぶん、力が散らばっています。あるいは、語ることが先に立って手が止まっているのかもしれません。使う道具をひとつに絞り、口より先に手を動かすと、流れが戻ってきます。"},
+{num:"II",name:"女教皇",en:"The High Priestess",sym:"☽",
+ kwU:"直感 ・ 静けさ ・ 見えない知恵",kwR:"考えすぎ ・ 秘めすぎ ・ 神経の張りつめ",
+ up:"答えはすでに、あなたの静かな部分が知っています。情報を足すより、雑音を減らすことが今の正解です。即断を求められても、一晩置く勇気を持ってください。",
+ rev:"頭の中の声が多すぎて、本当の直感が聞こえなくなっています。あるいは、抱え込んで誰にも見せていない何かが重くなってきた頃です。全部でなくていいので、一部だけ言葉にして外に出してみてください。"},
+{num:"III",name:"女帝",en:"The Empress",sym:"♀",
+ kwU:"実り ・ 受け取る豊かさ ・ 育てる力",kwR:"過保護 ・ 停滞した心地よさ ・ 浪費",
+ up:"育ててきたものが、実りの段階に入っています。ここで必要なのは頑張りを足すことではなく、受け取ることを自分に許すことです。休息も、ご褒美も、成果のうちです。",
+ rev:"心地よさが、いつのまにか動かない理由になっていないでしょうか。世話を焼きすぎて相手の力を奪っている場合もあります。与える手を少しゆるめ、自分の畑に水をやり直す時期です。"},
+{num:"IV",name:"皇帝",en:"The Emperor",sym:"♄",
+ kwU:"基盤 ・ 責任 ・ 継続で築く秩序",kwR:"硬直 ・ 支配 ・ 「こうあるべき」の重さ",
+ up:"感情の波に頼らず、仕組みと継続で積み上げる局面です。地味な決まりごと——時間割、予算、手順——が、いまのあなたの一番の味方になります。決めたルールを守る自分を、信頼の土台にしてください。",
+ rev:"「べき」が増えすぎて、自分にも周りにも窮屈になっています。守るべき芯と、手放していい形式を仕分けましょう。強さとは硬さではなく、締めるところと緩めるところを選べることです。"},
+{num:"V",name:"教皇",en:"The Hierophant",sym:"⚶",
+ kwU:"学び ・ 助言 ・ 信頼できる型",kwR:"形骸化 ・ 常識への窮屈さ ・ 権威頼み",
+ up:"自己流で悩み続けるより、先人の型を借りる方が早い場面です。本でも、師でも、伝統的なやり方でも構いません。「正しく教わる」ことは、遠回りに見えて一番の近道です。",
+ rev:"周囲の常識や「普通はこうする」が、あなたの実感と合わなくなってきています。型を破ること自体が目的化しないよう気をつけつつ、違和感には正直に。あなた自身の判断基準を育てる時期に入っています。"},
+{num:"VI",name:"恋人",en:"The Lovers",sym:"♊",
+ kwU:"選択 ・ 心が響き合う縁 ・ 素直な YES",kwR:"迷い ・ 決めきれない保留 ・ 不釣り合い",
+ up:"損得の計算より、心が「こちら」と言う方を選んでよい局面です。人との縁であれ道の選択であれ、素直さが最良の判断材料になります。選ぶことは、他方を手放す勇気とセットです。",
+ rev:"選択肢を残したままの保留が、少しずつ重くなっています。全部を取ろうとすると、どれも中途半端になります。決められないのは情報不足ではなく、失う覚悟の問題かもしれません。"},
+{num:"VII",name:"戦車",en:"The Chariot",sym:"♋",
+ kwU:"前進 ・ 勢い ・ 走りながら整える",kwR:"暴走 ・ 制御不能 ・ 方向のない焦り",
+ up:"考える時間は十分に取りました。ここからはスピードが味方をします。多少の粗さは走りながら直せばいい局面です。迷いを断って、まず出発してください。",
+ rev:"アクセルとブレーキを同時に踏んでいるか、方向を決めないまま焦りだけが加速しています。速度を落とすことは負けではありません。手綱を握り直すために、一度止まって行き先を確認してください。"},
+{num:"VIII",name:"力",en:"Strength",sym:"∞",
+ kwU:"静かな強さ ・ 根気 ・ 手なずける",kwR:"力み ・ 自信の揺らぎ ・ 感情に呑まれる",
+ up:"ねじ伏せる強さではなく、なだめて根気よく付き合う強さが問われています。相手はあなた自身の衝動や不安かもしれません。焦らず、しかし手を離さず。その粘りは必ず実を結びます。",
+ rev:"力ずくで抑え込もうとして、かえって暴れさせています。あるいは「自分には無理かも」という声に呑まれかけています。強さの回復は、まず自分に優しくすることから始まります。"},
+{num:"IX",name:"隠者",en:"The Hermit",sym:"☌",
+ kwU:"内省 ・ ひとりの時間 ・ 自分の灯",kwR:"孤立 ・ 引きこもりすぎ ・ 内向の袋小路",
+ up:"外の評価や比較から離れて、自分の内側と話す時間が必要です。ひとりになることは後退ではなく、灯を確かめる作業です。静かな場所で、本当はどうしたいのかを聞いてください。",
+ rev:"内省が長引いて、考えの袋小路に入っています。ひとりで抱える期間は役目を終えました。信頼できる誰かひとりにだけ、途中経過を話してみてください。外の光が、答えを照らします。"},
+{num:"X",name:"運命の輪",en:"Wheel of Fortune",sym:"☸",
+ kwU:"転機 ・ 流れの好転 ・ タイミングの波",kwR:"すれ違うタイミング ・ 空回りの繰り返し",
+ up:"自力では動かせなかった歯車が、外側から回り始めています。転機は準備した人にだけ「偶然」の顔をしてやってきます。来た波には、考えすぎずに乗ってください。",
+ rev:"頑張りと結果が噛み合わない時期です。これはあなたの力不足ではなく、タイミングの問題であることが多いのです。無理に回そうとせず、次の波のために足場を整えることに力を使ってください。"},
+{num:"XI",name:"正義",en:"Justice",sym:"⚖",
+ kwU:"公平 ・ 筋を通す ・ 冷静な裁定",kwR:"偏り ・ 白黒つけすぎ ・ 帳尻の合わなさ",
+ up:"感情や情に流されず、事実と筋道で判断すべき局面です。誰かに都合よくではなく、あなた自身も含めて公平に。誠実に積んだものは、少し遅れてでも必ず清算されます。",
+ rev:"どこかで天秤が傾いています。自分ばかり譲っているか、逆に相手の事情が見えなくなっているか。白か黒かを急がず、まだ見ていない側の言い分を一度机に載せてください。"},
+{num:"XII",name:"吊るされた男",en:"The Hanged Man",sym:"⚓",
+ kwU:"視点の反転 ・ 実りある停滞 ・ 手放して得る",kwR:"徒労感 ・ 我慢の空回り ・ 犠牲のしすぎ",
+ up:"動けないこの期間は、罰ではなく視点を変えるための時間です。逆さまから見ると、こだわっていたものの小ささと、見落としていたものの大きさに気づきます。今は耐える価値のある停滞です。",
+ rev:"我慢が実りにつながっていない徒労の気配があります。「耐えていれば報われる」が思考停止になっていないか点検を。手放すべきは努力ではなく、その努力の向け先かもしれません。"},
+{num:"XIII",name:"死神",en:"Death",sym:"♏",
+ kwU:"終わりと再生 ・ 大掃除 ・ 区切りをつける",kwR:"終わらせられない ・ 引きずり ・ 未練",
+ up:"怖い絵柄に見えて、実は「ちゃんと終わらせる」ことを応援するカードです。役目を終えた習慣、関係、やり方に区切りをつけると、新しいものの席が空きます。終わりは、再生の準備です。",
+ rev:"もう終わっているものを、手の中で握り続けています。手放せないのは、それが大切だった証拠でもあります。ただ、次の章はページをめくらないと始まりません。小さなお別れの儀式を、自分のためにしてあげてください。"},
+{num:"XIV",name:"節制",en:"Temperance",sym:"♐",
+ kwU:"調合 ・ ほどよさ ・ 異なるものの橋渡し",kwR:"配分の乱れ ・ 極端 ・ 噛み合わなさ",
+ up:"ゼロか百かではなく、混ぜ合わせて「ちょうどいい」を作る局面です。仕事と休み、理想と現実、自分と相手。対立に見える二つは、配合しだいで薬になります。あなたの調整力が活きます。",
+ rev:"どこかの配分が極端に振れています。やりすぎか、やらなすぎか。生活の中の「注ぎすぎているコップ」を一つ見つけて、少しだけ戻すことから整えましょう。"},
+{num:"XV",name:"悪魔",en:"The Devil",sym:"♑",
+ kwU:"欲との自覚的な付き合い ・ 執着の直視",kwR:"鎖に気づく ・ 悪習からの離脱 ・ 解放の初動",
+ up:"やめられない習慣、離れられない関係、手放せない欲。それ自体を責める必要はありません。大事なのは「自分は今つながれている」と自覚することです。鎖は、見えた瞬間から緩み始めます。",
+ rev:"長く縛られていたものから、離れる力が戻ってきています。惰性や依存の正体に、もう気づいているはずです。完全に断てなくても、距離を一歩とれたら十分な前進です。"},
+{num:"XVI",name:"塔",en:"The Tower",sym:"⚡",
+ kwU:"強制リセット ・ 前提が崩れる ・ 目が覚める衝撃",kwR:"崩壊の先送り ・ ひび割れの放置 ・ 内側の限界",
+ up:"積み上げたものが崩れる衝撃は、間違った土台ごと壊してくれる出来事でもあります。守りたかったのは建物か、それとも見栄だったのか。更地は痛みと同時に、正しく建て直す自由をくれます。",
+ rev:"崩れかけているものを、応急処置でつなぎ止めています。先送りは崩壊を防ぐのではなく、大きくするだけです。自分から少しずつ解体する方が、痛みは小さく済みます。"},
+{num:"XVII",name:"星",en:"The Star",sym:"✦",
+ kwU:"希望 ・ 回復 ・ 遠くの目標に注ぐ水",kwR:"理想と現実の距離 ・ 望みの見失い",
+ up:"嵐のあとの、静かな回復の時間です。すぐに叶わなくても、遠くに星が見えていること自体が力になります。焦らず、目標に向けて毎日少しずつ水を注いでください。方向は合っています。",
+ rev:"理想が遠すぎて、注ぐ水が虚しく感じられています。星を見失ったのではなく、雲がかかっているだけです。目標を一段近くに引き寄せて、今週できるサイズに切り直してみてください。"},
+{num:"XVIII",name:"月",en:"The Moon",sym:"☾",
+ kwU:"揺らぎ ・ 不確かさの中を歩く ・ 感受性",kwR:"霧が晴れる ・ 不安の正体判明 ・ 誤解の解消",
+ up:"輪郭のはっきりしない不安の中にいます。今は無理に結論を出さず、揺らぎごと抱えて歩いてよい時期です。夜道は、月明かりの分だけ見えれば進めます。感じたことのメモだけ残しておいてください。",
+ rev:"長かった霧が、晴れ始めています。漠然と怖かったものの正体が見え、誤解がほどけていきます。夜のあいだに感じ取ったことは無駄になりません。明るくなった道を、確かめながら進んでください。"},
+{num:"XIX",name:"太陽",en:"The Sun",sym:"☉",
+ kwU:"成功 ・ 祝福 ・ 隠さない喜び",kwR:"曇りがちの自信 ・ 喜びの出し惜しみ",
+ up:"努力が日の目を見る、率直に喜んでいい局面です。謙遜で薄めず、成果は成果として受け取り、周りとも分かち合ってください。あなたの明るさが、次の縁と機会を連れてきます。",
+ rev:"うまくいっているのに、素直に喜べない気持ちがあります。減点方式の目が、自分の光を曇らせています。満点でなくても、今日できたことをひとつ声に出して認めるところから始めましょう。"},
+{num:"XX",name:"審判",en:"Judgement",sym:"♆",
+ kwU:"再起 ・ 呼び覚まされる ・ 過去の清算と復活",kwR:"過去への固執 ・ 自己批判のループ",
+ up:"一度あきらめたこと、眠らせていた夢に、もう一度声がかかっています。過去の経験は失敗も含めてすべて、今回のための素材でした。「もう一度やってみる」に、年齢も遅すぎることもありません。",
+ rev:"過去の反省が、自分を責める道具になっています。振り返りは未来のためにあるもので、罰のためではありません。「あのときの自分も、あれが精一杯だった」と一度認めてから、次に進みましょう。"},
+{num:"XXI",name:"世界",en:"The World",sym:"🜨",
+ kwU:"完成 ・ 統合 ・ ひとつの章の大団円",kwR:"あと一歩の未完 ・ 締めくくりの甘さ",
+ up:"長かった物語が、ひとつの完成を迎えます。バラバラに見えた努力が、ここで一枚の絵につながります。達成を十分に味わってください。次の旅は、この完成を土台にして始まります。",
+ rev:"九割まで来て、最後の一割が残っています。惜しいのは力ではなく、締めくくる意志です。「完了」と宣言する基準を決めて、意識的に幕を引いてください。終わらせた人だけが、次を始められます。"}
+];
+
+const CARD_FILES = ["00-fool","01-magician","02-high-priestess","03-empress","04-emperor","05-hierophant","06-lovers","07-chariot","08-strength","09-hermit","10-wheel-of-fortune","11-justice","12-hanged-man","13-death","14-temperance","15-devil","16-tower","17-star","18-moon","19-sun","20-judgement","21-world"];
+
+/* ================= 描画 ================= */
+const W=1080,H=1920,FPS=30,RATIO=527/300;
+const $=id=>document.getElementById(id);
+const cv=$("cv"),ctx=cv.getContext("2d");
+ctx.imageSmoothingQuality="high";
+
+const THEMES={
+  sage:{bgTop:"#c7d1bf",bgBot:"#a6b59f",glow:"rgba(255,252,240,.5)",grainA:16,
+        ink:"#3b4a3f",inkDim:"#5d6c60",accent:"#a87f39",doodle:"rgba(252,250,242,.9)",
+        paper:"rgba(249,246,238,.94)",paperLine:"rgba(79,107,90,.28)",cardGlow:"rgba(255,249,228,.95)",
+        back:"#4f6b5a",backLine:"#efe6cf",backStar:"#dcb86e",chip:"#4f6b5a",chipInk:"#f6f1e4",ring:"#f9f6ee",
+        jp:"Klee One",jpW:600},
+  night:{bgTop:"#232a58",bgBot:"#0b0e1e",glow:"rgba(140,120,220,.22)",grainA:8,
+        ink:"#ece6d8",inkDim:"#a9a293",accent:"#d8b46a",doodle:"rgba(240,214,154,.85)",
+        paper:"rgba(26,31,69,.93)",paperLine:"rgba(216,180,106,.4)",cardGlow:"rgba(240,214,154,.5)",
+        back:"#1c2148",backLine:"#d8b46a",backStar:"#f0d69a",chip:"#d8b46a",chipInk:"#131735",ring:"#d8b46a",
+        jp:"Noto Serif JP",jpW:500}
+};
+const BIG={cx:540,cy:900,w:460}, ROW={cx:240,cy:680,w:280};
+const AV_INTRO={cx:540,cy:860,s:600,r:44}, AV_READY={cx:170,cy:1420,s:156,r:78}, AV_ROW={cx:160,cy:1008,s:144,r:72};
+const PANEL={x:80,y:1000,w:920,h:490}, MSG={x:130,y:1100,w:820,h:350};
+const NO_START="、。，．,.・：:；;？?！!ー－）)」』】〕〉》’”ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ…‥〜";
+const NO_END="（(「『【〔〈《‘“";
+
+const S={card:0,rev:false,theme:"sage",title:"",date:"",intro:"",msg:"",outro:"",handle:"",chara:null,img:null};
+let TL=null,LAY=null;
+
+const clamp=v=>v<0?0:v>1?1:v;
+const prog=(t,a,b)=>clamp((t-a)/(b-a));
+const lerp=(a,b,p)=>a+(b-a)*p;
+const easeOut=p=>1-Math.pow(1-p,3);
+const easeIO=p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+function th(){return THEMES[S.theme];}
+function jp(size,w){const T=th();return `${w||T.jpW} ${size}px "${T.jp}","Noto Serif JP",serif`;}
+function en(size,it){return `${it?"italic ":""}500 ${size}px "Cormorant Garamond",serif`;}
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+function rr(c,x,y,w,h,r){r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function star4(c,x,y,s){c.beginPath();c.moveTo(x,y-s);c.quadraticCurveTo(x,y,x+s,y);c.quadraticCurveTo(x,y,x,y+s);c.quadraticCurveTo(x,y,x-s,y);c.quadraticCurveTo(x,y,x,y-s);c.closePath();}
+function star5(c,x,y,r){c.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,d=i%2?r*.45:r;c.lineTo(x+Math.cos(a)*d,y+Math.sin(a)*d);}c.closePath();}
+
+/* 文字間をあけて中央揃えで描く */
+function spaced(s,x,y,sp){
+  const cs=[...s],ws=cs.map(ch=>ctx.measureText(ch).width);
+  let cx=x-(ws.reduce((a,b)=>a+b,0)+sp*(cs.length-1))/2;
+  ctx.textAlign="left";cs.forEach((ch,i)=>{ctx.fillText(ch,cx,y);cx+=ws[i]+sp;});ctx.textAlign="center";
+}
+/* 禁則つきの折り返し（ctx.font は呼び出し側で設定） */
+function wrap(s,maxW){
+  const out=[];
+  s.split("\n").forEach(para=>{
+    let line="";
+    for(const ch of para){
+      if(line&&ctx.measureText(line+ch).width>maxW&&!NO_START.includes(ch)){
+        let carry="";
+        while(line.length>1&&NO_END.includes(line[line.length-1])){carry=line[line.length-1]+carry;line=line.slice(0,-1);}
+        out.push(line);line=carry+ch;
+      }else line+=ch;
+    }
+    out.push(line);
+  });
+  return out;
+}
+/* [文字, font, 色] の並びを中央揃えで続けて描く */
+function runs(parts,x,y){
+  const ws=parts.map(([s,f])=>{ctx.font=f;return ctx.measureText(s).width;});
+  let cx=x-ws.reduce((a,b)=>a+b,0)/2;ctx.textAlign="left";
+  parts.forEach(([s,f,col],i)=>{ctx.font=f;ctx.fillStyle=col;ctx.fillText(s,cx,y);cx+=ws[i];});
+  ctx.textAlign="center";
+}
+function fitSize(s,font,max,min,maxW){let z=max;for(;z>min;z-=2){ctx.font=font(z);if(ctx.measureText(s).width<=maxW)break;}return z;}
+
+/* 紙のざらつき（テーマごとに一度だけ作る） */
+const grainCache={};
+function grain(){
+  const T=th();if(grainCache[S.theme])return grainCache[S.theme];
+  const c=document.createElement("canvas");c.width=W;c.height=H;
+  const g=c.getContext("2d"),d=g.createImageData(W,H),r=mulberry(7);
+  for(let i=0;i<d.data.length;i+=4){const v=r()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=T.grainA;}
+  g.putImageData(d,0,0);return grainCache[S.theme]=c;
+}
+
+/* カードの裏面（テーマごとに一度だけ作る。フォント読み込み後に作り直す） */
+let backCache={};
+function cardBack(){
+  if(backCache[S.theme])return backCache[S.theme];
+  const T=th(),w=BIG.w,h=Math.round(BIG.w*RATIO);
+  const c=document.createElement("canvas");c.width=w;c.height=h;const g=c.getContext("2d");
+  rr(g,0,0,w,h,26);g.fillStyle=T.back;g.fill();
+  g.strokeStyle=T.backLine;g.lineWidth=3;rr(g,18,18,w-36,h-36,16);g.stroke();
+  g.globalAlpha=.55;g.lineWidth=1.5;rr(g,30,30,w-60,h-60,10);g.stroke();
+  const r=mulberry(3);g.fillStyle=T.backLine;
+  for(let i=0;i<46;i++){g.globalAlpha=.25+r()*.4;g.beginPath();g.arc(44+r()*(w-88),44+r()*(h-88),1+r()*2.2,0,7);g.fill();}
+  g.globalAlpha=1;
+  const cx=w/2,cy=h/2;
+  g.lineWidth=2.5;g.beginPath();g.arc(cx,cy,118,0,7);g.stroke();
+  g.globalAlpha=.5;g.lineWidth=1.5;g.beginPath();g.arc(cx,cy,132,0,7);g.stroke();g.globalAlpha=1;
+  /* 三日月 */
+  const m=document.createElement("canvas");m.width=m.height=200;const mg=m.getContext("2d");
+  mg.fillStyle=T.backLine;mg.beginPath();mg.arc(100,100,64,0,7);mg.fill();
+  mg.globalCompositeOperation="destination-out";mg.beginPath();mg.arc(128,82,56,0,7);mg.fill();
+  g.drawImage(m,cx-112,cy-100);
+  g.fillStyle=T.backStar;star4(g,cx+42,cy-30,26);g.fill();star4(g,cx+70,cy+34,12);g.fill();
+  [[cx,62],[cx,h-62]].forEach(([x,y])=>{star4(g,x,y,16);g.fill();});
+  [[70,70],[w-70,70],[70,h-70],[w-70,h-70]].forEach(([x,y])=>{star4(g,x,y,9);g.fill();});
+  g.fillStyle=T.backLine;g.font=en(26);g.textAlign="center";g.textBaseline="middle";
+  const cs=[..."OMASU"];let x=cx-((cs.length-1)*30)/2;cs.forEach(ch=>{g.fillText(ch,x,cy+190);x+=30;});
+  return backCache[S.theme]=c;
+}
+
+/* 背景のらくがき星 */
+const DOODLES=[[130,300,26,4],[955,250,20,5],[925,560,15,4],[105,700,18,5],[985,1200,22,4],[70,1530,16,4],[1000,1600,18,5],[240,175,12,4],[860,400,10,4],[150,1050,12,5]];
+function doodles(t){
+  const T=th();ctx.strokeStyle=ctx.fillStyle=T.doodle;ctx.lineWidth=3;ctx.lineJoin=ctx.lineCap="round";
+  DOODLES.forEach(([x,y,s,k],i)=>{
+    ctx.globalAlpha=.45+.45*Math.sin(t*1.7+i*1.3);
+    if(k===4){star4(ctx,x,y,s);ctx.fill();}else{star5(ctx,x,y,s);ctx.stroke();}
+  });
+  /* 小さな星座 */
+  const pts=[[780,175],[838,150],[905,188],[965,160]];
+  ctx.globalAlpha=.6;ctx.lineWidth=2;ctx.setLineDash([6,8]);ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();ctx.setLineDash([]);
+  pts.forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.fill();});
+  ctx.globalAlpha=1;
+}
+
+function drawCard(cx,cy,w,flip,alpha){
+  const T=th(),h=w*RATIO,ang=flip*Math.PI,sx=Math.abs(Math.cos(ang)),lift=1+.07*Math.sin(ang);
+  const front=ang>Math.PI/2&&S.img;
+  ctx.save();ctx.globalAlpha=alpha;ctx.translate(cx,cy);ctx.scale(Math.max(sx,.002)*lift,lift);
+  ctx.transform(1,.1*Math.sin(ang)*(ang>Math.PI/2?-1:1),0,1,0,0);
+  ctx.shadowColor="rgba(30,40,32,.32)";ctx.shadowBlur=46;ctx.shadowOffsetY=20;
+  rr(ctx,-w/2,-h/2,w,h,w*.056);ctx.fillStyle=front?"#1d1d1d":T.back;ctx.fill();
+  ctx.shadowColor="transparent";
+  if(front){if(S.rev)ctx.rotate(Math.PI);ctx.drawImage(S.img,-w/2,-h/2,w,h);}
+  else ctx.drawImage(cardBack(),-w/2,-h/2,w,h);
+  ctx.restore();
+}
+
+function sparkles(cx,cy,w,amt,burst,t){
+  if(amt<=0&&burst<=.01)return;
+  const T=th(),h=w*RATIO,r=mulberry(11+S.card);ctx.fillStyle=T.cardGlow;
+  for(let i=0;i<16;i++){
+    const a=r()*Math.PI*2,k=.62+r()*.22,ph=r()*6,sz=8+r()*14;
+    const d=1+burst*.18;
+    const x=cx+Math.cos(a)*w*k*d,y=cy+Math.sin(a)*h*.5*d;
+    ctx.globalAlpha=clamp(amt*(.35+.65*Math.abs(Math.sin(t*2.1+ph)))+burst);
+    star4(ctx,x,y,sz*(1+burst*.6));ctx.fill();
+  }
+  ctx.globalAlpha=1;
+}
+
+function avatar(cx,cy,s,r,alpha){
+  if(!S.chara||alpha<=0)return;
+  const T=th(),im=S.chara,k=Math.min(im.width,im.height),sx=(im.width-k)/2,sy=(im.height-k)/2;
+  ctx.save();ctx.globalAlpha=alpha;
+  ctx.shadowColor="rgba(30,40,32,.22)";ctx.shadowBlur=30;ctx.shadowOffsetY=12;
+  rr(ctx,cx-s/2,cy-s/2,s,s,r);ctx.fillStyle=T.ring;ctx.fill();ctx.shadowColor="transparent";
+  ctx.save();rr(ctx,cx-s/2,cy-s/2,s,s,r);ctx.clip();ctx.drawImage(im,sx,sy,k,k,cx-s/2,cy-s/2,s,s);ctx.restore();
+  ctx.lineWidth=Math.max(4,s*.035);ctx.strokeStyle=T.ring;rr(ctx,cx-s/2,cy-s/2,s,s,r);ctx.stroke();
+  ctx.restore();
+}
+
+/* 吹き出し。tail="up" は下から上のキャラへ、"left" は左のキャラへ */
+function bubble(x,y,text,size,alpha,tail,shown){
+  if(alpha<=0||!text)return;
+  const T=th();ctx.font=jp(size);
+  const tw=ctx.measureText(text).width,w=tw+size*1.6,h=size*2.1;
+  const bx=tail==="up"?x-w/2:x,by=y-h/2;
+  ctx.save();ctx.globalAlpha=alpha;
+  ctx.shadowColor="rgba(30,40,32,.16)";ctx.shadowBlur=24;ctx.shadowOffsetY=8;
+  ctx.fillStyle=T.paper;rr(ctx,bx,by,w,h,h/2);ctx.fill();
+  ctx.beginPath();
+  if(tail==="up"){ctx.moveTo(x-16,by+2);ctx.lineTo(x+4,by-26);ctx.lineTo(x+18,by+2);}
+  else{ctx.moveTo(bx+2,y-14);ctx.lineTo(bx-24,y+4);ctx.lineTo(bx+2,y+14);}
+  ctx.fill();ctx.shadowColor="transparent";
+  ctx.fillStyle=T.ink;ctx.textAlign="left";ctx.textBaseline="middle";
+  ctx.fillText([...text].slice(0,shown).join(""),bx+size*.8,y+2);
+  ctx.restore();
+}
+
+/* 文字の配置と尺は、文面やテーマが変わったときだけ計算する */
+function relayout(){
+  const c=MAJOR[S.card];
+  LAY={};
+  let z=44;
+  for(;z>=28;z-=2){ctx.font=jp(z);LAY.msg=wrap(S.msg,MSG.w);if(LAY.msg.length*z*1.72<=MSG.h)break;}
+  LAY.msgSize=Math.max(z,28);ctx.font=jp(LAY.msgSize);LAY.msg=wrap(S.msg,MSG.w);
+  ctx.font=jp(44);LAY.outro=wrap(S.outro,760);
+  LAY.kw=(S.rev?c.kwR:c.kwU).split(/\s*・\s*/).slice(0,3);
+  LAY.nameSize=fitSize(c.name,s=>jp(s),92,48,560);
+  const has=!!S.chara,T={has};
+  if(has){T.charaIn=.3;T.bubbleIn=1.0;T.toAv=3.0;T.toAvEnd=3.8;T.backIn=3.0;}
+  else{T.backIn=.5;}
+  T.backInEnd=T.backIn+.9;T.flip=T.backInEnd+1.1;T.flipEnd=T.flip+.9;
+  T.toRow=T.flipEnd+1.9;T.rowEnd=T.toRow+1.0;T.msg=T.rowEnd;
+  const n=[...S.msg].length,lineIn=LAY.msg.length*.35+.6;
+  T.outro=T.msg+Math.min(16,Math.max(6,lineIn+n*.07+1.5));T.end=T.outro+3.2;
+  TL=T;
+  $("seek").max=T.end.toFixed(2);
+}
+
+function render(t){
+  const T=th(),L=TL,c=MAJOR[S.card];
+  ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.shadowColor="transparent";ctx.textBaseline="alphabetic";ctx.textAlign="center";
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,T.bgTop);g.addColorStop(1,T.bgBot);
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const rg=ctx.createRadialGradient(540,820,60,540,820,980);rg.addColorStop(0,T.glow);rg.addColorStop(1,"rgba(255,255,255,0)");
+  ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+  ctx.drawImage(grain(),0,0);
+  doodles(t);
+
+  /* 見出し */
+  ctx.globalAlpha=easeOut(prog(t,0,.7));
+  ctx.fillStyle=T.accent;ctx.font=en(32);spaced("TODAY'S CARD",540,252,9);
+  ctx.fillStyle=T.ink;ctx.font=jp(64);ctx.fillText(S.title,540,334);
+  if(S.date){ctx.fillStyle=T.inkDim;ctx.font=jp(32,400);ctx.fillText(S.date,540,392);}
+  ctx.globalAlpha=1;
+
+  const toRow=easeIO(prog(t,L.toRow,L.rowEnd));
+
+  /* カード */
+  if(t>=L.backIn){
+    const a=easeOut(prog(t,L.backIn,L.backInEnd)),fp=easeIO(prog(t,L.flip,L.flipEnd));
+    const float=Math.sin((t-L.backIn)*2.2)*10*(1-prog(t,L.flip-.5,L.flip));
+    const cx=lerp(BIG.cx,ROW.cx,toRow),cy=lerp(BIG.cy,ROW.cy,toRow)+(1-a)*460+float,w=lerp(BIG.w,ROW.w,toRow);
+    const glow=prog(t,L.flip+.35,L.flipEnd+.4)*(1-toRow*.7);
+    if(glow>0){
+      const gg=ctx.createRadialGradient(cx,cy,w*.2,cx,cy,w*1.25);gg.addColorStop(0,T.cardGlow);gg.addColorStop(1,"rgba(255,255,255,0)");
+      ctx.globalAlpha=glow*.85;ctx.fillStyle=gg;ctx.fillRect(cx-w*1.3,cy-w*1.9,w*2.6,w*3.8);ctx.globalAlpha=1;
+    }
+    drawCard(cx,cy,w,fp,a);
+    const amt=prog(t,L.backInEnd,L.backInEnd+.5)*(1-prog(t,L.toRow,L.toRow+.5));
+    const burst=Math.exp(-Math.pow((t-(L.flip+.5))/.28,2));
+    sparkles(cx,cy,w,amt*.8,burst,t);
+  }
+
+  /* めくった直後のカード名 */
+  const nameA=easeOut(prog(t,L.flipEnd+.1,L.flipEnd+.8))*(1-prog(t,L.toRow,L.toRow+.35));
+  if(nameA>0){
+    ctx.globalAlpha=nameA;const dy=(1-nameA)*16;
+    ctx.fillStyle=T.ink;ctx.font=jp(Math.min(76,LAY.nameSize));ctx.fillText(c.name,540,1392+dy);
+    runs([[c.en,en(42,true),T.inkDim],["　・　",jp(30,400),T.inkDim],[S.rev?"逆位置":"正位置",jp(32),T.ink]],540,1452+dy);
+    ctx.globalAlpha=1;
+  }
+
+  /* 右の列：カード名・向き・キーワード */
+  const colA=easeOut(prog(t,L.toRow+.4,L.rowEnd+.25));
+  if(colA>0){
+    const x=420+(1-colA)*30;ctx.globalAlpha=colA;ctx.textAlign="left";
+    ctx.fillStyle=T.accent;ctx.font=en(40);ctx.fillText(`No. ${c.num}`,x,486);
+    ctx.fillStyle=T.ink;ctx.font=jp(LAY.nameSize);ctx.fillText(c.name,x,486+LAY.nameSize+12);
+    ctx.fillStyle=T.inkDim;ctx.font=en(44,true);ctx.fillText(c.en,x,652);
+    const ori=S.rev?"逆位置":"正位置";ctx.font=jp(32);
+    const pw=ctx.measureText(ori).width+52;
+    ctx.fillStyle=T.chip;rr(ctx,x,680,pw,58,29);ctx.fill();
+    ctx.fillStyle=T.chipInk;ctx.textBaseline="middle";ctx.fillText(ori,x+26,710);ctx.textBaseline="alphabetic";
+    ctx.fillStyle=T.ink;
+    LAY.kw.forEach((k,i)=>{const z=fitSize("・"+k,s=>jp(s,400),38,26,580);ctx.font=jp(z,400);ctx.fillText("・"+k,x,808+i*56);});
+    ctx.textAlign="center";ctx.globalAlpha=1;
+  }
+
+  /* メッセージの紙 */
+  const panA=easeOut(prog(t,L.toRow+.5,L.rowEnd+.35));
+  if(panA>0){
+    const oy=(1-panA)*40;
+    ctx.save();ctx.globalAlpha=panA;
+    ctx.shadowColor="rgba(30,40,32,.18)";ctx.shadowBlur=36;ctx.shadowOffsetY=14;
+    ctx.fillStyle=T.paper;rr(ctx,PANEL.x,PANEL.y+oy,PANEL.w,PANEL.h,36);ctx.fill();ctx.shadowColor="transparent";
+    ctx.strokeStyle=T.paperLine;ctx.lineWidth=2;ctx.setLineDash([12,10]);rr(ctx,PANEL.x+14,PANEL.y+14+oy,PANEL.w-28,PANEL.h-28,26);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=T.inkDim;ctx.font=jp(30,400);ctx.textAlign="left";
+    ctx.fillText(DEFAULTS.from,S.chara?268:MSG.x,PANEL.y+62+oy);
+    const msgOut=1-prog(t,L.outro,L.outro+.5),z=LAY.msgSize,lh=z*1.72;
+    ctx.font=jp(z,400);ctx.fillStyle=T.ink;ctx.textBaseline="top";
+    LAY.msg.forEach((line,i)=>{
+      const a=easeOut(prog(t,L.msg+i*.35,L.msg+i*.35+.6))*msgOut;if(a<=0)return;
+      ctx.globalAlpha=panA*a;ctx.fillText(line,MSG.x,MSG.y+i*lh+(1-a)*12+oy);
+    });
+    /* 締め */
+    const oa=easeOut(prog(t,L.outro+.45,L.outro+1.2));
+    if(oa>0){
+      ctx.globalAlpha=panA*oa;ctx.textAlign="center";ctx.font=jp(44);ctx.fillStyle=T.ink;
+      const lh2=44*1.7,blockH=LAY.outro.length*lh2+96,y0=MSG.y+(MSG.h-blockH)/2+(1-oa)*12;
+      LAY.outro.forEach((line,i)=>ctx.fillText(line,540,y0+i*lh2));
+      ctx.textBaseline="alphabetic";ctx.fillStyle=T.accent;ctx.font=en(50);
+      const hy=y0+LAY.outro.length*lh2+70;ctx.fillText(S.handle,540,hy);
+      ctx.font=en(50);const hw=ctx.measureText(S.handle).width;
+      star4(ctx,540-hw/2-40,hy-16,14);ctx.fill();star4(ctx,540+hw/2+40,hy-16,14);ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  /* キャラクター */
+  if(L.has){
+    const inA=easeOut(prog(t,L.charaIn,L.charaIn+.8)),m=easeIO(prog(t,L.toAv,L.toAvEnd));
+    let cx=lerp(AV_INTRO.cx,AV_READY.cx,m),cy=lerp(AV_INTRO.cy,AV_READY.cy,m),s=lerp(AV_INTRO.s,AV_READY.s,m),r=lerp(AV_INTRO.r,AV_READY.r,m);
+    s*=lerp(.92+.08*inA,1,m);
+    cx=lerp(cx,AV_ROW.cx,toRow);cy=lerp(cy,AV_ROW.cy,toRow);
+    avatar(cx,cy,s,r,inA);
+    const bA=prog(t,L.bubbleIn,L.bubbleIn+.4)*(1-prog(t,L.toAv,L.toAv+.3));
+    bubble(540,1262,S.intro,44,bA,"up",Math.floor((t-L.bubbleIn-.15)*14));
+    const rA=prog(t,L.toAvEnd,L.toAvEnd+.3)*(1-prog(t,L.flip+.2,L.flip+.5));
+    bubble(AV_READY.cx+112,AV_READY.cy-6,DEFAULTS.ready,36,rA,"left",99);
+  }
+}
+
+/* ================= 状態とUI ================= */
+const STORE="omasuReel";
+function loadPrefs(){try{return JSON.parse(localStorage.getItem(STORE))||{};}catch(e){return{};}}
+function savePrefs(){
+  try{localStorage.setItem(STORE,JSON.stringify({title:S.title,intro:S.intro,outro:S.outro,handle:S.handle,theme:S.theme,chara:S.charaSrc||null}));}
+  catch(e){/* 容量オーバーなどは無視（画像は次回選び直し） */}
+}
+function loadImg(src){return new Promise((ok,ng)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ng;i.src=src;});}
+
+const imgCache={};
+async function setCard(i,rev){
+  S.card=i;S.rev=rev;
+  $("card").value=i;document.querySelector(`input[name=ori][value=${rev?"rev":"up"}]`).checked=true;
+  S.msg=rev?MAJOR[i].rev:MAJOR[i].up;$("f-msg").value=S.msg;
+  S.img=imgCache[i]||null;
+  refresh();loadFonts();
+  if(!imgCache[i]){
+    try{imgCache[i]=await loadImg(`../${CARD_FILES[i]}.png`);}catch(e){return;}
+    if(S.card===i){S.img=imgCache[i];draw();}
+  }
+}
+function randomCard(){setCard(Math.floor(Math.random()*MAJOR.length),Math.random()<.5);}
+
+async function setChara(src,persist){
+  if(!src){S.chara=null;S.charaSrc=null;$("chara-thumb").removeAttribute("src");$("chara-clear").hidden=true;refresh();if(persist)savePrefs();return;}
+  try{S.chara=await loadImg(src);}catch(e){return false;}
+  S.charaSrc=persist?src:S.charaSrc;$("chara-thumb").src=src;$("chara-clear").hidden=!persist;
+  refresh();if(persist)savePrefs();return true;
+}
+/* 端末で選んだ画像は縮小してから保存する */
+function shrink(file){
+  return new Promise((ok,ng)=>{
+    const url=URL.createObjectURL(file);
+    loadImg(url).then(im=>{
+      const k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement("canvas");
+      c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+      const g=c.getContext("2d");g.fillStyle="#f9f6ee";g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);ok(c.toDataURL("image/jpeg",.92));
+    },ng);
+  });
+}
+
+/* 日本語フォントは分割配信なので、使う文字を渡して必要な分だけ読み込む */
+function loadFonts(){
+  const c=MAJOR[S.card],T=th();
+  const text=[S.title,S.date,S.intro,S.msg,S.outro,S.handle,DEFAULTS.ready,DEFAULTS.from,"正位置逆位置・",c.name,c.kwU,c.kwR].join("");
+  const latin="TODAY'S CARD No.0123456789 IVXL·@_ "+c.en+"UprightReversedOMASU"+S.handle;
+  return Promise.all([
+    document.fonts.load(`${T.jpW} 40px "${T.jp}"`,text),
+    document.fonts.load(`400 40px "${T.jp}"`,text),
+    document.fonts.load(`500 40px "Cormorant Garamond"`,latin),
+    document.fonts.load(`italic 500 40px "Cormorant Garamond"`,latin)
+  ]).catch(()=>{}).then(()=>{backCache={};refresh();});
+}
+
+let cur=0,playing=false,t0=0;
+function draw(){render(cur);$("seek").value=cur;$("time").textContent=cur.toFixed(1)+"s";}
+function refresh(){relayout();cur=Math.min(cur,TL.end);draw();}
+function tick(now){
+  if(!playing)return;
+  cur=(now-t0)/1000;if(cur>=TL.end){cur=0;t0=now;}
+  draw();requestAnimationFrame(tick);
+}
+function play(on){
+  playing=on;$("play").textContent=on?"❚❚ 停止":"▶ 再生";
+  if(on){if(cur>=TL.end-.05)cur=0;t0=performance.now()-cur*1000;requestAnimationFrame(tick);}
+}
+
+/* ================= 書き出し ================= */
+async function encodeMp4(onP){
+  if(!("VideoEncoder" in window)||!window.Mp4Muxer)return null;
+  const base={width:W,height:H,bitrate:8e6,framerate:FPS};let cfg=null;
+  for(const codec of ["avc1.640028","avc1.4d0028","avc1.420028"]){
+    try{if((await VideoEncoder.isConfigSupported({...base,codec})).supported){cfg={...base,codec};break;}}catch(e){}
+  }
+  if(!cfg)return null;
+  const muxer=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:"avc",width:W,height:H,frameRate:FPS},fastStart:"in-memory"});
+  let err=null;
+  const enc=new VideoEncoder({output:(chunk,meta)=>muxer.addVideoChunk(chunk,meta),error:e=>{err=e;}});
+  enc.configure(cfg);
+  const n=Math.ceil(TL.end*FPS);
+  for(let i=0;i<n;i++){
+    if(err)throw err;
+    render(i/FPS);
+    const f=new VideoFrame(cv,{timestamp:Math.round(i*1e6/FPS),duration:Math.round(1e6/FPS)});
+    enc.encode(f,{keyFrame:i%(FPS*2)===0});f.close();
+    while(enc.encodeQueueSize>4)await new Promise(r=>setTimeout(r,4));
+    if(i%6===0){onP(i/n);await new Promise(r=>setTimeout(r,0));}
+  }
+  await enc.flush();if(err)throw err;enc.close();muxer.finalize();
+  return new Blob([muxer.target.buffer],{type:"video/mp4"});
+}
+/* WebCodecs が使えない端末向け：実時間で再生しながら録画する */
+function recordRealtime(onP){
+  return new Promise((ok,ng)=>{
+    if(!cv.captureStream||!window.MediaRecorder)return ng(new Error("この端末のブラウザは動画の書き出しに対応していません"));
+    const mime=["video/mp4;codecs=avc1.640028","video/mp4","video/webm;codecs=vp9","video/webm"].find(m=>MediaRecorder.isTypeSupported(m))||"";
+    const rec=new MediaRecorder(cv.captureStream(FPS),mime?{mimeType:mime,videoBitsPerSecond:8e6}:{});
+    const chunks=[];rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
+    rec.onstop=()=>ok(new Blob(chunks,{type:(rec.mimeType||mime||"video/webm").split(";")[0]}));
+    rec.onerror=e=>ng(e.error||new Error("録画に失敗しました"));
+    render(0);rec.start(250);
+    const start=performance.now();
+    (function step(now){
+      const t=(now-start)/1000;render(Math.min(t,TL.end));onP(t/TL.end);
+      if(t<TL.end)requestAnimationFrame(step);else setTimeout(()=>rec.stop(),200);
+    })(start);
+  });
+}
+
+let outUrl=null;
+/* 書き出し中に設定が変わると尺がずれるので、操作をまとめて止める */
+function lock(on){document.querySelectorAll(".controls input,.controls select,.controls textarea,.controls button,.player input,.player button").forEach(e=>{e.disabled=on;});}
+async function exportVideo(){
+  play(false);lock(true);
+  $("progress").hidden=false;$("result").hidden=true;
+  const setP=p=>{$("bar").style.width=Math.round(clamp(p)*100)+"%";};
+  $("status").textContent="準備しています…";setP(0);
+  let blob=null;
+  try{
+    await loadFonts();
+    if(!S.img){S.img=imgCache[S.card]=await loadImg(`../${CARD_FILES[S.card]}.png`);}
+    relayout();
+    $("status").textContent="動画を作っています…";
+    try{blob=await encodeMp4(setP);}catch(e){console.warn(e);blob=null;}
+    if(!blob){$("status").textContent="録画しています…（このまま画面を開いておいてください）";blob=await recordRealtime(setP);}
+  }catch(e){
+    $("status").textContent="書き出せませんでした："+(e&&e.message||e);lock(false);return;
+  }
+  setP(1);
+  const ext=blob.type.includes("mp4")?"mp4":"webm";
+  const d=new Date(),name=`reel-${d.getMonth()+1}${String(d.getDate()).padStart(2,"0")}-${CARD_FILES[S.card].slice(3)}.${ext}`;
+  if(outUrl)URL.revokeObjectURL(outUrl);outUrl=URL.createObjectURL(blob);
+  $("out").src=outUrl;$("download").href=outUrl;$("download").download=name;
+  const file=new File([blob],name,{type:blob.type});
+  $("share").hidden=!(navigator.canShare&&navigator.canShare({files:[file]}));
+  $("share").onclick=()=>navigator.share({files:[file]}).catch(()=>{});
+  $("result-note").textContent=ext==="mp4"
+    ?`できました（${TL.end.toFixed(1)}秒・MP4）。スマホは「保存・共有する」から「ビデオを保存」で写真に入ります。`
+    :"この端末ではWebM形式になりました。Instagramに上げる前にMP4へ変換するか、iPhoneのSafariかパソコンのChromeで書き出してください。";
+  $("status").textContent="";$("progress").hidden=true;$("result").hidden=false;lock(false);
+  play(false);cur=0;draw();
+}
+
+/* ================= 初期化 ================= */
+(function init(){
+  const sel=$("card");
+  MAJOR.forEach((c,i)=>{const o=document.createElement("option");o.value=i;o.textContent=`${c.num}　${c.name}（${c.en}）`;sel.appendChild(o);});
+  const p=loadPrefs(),d=new Date();
+  S.title=p.title??DEFAULTS.title;S.intro=p.intro??DEFAULTS.intro;S.outro=p.outro??DEFAULTS.outro;S.handle=p.handle??DEFAULTS.handle;
+  S.theme=THEMES[p.theme]?p.theme:"sage";
+  S.date=`${d.getMonth()+1}月${d.getDate()}日（${"日月火水木金土"[d.getDay()]}）`;
+  [["f-title","title"],["f-date","date"],["f-intro","intro"],["f-outro","outro"],["f-handle","handle"],["f-msg","msg"]].forEach(([id,k])=>{
+    $(id).value=S[k];
+    $(id).addEventListener("input",()=>{S[k]=$(id).value;refresh();if(k!=="msg"&&k!=="date")savePrefs();});
+    $(id).addEventListener("change",loadFonts);
+  });
+  document.querySelector(`input[name=theme][value=${S.theme}]`).checked=true;
+  document.querySelectorAll("input[name=theme]").forEach(r=>r.addEventListener("change",()=>{S.theme=r.value;savePrefs();refresh();loadFonts();}));
+  document.querySelectorAll("input[name=ori]").forEach(r=>r.addEventListener("change",()=>setCard(S.card,r.value==="rev")));
+  sel.addEventListener("change",()=>setCard(+sel.value,S.rev));
+  $("shuffle").addEventListener("click",randomCard);
+  $("msg-reset").addEventListener("click",()=>setCard(S.card,S.rev));
+  $("play").addEventListener("click",()=>play(!playing));
+  $("seek").addEventListener("input",()=>{play(false);cur=+$("seek").value;draw();});
+  $("chara-file").addEventListener("change",async e=>{
+    const f=e.target.files[0];if(!f)return;
+    try{await setChara(await shrink(f),true);}catch(err){alert("画像を読み込めませんでした");}
+    e.target.value="";
+  });
+  $("chara-clear").addEventListener("click",async()=>{await setChara(null,true);tryRepoChara();});
+  $("export").addEventListener("click",exportVideo);
+
+  randomCard();
+  if(p.chara)setChara(p.chara,true).then(ok=>{if(!ok)tryRepoChara();});else tryRepoChara();
+  loadFonts().then(()=>{if(!playing){cur=0;play(true);}});
+})();
+async function tryRepoChara(){for(const f of CHARA_FILES){if(await setChara(f,false))return;}}
+</script>
+</body>
+</html>

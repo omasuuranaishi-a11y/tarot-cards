@@ -208,16 +208,17 @@ class Renderer:
         if ch["num"] not in self.title_cache:
             frame = self.bg(PALETTE[ch["num"]], 100 + int(ch["num"])).copy()
             d = ImageDraw.Draw(frame)
-            d.text((W // 2, 400), f"第{int(ch['num'])}章", font=vp.font(vp.SERIF_B, 56), fill=vp.GOLD, anchor="mm")
-            d.text((W // 2, 520), ch["title"], font=vp.font(vp.SERIF_B, 84), fill=(255, 255, 255), anchor="mm")
-            d.line((W // 2 - 220, 610, W // 2 + 220, 610), fill=vp.GOLD, width=3)
+            # 章の名前は上に、山羊は左下に（重ならないように）
+            d.text((W // 2, 250), f"第{int(ch['num'])}章", font=vp.font(vp.SERIF_B, 56), fill=vp.GOLD, anchor="mm")
+            d.text((W // 2, 370), ch["title"], font=vp.font(vp.SERIF_B, 84), fill=(255, 255, 255), anchor="mm")
+            d.line((W // 2 - 220, 460, W // 2 + 220, 460), fill=vp.GOLD, width=3)
             icon = TITLE_ICON.get(ch["num"])
             if icon:
                 st = vp.sticker(icon, 200)
-                frame.alpha_composite(st, (W - 420, 160))
+                frame.alpha_composite(st, (W - 380, 30))
             gl = goat_layer(TITLE_GOAT.get(ch["num"], ""), TITLE_POSE.get(ch["num"], "point"), 340)
             if gl is not None:
-                frame.alpha_composite(gl, (60, 1000 - gl.height))
+                frame.alpha_composite(gl, (W // 2 - gl.width // 2, 1040 - gl.height))
             self.title_cache[ch["num"]] = frame
         return self.title_cache[ch["num"]]
 

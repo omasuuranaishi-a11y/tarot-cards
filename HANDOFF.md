@@ -116,7 +116,8 @@
 | `youtube/newmoon-20261109/audio/newmoon_rec.m4a` | 新月動画の、おますさんの録音 | 6.8MB |
 | `youtube/newmoon-20261109/astro/chart_astro.jpg`、`grid_astro.jpg` | おますさんの astro.com の新月チャートとアスペクト表 | 0.6MB |
 | `youtube/newmoon-20261109/final_work/transcript.json`、`transcript.txt` | 録音の文字起こし | 小 |
-| `youtube/newmoon-20261109/videos/11月9日蠍座新月_v2.mp4` | **ブラッシュアップ版（山羊なし）** | 94MB |
+| `youtube/newmoon-20261109/videos/11月9日蠍座新月_v2_山羊入り.mp4` | **いちばん新しい版：v2 におますさんの山羊を入れたもの** | 95MB |
+| `youtube/newmoon-20261109/videos/11月9日蠍座新月_v2.mp4` | ブラッシュアップ版（山羊なし） | 94MB |
 | `youtube/newmoon-20261109/videos/11月9日蠍座新月_本番.mp4` | v1 の完成版 | 52MB |
 | `youtube/newmoon-20261109/videos/v2_見本_1-2章.mp4`、`11月9日蠍座新月_仮の動画.mp4` | 見本・録音前の仮の動画 | 27MB・32MB |
 | `youtube/newmoon-20261109/サムネイル案_11月9日蠍座新月.png` | サムネイル案 | 小 |

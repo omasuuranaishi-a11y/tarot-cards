@@ -10,7 +10,7 @@ import os
 from PIL import Image, ImageDraw, ImageFilter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "astro")
+OUT = os.path.join(HERE, "astro", "goat_backup")  # 予備（おますさんの山羊を使うので、ふだんは使わない）
 
 LINE = (88, 60, 52, 255)
 CREAM = (252, 246, 234, 255)

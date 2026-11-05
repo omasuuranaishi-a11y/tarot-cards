@@ -49,7 +49,7 @@ SCENES = [
     S(44, "diagram", make=lambda c: vp.diagram_retrograde(c["p"]), goat=("後ろに進んで\n見えるだけだよ", "think")),
     S(48, "illust", phrase="関係のことも、言葉のことも、\n少しずつ前へ", st=[("talk", 440, (960, 620))]),
     S(51, "chart"),
-    S(54, "illust", phrase="止まっていた車が、\nゆっくり動き出す", st=[("drive", 420, (960, 620))], goat=("一つずつ\n試していこう", "point")),
+    S(54, "illust", phrase="止まっていた車が、\nゆっくり動き出す", st=[("drive", 420, (960, 620))], goat=("一つずつ\n試していこう", "broom")),
     S(59, "chart"),
     S(62, "diagram", make=lambda c: vp.diagram_aspects(), goat=("前回は90度\nだったね", "surprise")),
     S(68, "illust", phrase="「一緒にこうしてみない？」", st=[("talk", 460, (960, 610))]),
@@ -57,14 +57,14 @@ SCENES = [
     S(76, "illust", phrase="自分らしく動くことに、\n後押しがある", st=[("leo", 380, (760, 620)), ("jupiter", 280, (1200, 620))]),
     S(79, "illust", phrase="サビアン＝\n度数ごとのイメージ", st=[("scorpio", 300, (700, 620)), ("libra", 300, (1220, 620))]),
     S(81, "chart"),
-    S(83, "diagram", make=lambda c: vp.sabian_card("蠍座17度", "自分の子どもの\n父親である女性", "sprout", "待つより、自分の中で育てたものを、自分で形に"), goat=("サビアンを\n読んでみよう", "book")),
+    S(83, "diagram", make=lambda c: vp.sabian_card("蠍座17度", "自分の子どもの\n父親である女性", "sprout", "待つより、自分の中で育てたものを、自分で形に"), goat=("サビアンを\n読んでみよう", "readbook")),
     S(87, "illust", phrase="待つより、\n自分で形にしていく", st=[("waiting", 420, (960, 620))]),
     S(89, "illust", phrase="自分の言葉で伝えて、\n自分で動く", st=[("seed_girl", 420, (960, 620))]),
     S(91, "chart"),
     S(93, "diagram", make=lambda c: vp.sabian_card("天秤座24度", "蝶の左側にある、\n3枚目の羽", "butterfly", "ほかの人と同じ形じゃなくていい")),
     S(98, "illust", phrase="二人の間だけの、\nちょうどいい形", st=[("couple", 440, (960, 620))]),
-    S(102, "diagram", make=lambda c: vp.calendar_diagram(c["reveal"](["新月は、11月9日", "翌日の10日", "14日に", "16日に", "22日には", "24日の夜"])), goat=("カレンダーで\n確かめよう", "point")),
-    S(108, "diagram", make=lambda c: vp.question_card(1, "この関係を、\nもう一歩深めるとしたら？", "imagine", "蠍座の新月の問い"), goat=("思い浮かべて\nみてね", "think")),
+    S(102, "diagram", make=lambda c: vp.calendar_diagram(c["reveal"](["新月は、11月9日", "翌日の10日", "14日に", "16日に", "22日には", "24日の夜"])), goat=("カレンダーで\n確かめよう", "lantern")),
+    S(108, "diagram", make=lambda c: vp.question_card(1, "この関係を、\nもう一歩深めるとしたら？", "imagine", "蠍座の新月の問い"), goat=("思い浮かべて\nみてね", "sparkle")),
     S(112, "diagram", make=lambda c: vp.question_card(2, "見直して、\n分かったことは何？", "calendar", "順行に戻る金星と水星の問い")),
     S(115, "diagram", make=lambda c: vp.question_card(3, "自分から、\nどんな提案ができる？", "talk", "金星と火星の60度・蠍座17度の問い")),
     S(118, "chart"),
@@ -74,6 +74,7 @@ SCENES = [
 
 TITLE_GOAT = {"02": "次は、新月の時刻と\n蠍座のお話だよ", "03": "いちばん大事な\n流れのお話だよ", "04": "金星と火星の\n角度を見てみよう",
               "05": "サビアンの\nイメージを見るよ", "06": "2週間の使い方を\nまとめるよ", "07": "最後に\nおさらいしよう"}
+TITLE_POSE = {"02": "magic", "03": "point", "04": "broom", "05": "book", "06": "lantern", "07": "smile"}
 TITLE_ICON = {"02": "scorpio", "03": "venus", "04": "mars", "05": "butterfly", "06": "calendar", "07": "sprout"}
 
 
@@ -106,7 +107,7 @@ _goat_cache = {}
 
 
 def goat_layer(text, pose="hello", height=330):
-    """案内役の山羊（goat_draw.py で描いた絵）と吹き出し。text は \n で改行。"""
+    """案内役の山羊（おますさんの山羊。goat_src/poses から選んだ astro/goat_<ポーズ>.png）と吹き出し。text は \n で改行。"""
     path = os.path.join(HERE, "astro", f"goat_{pose}.png")
     if not os.path.exists(path):
         return None
@@ -214,7 +215,7 @@ class Renderer:
             if icon:
                 st = vp.sticker(icon, 200)
                 frame.alpha_composite(st, (W - 420, 160))
-            gl = goat_layer(TITLE_GOAT.get(ch["num"], ""), "point", 330)
+            gl = goat_layer(TITLE_GOAT.get(ch["num"], ""), TITLE_POSE.get(ch["num"], "point"), 340)
             if gl is not None:
                 frame.alpha_composite(gl, (60, 1000 - gl.height))
             self.title_cache[ch["num"]] = frame

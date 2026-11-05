@@ -13,3 +13,9 @@ venv/
 newmoon-20261109/v2chk_*.png
 newmoon-20261109/goat_check.png
 newmoon-20261109/x.mp4
+newmoon-20261109/v2_goat.log
+newmoon-20261109/goat_src/fg.npy
+newmoon-20261109/goat_src/poses_check.png
+# おますさんの山羊の絵は非公開リポジトリだけに置く
+newmoon-20261109/goat_src/
+newmoon-20261109/astro/goat_*.png

@@ -1,0 +1,215 @@
+<title>2027年運勢鑑定 録音台本</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+/* 1段組みの読み上げ台本。上に章へのジャンプ、章ごとに台本→要点。スマホで読みやすい大きな文字 */
+:root {
+  --bg: #f3f5f4;
+  --paper: #ffffff;
+  --ink: #2c3331;
+  --muted: #66716e;
+  --accent: #4f6f6b;
+  --accent-soft: #e2eae8;
+  --gold: #a5803f;
+  --gold-soft: #f6efe1;
+  --line: #d9e0de;
+  --font-read: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+  --font-ui: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #161b1a; --paper: #1f2624; --ink: #e7ecea; --muted: #a2adaa; --accent: #8fb3ad;
+  --accent-soft: #283431; --gold: #d2b072; --gold-soft: #2e2a20; --line: #34403d; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #161b1a; --paper: #1f2624; --ink: #e7ecea; --muted: #a2adaa; --accent: #8fb3ad;
+  --accent-soft: #283431; --gold: #d2b072; --gold-soft: #2e2a20; --line: #34403d; color-scheme: dark; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); }
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 22px; }
+.top h1 { font-family: var(--font-read); font-weight: 700; font-size: clamp(1.5rem, 5vw, 2rem); margin: 0 0 6px; text-wrap: balance; }
+.top .sub { color: var(--muted); margin: 0; font-size: 0.95rem; line-height: 1.7; }
+.top .total { display: inline-block; margin-top: 10px; font-size: 0.85rem; color: var(--accent);
+  background: var(--accent-soft); border-radius: 999px; padding: 4px 12px; font-variant-numeric: tabular-nums; }
+.how { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 4px 18px; }
+.how summary { cursor: pointer; font-weight: 500; padding: 12px 0; color: var(--accent); }
+.how ol { margin: 0 0 14px; padding-left: 1.3em; line-height: 1.8; display: grid; gap: 6px; font-size: 0.95rem; }
+.how p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; margin: 0 0 14px; }
+nav.jump { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  padding-block: 10px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: thin;
+  border-bottom: 1px solid var(--line); }
+nav.jump a { flex: 0 0 auto; text-decoration: none; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px 6px 6px; font-size: 0.85rem;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+nav.jump a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.nav-num { background: var(--accent); color: var(--paper); border-radius: 999px; font-size: 0.75rem;
+  width: 24px; height: 24px; display: inline-grid; place-items: center; font-variant-numeric: tabular-nums; }
+.chapter { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 22px 20px 18px;
+  display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 70px; }
+.ch-head { display: flex; gap: 14px; align-items: flex-start; }
+.ch-num { font-family: var(--font-read); font-weight: 700; font-size: 1.6rem; color: var(--gold); line-height: 1;
+  padding-top: 4px; font-variant-numeric: tabular-nums; }
+.ch-title-wrap { min-width: 0; }
+.ch-head h2 { font-family: var(--font-read); font-weight: 700; font-size: 1.3rem; margin: 0; text-wrap: balance; }
+.ch-meta { margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.82rem; color: var(--muted); }
+.script { display: flex; flex-direction: column; gap: 1.1em; }
+.script p { margin: 0; font-family: var(--font-read); font-size: 1.2rem; line-height: 2.05; letter-spacing: 0.02em; }
+.adlib { display: flex; gap: 10px; align-items: baseline; background: var(--gold-soft); border-radius: 10px;
+  padding: 10px 14px; font-size: 0.95rem; line-height: 1.7; }
+.adlib-tag { flex: 0 0 auto; font-size: 0.75rem; font-weight: 500; color: var(--gold); border: 1px solid var(--gold);
+  border-radius: 999px; padding: 1px 8px; letter-spacing: 0.05em; }
+.points { border-top: 1px dashed var(--line); padding-top: 10px; }
+.points summary { cursor: pointer; font-size: 0.88rem; color: var(--accent); }
+.points ul { margin: 10px 0 2px; padding-left: 1.2em; line-height: 1.8; font-size: 0.92rem; color: var(--muted); }
+.pause { margin: 0; text-align: center; font-size: 0.8rem; color: var(--muted); letter-spacing: 0.05em; }
+.pause::before, .pause::after { content: "・・・"; margin: 0 8px; color: var(--line); }
+@media (max-width: 480px) { .script p { font-size: 1.12rem; line-height: 1.95; } .chapter { padding: 18px 16px 14px; } }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+<div class="wrap">
+  <header class="top">
+    <h1>2027年運勢鑑定のご紹介<br>録音台本</h1>
+    <p class="sub">新月動画と同じ話し方で書いています。「このサンプルの方の場合」は、サンプル鑑定書の内容です。ページ数と価格は入れていません。</p>
+    <span class="total">全12章・2,923字・約9分（アドリブを入れると10〜12分）</span>
+  </header>
+  <details class="how" id="how">
+    <summary>録音のしかた</summary>
+    <ol><li><strong>章ごとに1つのファイル</strong>で録ってください。ファイル名は章の番号（01〜12）にしていただけると助かります。1本にまとめて録る場合は、章と章のあいだを3秒ほどあけてください。</li><li>段落の間（台本で行が空いているところ）は、1〜2秒あけます。</li><li><strong>読み間違えたら、止めずに、その文の頭から読み直してください。</strong> 読み直した部分はこちらで切り取ります。</li><li>台本は、言いやすいように言いかえて大丈夫です。【アドリブ欄】は、話したいことがあるときだけで大丈夫です。</li><li>スマホのボイスメモで十分です。静かな部屋で、口とスマホは20〜30cmくらいです。</li></ol>
+    <p>テロップは、各章の「画面に出す要点」を表示します。話す言葉と一字一句そろえなくて大丈夫です。</p>
+  </details>
+  <nav class="jump" aria-label="章へ移動"><a href="#c01"><span class="nav-num">01</span>はじめに</a><a href="#c02"><span class="nav-num">02</span>一年のテーマと流れ</a><a href="#c03"><span class="nav-num">03</span>誕生日から始まる一年</a><a href="#c04"><span class="nav-num">04</span>心の変化</a><a href="#c05"><span class="nav-num">05</span>サビアン</a><a href="#c06"><span class="nav-num">06</span>仕事</a><a href="#c07"><span class="nav-num">07</span>お金と働き方</a><a href="#c08"><span class="nav-num">08</span>恋愛・パートナーシップ</a><a href="#c09"><span class="nav-num">09</span>家族と、自分の気持ち</a><a href="#c10"><span class="nav-num">10</span>注目の時期と、今からできる準備</a><a href="#c11"><span class="nav-num">11</span>カードからのメッセージ</a><a href="#c12"><span class="nav-num">12</span>おわりに</a></nav>
+  <section class="chapter" id="c01">
+  <header class="ch-head">
+    <span class="ch-num">01</span>
+    <div class="ch-title-wrap">
+      <h2>はじめに</h2>
+      <p class="ch-meta"><span>映すページ：表紙</span><span>目安 0:51</span></p>
+    </div>
+  </header>
+  <div class="script"><p>こんにちは。星よみ専門家のおますです。</p><p>今日は、2027年の運勢鑑定のご案内をさせてください。</p><p>年末が近づいてくると、来年のことが、ちょっと気になってきますよね。「仕事は、このままでいいのかな」とか、「パートナーとの関係、これからどうなっていくんだろう」とか。考え始めると、なかなか答えが出なくて、ぐるぐるしちゃう。そんなこと、ありませんか。</p><p>この鑑定は、生年月日と、生まれた時間、生まれた場所から、あなたの2027年を読んで、一冊の鑑定書にしてお届けするものです。</p><p>今日は、サンプルの鑑定書を画面でお見せしながら、どんなことが書いてあるのかを、一緒に見ていきますね。</p><div class="adlib"><span class="adlib-tag">アドリブ</span><span>この鑑定書を作ろうと思ったきっかけ、込めた思いなど</span></div></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>2027年運勢鑑定のご案内</li><li>生年月日・生まれた時間・生まれた場所から読みます</li><li>あなたの一年を、一冊の鑑定書に</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c02">
+  <header class="ch-head">
+    <span class="ch-num">02</span>
+    <div class="ch-title-wrap">
+      <h2>一年のテーマと流れ</h2>
+      <p class="ch-meta"><span>映すページ：一年のテーマ</span><span>目安 0:54</span></p>
+    </div>
+  </header>
+  <div class="script"><p>では、最初のページから見ていきましょう。ここには、その方の一年のテーマと、だいたいの流れを書いています。</p><p>このサンプルの方の場合、テーマは「自分の希望も大切にする一年」でした。</p><p>1月から7月の中ごろまでは、予定を増やすより、落ち着いて過ごせる時間を大切にしたい時期。7月の終わりごろからは、好きなことを試してみたくなって、9月から10月に、人との約束や仕事の条件を見直す。そして11月の終わりごろから、自分で選んだことを、行動に移していく。そんな流れなんですね。</p><p>一年の流れが先にわかっていると、「今は、ゆっくりでいい時期なんだな」とか、「秋になったら動いてみよう」って、予定が立てやすくなるんです。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>一年のテーマと、だいたいの流れ</li><li>何月ごろに休み、何月ごろに動くとよさそうか</li><li>先にわかると、予定が立てやすい</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c03">
+  <header class="ch-head">
+    <span class="ch-num">03</span>
+    <div class="ch-title-wrap">
+      <h2>誕生日から始まる一年（太陽回帰）</h2>
+      <p class="ch-meta"><span>映すページ：太陽回帰</span><span>目安 0:56</span></p>
+    </div>
+  </header>
+  <div class="script"><p>ここからは、星の読み方を、少しだけご紹介させてください。</p><p>まずは、太陽回帰です。これは、誕生日のころから、次の誕生日のころまでのテーマを見る方法なんですね。</p><p>むずかしそうに聞こえますよね。でも鑑定書では、「太陽は毎日の仕事」「月は休む時間」というふうに、ふだんの言葉に置きかえて書いています。占星術を知らない方でも、読んでいただけるようにしました。</p><p>このサンプルの方は、役に立ちたい気持ちが強くて、頼まれた以上に、つい頑張っちゃう配置でした。終わりの目安がないと、できたことより、足りないことのほうが気になっちゃうんですよね。なので、「今日はここまでできたら十分」と先に決めておく、という具体的な工夫まで、お伝えしています。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>太陽回帰＝誕生日から、次の誕生日までのテーマ</li><li>星のことは、ふだんの言葉で</li><li>「ここまでで十分」を決める、などの工夫まで</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c04">
+  <header class="ch-head">
+    <span class="ch-num">04</span>
+    <div class="ch-title-wrap">
+      <h2>心の変化（プログレス）</h2>
+      <p class="ch-meta"><span>映すページ：プログレス</span><span>目安 0:36</span></p>
+    </div>
+  </header>
+  <div class="script"><p>次は、プログレスです。これは、年齢を重ねるなかで変わっていく、気持ちや関心を見る方法です。</p><p>鑑定書では、「1月から7月中旬」「7月下旬から」「11月下旬から」というふうに、時期ごとに分けて書いています。</p><p>気持ちの変化って、自分では気づきにくいものなんですよね。人と会うのは楽しいのに、最近なんだか一人の時間がほしい。そんなとき、「今はそういう時期なんだな」とわかっていると、自分を責めずにすむんです。</p><div class="adlib"><span class="adlib-tag">アドリブ</span><span>気持ちの変化の時期を知っていてよかったこと など</span></div></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>プログレス＝年齢とともに変わる、気持ちや関心</li><li>時期ごとに分けてお伝え</li><li>気持ちの変化を知ると、自分を責めずにすむ</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c05">
+  <header class="ch-head">
+    <span class="ch-num">05</span>
+    <div class="ch-title-wrap">
+      <h2>サビアン</h2>
+      <p class="ch-meta"><span>映すページ：サビアン</span><span>目安 0:52</span></p>
+    </div>
+  </header>
+  <div class="script"><p>それから、サビアンも使っています。サビアンは、星の位置を、短い場面のイメージで表したものなんですね。</p><p>このサンプルの方には、「顔をしかめる道化師」という場面が出てきました。</p><p>ちょっとドキッとする言葉ですよね。でも、これは何か悪いことが起きる、という意味ではないんです。</p><p>道化師は、まじめな場面に、違う見方や笑いを持ちこむ役です。なので私は、「きちんとしなきゃ」って力が入りすぎたときに、少し肩の力を抜いてみる、というヒントとして読みました。完璧な答えを用意しなくても、「ここで迷っています」って、まず話してみる。鑑定書では、そんなふうに、ふだんの場面での使い方までお伝えしています。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>サビアン＝星の位置を、短い場面で表したもの</li><li>例：「顔をしかめる道化師」</li><li>ふだんの場面での使い方まで</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c06">
+  <header class="ch-head">
+    <span class="ch-num">06</span>
+    <div class="ch-title-wrap">
+      <h2>仕事</h2>
+      <p class="ch-meta"><span>映すページ：仕事・キャリア</span><span>目安 0:53</span></p>
+    </div>
+  </header>
+  <div class="script"><p>ここからは、項目ごとのページです。まずは、仕事から見ていきますね。</p><p>仕事のページでは、「仕事の内容」と「働き方」を、分けて考えられるように書いています。</p><p>たとえば、仕事そのものは好きなのに、帰りが遅くなるのがつらい。それなら、仕事を変える前に、時間や担当の量を相談できるかもしれないですよね。反対に、条件を変えても気持ちが晴れないなら、ほかの仕事を調べてみる理由になります。</p><p>何がつらいのかを一つずつ分けていくと、疲れた日の気持ちだけで、大きな決断をしなくてすむんです。このサンプルの方の場合は、6月ごろに条件を相談して、10月の中ごろに振り返る、という時期の目安もお伝えしています。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>「仕事の内容」と「働き方」を分けて考える</li><li>変える前に、相談できることもある</li><li>動く時期の目安も</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c07">
+  <header class="ch-head">
+    <span class="ch-num">07</span>
+    <div class="ch-title-wrap">
+      <h2>お金と働き方</h2>
+      <p class="ch-meta"><span>映すページ：収入・お金</span><span>目安 0:42</span></p>
+    </div>
+  </header>
+  <div class="script"><p>次は、お金と働き方です。</p><p>「収入を増やしたい」と思ったとき、何から考えたらいいか、迷っちゃいますよね。鑑定書では、まず「何円増えたら、どんな不安が減るのか」から考えてみる、というお話をしています。</p><p>そこがはっきりすると、目標が具体的になって、時間に見合う仕事を選びやすくなるんです。同じ金額でも、準備や移動にかかる時間が違えば、手元に残るものも変わりますよね。金額だけじゃなくて、仕事を終えたあとの暮らしまで含めて考える。そんな、生活に合わせた考え方をお伝えしています。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>「何円増えたら、どんな不安が減るか」から考える</li><li>金額だけでなく、時間もあわせて</li><li>暮らしに合う働き方を選ぶヒント</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c08">
+  <header class="ch-head">
+    <span class="ch-num">08</span>
+    <div class="ch-title-wrap">
+      <h2>恋愛・パートナーシップ</h2>
+      <p class="ch-meta"><span>映すページ：恋愛</span><span>目安 0:53</span></p>
+    </div>
+  </header>
+  <div class="script"><p>そして、恋愛とパートナーシップです。ここは、二つに分けて書いています。パートナーがいる方と、これから出会いを考える方です。</p><p>パートナーがいる方には、「手伝ってほしいのか、気持ちを聞いてほしいのか」を分けてみる、というお話をしています。「わかってほしい」だけだと、相手は何をしたらいいのか、迷っちゃうこともあるんですよね。なので、「今週は帰りが遅いから、この用事をお願いできる？」みたいに、伝え方の例まで入れました。</p><p>これから出会いを考える方には、どの時期に人と関わる機会を増やすとよさそうか、それから、会ったあとに何を確かめると、自分に合う関係がわかりやすいかを、お伝えしています。</p><div class="adlib"><span class="adlib-tag">アドリブ</span><span>よくいただくご相談、パートナーシップについて伝えたいこと など</span></div></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>パートナーがいる方／これから出会いを考える方</li><li>気持ちを伝えるときの、言い方の例つき</li><li>出会いを広げやすい時期も</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c09">
+  <header class="ch-head">
+    <span class="ch-num">09</span>
+    <div class="ch-title-wrap">
+      <h2>家族と、自分の気持ち</h2>
+      <p class="ch-meta"><span>映すページ：家族・気持ち</span><span>目安 0:47</span></p>
+    </div>
+  </header>
+  <div class="script"><p>家族のページでは、家族を大切にしながら、自分の時間もどう持つか、を書いています。家の用事が自分に集まりやすい時期や、暮らし方を見直しやすい時期を、月ごとにお伝えしていますね。</p><p>それから、自分の気持ちとの付き合い方のページもあります。</p><p>たとえば、相手からの返事が来ないとき。いろんな理由を想像して、落ちこんじゃうこと、ありますよね。でも、「返事がない」ことはわかっていても、「嫌われた」かどうかは、まだわからないんです。わかっていることと、まだわからないことを分けてみる。それだけで、考えが広がりすぎるのを防げるんですね。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>家族との時間と、自分の時間</li><li>「返事がない」と「嫌われた」は別のこと</li><li>気持ちが揺れたときの考え方</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c10">
+  <header class="ch-head">
+    <span class="ch-num">10</span>
+    <div class="ch-title-wrap">
+      <h2>注目の時期と、今からできる準備</h2>
+      <p class="ch-meta"><span>映すページ：注目の時期・準備</span><span>目安 0:27</span></p>
+    </div>
+  </header>
+  <div class="script"><p>一年の中で、特に注目したい三つの時期も、まとめています。それぞれの時期に、試すこと、決めること、見直すことを一つずつ決めておくと、経験を次に生かしやすくなるんです。</p><p>それから、2026年のうちにできる準備も、三つお伝えしています。鑑定書が届いたその日から、少しずつ使っていただけるようにしました。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>特に注目したい、三つの時期</li><li>2026年のうちにできる準備</li><li>届いたその日から使える</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c11">
+  <header class="ch-head">
+    <span class="ch-num">11</span>
+    <div class="ch-title-wrap">
+      <h2>カードからのメッセージ</h2>
+      <p class="ch-meta"><span>映すページ：カード</span><span>目安 0:30</span></p>
+    </div>
+  </header>
+  <div class="script"><p>最後のページは、オラクルカードからのメッセージです。</p><p>このサンプルの方に出たのは、「CHANGE」というカードでした。気持ちが変わったら、選び直してもいい。そんなメッセージなんですね。</p><p>以前はうれしかったことが、今も同じように続けられるとは限らない。やってみてわかったことを、次の選択に使っていい。そんなふうに、一年を締めくくっています。</p><div class="adlib"><span class="adlib-tag">アドリブ</span><span>カードを引くときに大切にしていること など</span></div></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>オラクルカードからのメッセージ</li><li>サンプルの方は「CHANGE」</li><li>気持ちが変わったら、選び直していい</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c12">
+  <header class="ch-head">
+    <span class="ch-num">12</span>
+    <div class="ch-title-wrap">
+      <h2>おわりに</h2>
+      <p class="ch-meta"><span>映すページ：申し込み画面</span><span>目安 0:31</span></p>
+    </div>
+  </header>
+  <div class="script"><p>2027年の運勢鑑定は、一年の始まりにさっと読んで、迷ったときに、また開いていただける一冊になったらいいな、と思って作りました。</p><p>占星術を知らなくても読めるように、ふだんの言葉で書いています。気になった方は、概要欄のリンクから、くわしい内容を見てみてくださいね。</p><div class="adlib"><span class="adlib-tag">アドリブ</span><span>見てくださった方へのひと言</span></div><p>最後まで見てくださって、ありがとうございました。星よみ専門家のおますでした。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>迷ったときに、また開ける一冊</li><li>占星術を知らなくても読めます</li><li>くわしい内容は概要欄のリンクから</li></ul></details>
+  <p class="pause end">おわり</p>
+</section>
+</div>

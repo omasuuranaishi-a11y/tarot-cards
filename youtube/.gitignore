@@ -1,0 +1,10 @@
+# 素材の再配布が禁止のもの・大きすぎて入れないもの・作り直せるもの
+newmoon-20261109/illust/*.png
+newmoon-20261109/illust/*.jpg
+asr_model/
+2027-unsei-pr/htsvoice-tohoku-f01/
+2027-unsei-pr/out/
+newmoon-20261109/final_work/*.wav
+*.wav
+__pycache__/
+venv/

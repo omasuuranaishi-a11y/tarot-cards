@@ -8,3 +8,8 @@ newmoon-20261109/final_work/*.wav
 *.wav
 __pycache__/
 venv/
+
+# 確認用の静止画
+newmoon-20261109/v2chk_*.png
+newmoon-20261109/goat_check.png
+newmoon-20261109/x.mp4

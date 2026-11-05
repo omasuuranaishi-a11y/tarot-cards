@@ -33,43 +33,43 @@ def S(unit, kind, **kw):
 
 # (この番号のテロップが始まる所から, 場面の種類, 中身)
 SCENES = [
-    S(0, "illust", phrase="11月9日　蠍座の新月", st=[("scorpio", 440, (960, 600))], goat="こんにちは！\n一緒に読んでいこう"),
+    S(0, "illust", phrase="11月9日　蠍座の新月", st=[("scorpio", 440, (960, 600))], goat=("こんにちは！\n一緒に読んでいこう", "hello")),
     S(3, "illust", phrase="大切な人とは、\nもう一歩深く関わりたい", st=[("couple", 470, (960, 610))]),
     S(6, "illust", phrase="「ここまで言って\n大丈夫かな」", st=[("gaman", 440, (960, 620))]),
     S(8, "diagram", make=lambda c: vp.diagram_before_after(c["p"])),
-    S(13, "diagram", make=lambda c: vp.diagram_three_points(c["reveal"](["一つ目は", "二つ目は", "三つ目は"]))),
+    S(13, "diagram", make=lambda c: vp.diagram_three_points(c["reveal"](["一つ目は", "二つ目は", "三つ目は"])), goat=("見るのは\n三つだよ", "point")),
     S(19, "chart"),
     S(21, "illust", phrase="蠍座は、深く、\n長く関わるサイン", st=[("scorpio", 360, (700, 610)), ("couple", 360, (1240, 620))]),
     S(25, "diagram", make=lambda c: vp.diagram_new_moon(), extra=[("seed_girl", 240, (170, 745))]),
     S(27, "chart"),
-    S(30, "diagram", make=lambda c: vp.diagram_houses(), goat="ここ、大事だよ！"),
+    S(30, "diagram", make=lambda c: vp.diagram_houses(), goat=("ここ、大事だよ！", "surprise")),
     S(35, "illust", phrase="大切な人との関係を、\nもう一歩深める種まき", st=[("seed_girl", 400, (760, 620)), ("couple", 380, (1240, 630))]),
     S(38, "illust", phrase="11/14\n金星と水星が順行へ", st=[("venus", 300, (760, 620)), ("mercury", 260, (1180, 640))]),
     S(42, "chart"),
-    S(44, "diagram", make=lambda c: vp.diagram_retrograde(c["p"])),
+    S(44, "diagram", make=lambda c: vp.diagram_retrograde(c["p"]), goat=("後ろに進んで\n見えるだけだよ", "think")),
     S(48, "illust", phrase="関係のことも、言葉のことも、\n少しずつ前へ", st=[("talk", 440, (960, 620))]),
     S(51, "chart"),
-    S(54, "illust", phrase="止まっていた車が、\nゆっくり動き出す", st=[("drive", 420, (960, 620))], goat="一つずつ\n試していこう"),
+    S(54, "illust", phrase="止まっていた車が、\nゆっくり動き出す", st=[("drive", 420, (960, 620))], goat=("一つずつ\n試していこう", "point")),
     S(59, "chart"),
-    S(62, "diagram", make=lambda c: vp.diagram_aspects()),
+    S(62, "diagram", make=lambda c: vp.diagram_aspects(), goat=("前回は90度\nだったね", "surprise")),
     S(68, "illust", phrase="「一緒にこうしてみない？」", st=[("talk", 460, (960, 610))]),
     S(73, "chart"),
     S(76, "illust", phrase="自分らしく動くことに、\n後押しがある", st=[("leo", 380, (760, 620)), ("jupiter", 280, (1200, 620))]),
     S(79, "illust", phrase="サビアン＝\n度数ごとのイメージ", st=[("scorpio", 300, (700, 620)), ("libra", 300, (1220, 620))]),
     S(81, "chart"),
-    S(83, "diagram", make=lambda c: vp.sabian_card("蠍座17度", "自分の子どもの\n父親である女性", "sprout", "待つより、自分の中で育てたものを、自分で形に")),
+    S(83, "diagram", make=lambda c: vp.sabian_card("蠍座17度", "自分の子どもの\n父親である女性", "sprout", "待つより、自分の中で育てたものを、自分で形に"), goat=("サビアンを\n読んでみよう", "book")),
     S(87, "illust", phrase="待つより、\n自分で形にしていく", st=[("waiting", 420, (960, 620))]),
     S(89, "illust", phrase="自分の言葉で伝えて、\n自分で動く", st=[("seed_girl", 420, (960, 620))]),
     S(91, "chart"),
     S(93, "diagram", make=lambda c: vp.sabian_card("天秤座24度", "蝶の左側にある、\n3枚目の羽", "butterfly", "ほかの人と同じ形じゃなくていい")),
     S(98, "illust", phrase="二人の間だけの、\nちょうどいい形", st=[("couple", 440, (960, 620))]),
-    S(102, "diagram", make=lambda c: vp.calendar_diagram(c["reveal"](["新月は、11月9日", "翌日の10日", "14日に", "16日に", "22日には", "24日の夜"]))),
-    S(108, "diagram", make=lambda c: vp.question_card(1, "この関係を、\nもう一歩深めるとしたら？", "imagine", "蠍座の新月の問い")),
+    S(102, "diagram", make=lambda c: vp.calendar_diagram(c["reveal"](["新月は、11月9日", "翌日の10日", "14日に", "16日に", "22日には", "24日の夜"])), goat=("カレンダーで\n確かめよう", "point")),
+    S(108, "diagram", make=lambda c: vp.question_card(1, "この関係を、\nもう一歩深めるとしたら？", "imagine", "蠍座の新月の問い"), goat=("思い浮かべて\nみてね", "think")),
     S(112, "diagram", make=lambda c: vp.question_card(2, "見直して、\n分かったことは何？", "calendar", "順行に戻る金星と水星の問い")),
     S(115, "diagram", make=lambda c: vp.question_card(3, "自分から、\nどんな提案ができる？", "talk", "金星と火星の60度・蠍座17度の問い")),
     S(118, "chart"),
-    S(121, "illust", phrase="見直してきた関係を、\n自分らしい形で育てる", st=[("sprout", 360, (760, 620)), ("couple", 400, (1240, 630))]),
-    S(123, "illust", phrase="コメント欄で\n教えてくださいね", st=[("smartphone", 440, (960, 620))], goat="またね！"),
+    S(121, "illust", phrase="見直してきた関係を、\n自分らしい形で育てる", st=[("sprout", 360, (760, 620)), ("couple", 400, (1240, 630))], goat=("自分らしく\nいこうね", "heart")),
+    S(123, "illust", phrase="コメント欄で\n教えてくださいね", st=[("smartphone", 440, (960, 620))], goat=("またね！", "hello")),
 ]
 
 TITLE_GOAT = {"02": "次は、新月の時刻と\n蠍座のお話だよ", "03": "いちばん大事な\n流れのお話だよ", "04": "金星と火星の\n角度を見てみよう",
@@ -102,34 +102,41 @@ def scene_times(chapters, units, total):
     return scenes
 
 
-_goat_img = None
+_goat_cache = {}
 
 
-def goat_layer(text, flip=False):
-    """山羊のキャラクター（画像があるときだけ）と吹き出し。"""
-    global _goat_img
-    if not os.path.exists(GOAT):
+def goat_layer(text, pose="hello", height=330):
+    """案内役の山羊（goat_draw.py で描いた絵）と吹き出し。text は \n で改行。"""
+    path = os.path.join(HERE, "astro", f"goat_{pose}.png")
+    if not os.path.exists(path):
         return None
-    if _goat_img is None:
-        g = Image.open(GOAT).convert("RGBA")
-        g = g.crop(g.getbbox())
-        s = 300 / g.height
-        _goat_img = g.resize((int(g.width * s), 300), Image.LANCZOS)
-    g = _goat_img.transpose(Image.FLIP_LEFT_RIGHT) if flip else _goat_img
-    f = vp.font(vp.SANS_B, 36)
+    key = (text, pose, height)
+    if key in _goat_cache:
+        return _goat_cache[key]
+    g = Image.open(path).convert("RGBA")
+    g = g.resize((int(g.width * height / g.height), height), Image.LANCZOS)
+    f = vp.font(vp.SANS_B, 38)
     lines = text.split("\n")
     tmp = ImageDraw.Draw(Image.new("RGB", (1, 1)))
-    bw_ = int(max(tmp.textlength(l, font=f) for l in lines)) + 60
-    bh = 52 * len(lines) + 40
-    w, h = g.width + bw_ + 30, max(g.height, bh + 60)
+    bw_ = int(max(tmp.textlength(l, font=f) for l in lines)) + 64
+    bh = 54 * len(lines) + 40
+    w = max(g.width, bw_) + 20
+    h = bh + 40 + g.height
     im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    im.alpha_composite(g, (0, h - g.height))
+    gx = (w - g.width) // 2
+    sh = Image.new("RGBA", g.size, (20, 10, 40, 0))
+    sh.putalpha(g.split()[3].filter(ImageFilter.GaussianBlur(10)).point(lambda v: v * 0.4))
+    im.alpha_composite(sh, (gx + 6, h - g.height + 10))
+    im.alpha_composite(g, (gx, h - g.height))
     d = ImageDraw.Draw(im)
-    bx, by = g.width + 10, 10
-    d.rounded_rectangle((bx, by, bx + bw_, by + bh), 28, fill=(255, 255, 255, 245), outline=(226, 186, 110, 255), width=4)
-    d.polygon([(bx + 4, by + bh - 40), (bx - 34, by + bh + 10), (bx + 40, by + bh - 6)], fill=(255, 255, 255, 245))
+    bx, by = (w - bw_) // 2, 4
+    d.rounded_rectangle((bx, by, bx + bw_, by + bh), 28, fill=(255, 255, 255, 248), outline=(226, 186, 110, 255), width=4)
+    tx = w // 2 + 30
+    d.polygon([(tx - 26, by + bh - 4), (tx + 6, by + bh + 34), (tx + 20, by + bh - 4)], fill=(255, 255, 255, 248))
+    d.line([(tx - 26, by + bh), (tx + 6, by + bh + 34), (tx + 20, by + bh)], fill=(226, 186, 110, 255), width=4)
     for i, l in enumerate(lines):
-        d.text((bx + bw_ / 2, by + 20 + 52 * i + 26), l, font=f, fill=vp.INK, anchor="mm")
+        d.text((bx + bw_ / 2, by + 20 + 54 * i + 27), l, font=f, fill=vp.INK, anchor="mm")
+    _goat_cache[key] = im
     return im
 
 
@@ -176,16 +183,24 @@ class Renderer:
             ctx = dict(p=p, reveal=self.reveal_fn(ch, t))
             key = ("diagram", k, json.dumps(ctx["reveal"]([]) if False else None), round(p, 2) if "p" in s["make"].__code__.co_names or True else 0)
             g = s["make"](ctx)
-            x, y = (W - g.width) // 2, max(40, (870 - g.height) // 2)
+            if s.get("goat"):
+                left = 400
+                avail = W - left - 40
+                if g.width > avail:
+                    g = g.resize((avail, int(g.height * avail / g.width)), Image.LANCZOS)
+                x, y = left + (avail - g.width) // 2, max(40, (870 - g.height) // 2)
+            else:
+                x, y = (W - g.width) // 2, max(40, (870 - g.height) // 2)
             frame.alpha_composite(g, (x, y))
             for name, hgt, (cx, cy) in s.get("extra", []):
                 st = vp.sticker(name, hgt)
                 frame.alpha_composite(st, (int(cx - st.width / 2), int(cy - st.height / 2)))
-        if s.get("goat") and lt < 9:
-            gl = goat_layer(s["goat"])
+        if s.get("goat") and lt < 7:
+            gl = goat_layer(*s["goat"])
             if gl is not None:
-                slide = min(1.0, lt / 0.5)
-                frame.alpha_composite(gl, (int(40 - (1 - slide) * 400), 880 - gl.height))
+                slide = min(1.0, lt / 0.5, (7 - lt) / 0.5)
+                hop = int(abs(math.sin(lt * 3.0)) * 10) if lt < 2 else 0
+                frame.alpha_composite(gl, (int(20 - (1 - slide) * 420), 885 - gl.height - hop))
         return frame
 
     def title_frame(self, ch):
@@ -199,7 +214,7 @@ class Renderer:
             if icon:
                 st = vp.sticker(icon, 200)
                 frame.alpha_composite(st, (W - 420, 160))
-            gl = goat_layer(TITLE_GOAT.get(ch["num"], ""))
+            gl = goat_layer(TITLE_GOAT.get(ch["num"], ""), "point", 330)
             if gl is not None:
                 frame.alpha_composite(gl, (60, 1000 - gl.height))
             self.title_cache[ch["num"]] = frame

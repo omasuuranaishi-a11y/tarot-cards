@@ -24,6 +24,7 @@ W, H, FPS = 1920, 1080, 30
 WORK = os.path.join(HERE, "final_work")
 GOAT = os.path.join(HERE, "astro", "goat.png")
 FADE = 0.5
+GOAT_TIME = 7.0  # 場面の中で山羊が出ている秒数
 PALETTE = {"01": "night", "02": "night", "03": "dawn", "04": "sunset", "05": "lavender", "06": "teal", "07": "gold"}
 
 
@@ -184,22 +185,31 @@ class Renderer:
             ctx = dict(p=p, reveal=self.reveal_fn(ch, t))
             key = ("diagram", k, json.dumps(ctx["reveal"]([]) if False else None), round(p, 2) if "p" in s["make"].__code__.co_names or True else 0)
             g = s["make"](ctx)
-            if s.get("goat"):
+            # ふだんは画面の真ん中。山羊が出ている間（最初の7秒）だけ、山羊の右に小さく寄せ、
+            # 山羊が戻ったら 0.6 秒で真ん中・元の大きさへ戻す
+            full_w = min(g.width, W - 80)
+            cx_c, cw_c = W / 2, full_w
+            if s.get("goat") and lt < GOAT_TIME + 0.6:
                 left = 400
                 avail = W - left - 40
-                if g.width > avail:
-                    g = g.resize((avail, int(g.height * avail / g.width)), Image.LANCZOS)
-                x, y = left + (avail - g.width) // 2, max(40, (870 - g.height) // 2)
+                aw = min(full_w, avail)
+                k = 0.0 if lt < GOAT_TIME else (lt - GOAT_TIME) / 0.6
+                k = k * k * (3 - 2 * k)
+                cw = aw + (cw_c - aw) * k
+                cx = (left + avail / 2) + (cx_c - (left + avail / 2)) * k
             else:
-                x, y = (W - g.width) // 2, max(40, (870 - g.height) // 2)
+                cw, cx = cw_c, cx_c
+            if abs(cw - g.width) > 1:
+                g = g.resize((int(cw), int(g.height * cw / g.width)), Image.LANCZOS)
+            x, y = int(cx - g.width / 2), max(40, (870 - g.height) // 2)
             frame.alpha_composite(g, (x, y))
             for name, hgt, (cx, cy) in s.get("extra", []):
                 st = vp.sticker(name, hgt)
                 frame.alpha_composite(st, (int(cx - st.width / 2), int(cy - st.height / 2)))
-        if s.get("goat") and lt < 7:
+        if s.get("goat") and lt < GOAT_TIME:
             gl = goat_layer(*s["goat"])
             if gl is not None:
-                slide = min(1.0, lt / 0.5, (7 - lt) / 0.5)
+                slide = min(1.0, lt / 0.5, (GOAT_TIME - lt) / 0.5)
                 hop = int(abs(math.sin(lt * 3.0)) * 10) if lt < 2 else 0
                 frame.alpha_composite(gl, (int(20 - (1 - slide) * 420), 885 - gl.height - hop))
         return frame

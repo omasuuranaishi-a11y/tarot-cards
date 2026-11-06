@@ -1,7 +1,7 @@
 """11/9 蠍座新月のサムネイル案（3パターン、1280×720）。
 
 型（サムネイル調査 2026-11-06 から）：上段に日付・時刻と出来事、真ん中に大きく「見る人に起きること」の言葉
-（1語だけ色を変える）、右に山羊を大きく、右下におますさんのアイコンを小さく。
+（1語だけ色を変える）、右におますさんのアイコンを大きく（山羊の画像は荒いので使わない）。
     python3 make_thumbnails.py   # thumbnails/サムネイル案A〜C.png と、スマホで見たときの大きさの見本
 """
 import os
@@ -94,7 +94,7 @@ def icon_badge(size=120):
     return out
 
 
-def background(palette, seed, moon=True):
+def background(palette, seed, moon=False):
     bg = vp.watercolor_bg(palette, seed).convert("RGBA").resize((W, H), Image.LANCZOS)
     if moon:  # 新月：右上に、光の輪だけの新月
         glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -112,43 +112,48 @@ def header(img, date="11月9日 16:02", title="蠍座新月"):
 
 
 def make_a():
-    """A：待ってても 変わらない（びっくりの山羊）"""
+    """A：待ってても 変わらない"""
     img = background("night", 21)
     header(img)
     phrase(img, 48, 300, [("待ってても", (255, 255, 255))], 120)
     phrase(img, 48, 450, [("変わらない", (255, 120, 170))], 136)
-    g = goat("r3c5", 470)
-    img.alpha_composite(g, (W - g.width + 10, H - g.height + 30))
     return img
 
 
 def make_b():
-    """B：関係が、動き出す（ほうきの山羊）"""
+    """B：関係が、動き出す"""
     img = background("dawn", 33)
     header(img)
     phrase(img, 48, 290, [("関係が、", (255, 255, 255))], 124)
     phrase(img, 48, 430, [("動き出す", (255, 232, 90))], 140)
     plain(img, (56, 628), "11/14 金星と水星が順行へ", font(SANS, 40), (255, 255, 255), (52, 22, 70, 255), stroke=6)
-    g = goat("r3c4", 430)
-    img.alpha_composite(g, (W - g.width + 20, H - g.height + 10))
     return img
 
 
 def make_c():
-    """C：本音で、もう一歩（ハートの山羊）"""
+    """C：本音で、もう一歩"""
     img = background("lavender", 45)
     header(img)
     phrase(img, 48, 290, [("本音で、", (255, 255, 255))], 124)
     phrase(img, 48, 430, [("もう一歩", (255, 140, 180))], 140)
     plain(img, (56, 628), "大切な人と深まる2週間", font(SANS, 40), (255, 255, 255), (52, 22, 70, 255), stroke=6)
-    g = goat("r4c6", 470)
-    img.alpha_composite(g, (W - g.width + 10, H - g.height + 30))
     return img
 
 
+def big_icon(img, cx=1010, cy=420, d=440):
+    """おますさんのアイコンを大きく、金のふちと光の輪をつけて置く（山羊の画像は荒いので使わない）"""
+    glow = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    ImageDraw.Draw(glow).ellipse((cx - d / 2 - 60, cy - d / 2 - 60, cx + d / 2 + 60, cy + d / 2 + 60), fill=(255, 224, 170, 150))
+    img.alpha_composite(glow.filter(ImageFilter.GaussianBlur(40)))
+    b = icon_badge(d)
+    ImageDraw.Draw(img).ellipse((cx - d / 2 - 16, cy - d / 2 - 16, cx + d / 2 + 16, cy + d / 2 + 16), outline=(255, 230, 180, 255), width=5)
+    img.alpha_composite(b, (int(cx - b.width / 2), int(cy - b.height / 2)))
+
+
 def finish(img):
-    b = icon_badge()
-    img.alpha_composite(b, (W - b.width - 22, H - b.height - 22))
+    big_icon(img)
+    st = vp.sticker("scorpio", 160)  # アイコンのサインにかからないよう、右下のすみに
+    img.alpha_composite(st, (W - st.width + 8, H - st.height + 6))
     return img.convert("RGB")
 
 

@@ -40,5 +40,29 @@
   "license": "Public Domain (Open Access, CC0)",
   "credit": "Gilman Collection, Museum Purchase, 2005",
   "edit": "色と明るさを調整して使う"
+ },
+ "luzhu_cut": {
+  "title": "Small portrait of Luzhu",
+  "artist": "Gai Qi",
+  "date": "1823",
+  "culture": "China",
+  "museum": "The Metropolitan Museum of Art",
+  "url": "https://www.metmuseum.org/art/collection/search/737733",
+  "image": "https://images.metmuseum.org/CRDImages/as/original/DP-41026-002.jpg",
+  "license": "Public Domain (Open Access, CC0)",
+  "credit": "Gift of Jane DeBevoise and the Calello Family, 2024",
+  "edit": "人物だけを切り抜き（顔と首は形を指定して残した）"
+ },
+ "bronze_scorpion_cut": {
+  "title": "Scorpion",
+  "artist": "",
+  "date": "6th–7th century",
+  "culture": "Moche",
+  "museum": "The Metropolitan Museum of Art",
+  "url": "https://www.metmuseum.org/art/collection/search/314462",
+  "image": "https://images.metmuseum.org/CRDImages/ao/original/1981.459.1.JPG",
+  "license": "Public Domain (Open Access, CC0)",
+  "credit": "Gift of Jane Costello Goldberg, from the Collection of Arnold I. Goldberg, 1981",
+  "edit": "背景を切り抜き"
  }
 }

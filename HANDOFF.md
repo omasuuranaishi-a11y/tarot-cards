@@ -92,6 +92,7 @@
 - 作ったもの：`make_thumbnails.py`（第1弾、アイコン）、`make_thumbnails_v2.py`（第2弾：朱色・韓国風・夜と蓮）、`make_thumbnails_v3.py`（第3弾：中華街の円窓・春聯・台湾の翡翠色。金色に塗った大仏）。画像は `thumbnails/`。
 - 書体は `youtube/fonts/`（Dela Gothic One、Zen Old Mincho Black、Kaisei Tokumin、Yuji Syuku、Zen Kaku Gothic New、Shippori Mincho B1。どれも SIL Open Font License で商用可。取得元 raw.githubusercontent.com/google/fonts）。
 - いらすとやの点数：動画の18点＋サムネイルの大仏・雷紋の丸枠の2点＝**20点（上限ちょうど）**。これ以上足すときは、ほかを減らす。
+- **いちばん参考にしたい雰囲気**（2026-11-07）：新聞の見出しのような極太明朝が画面いっぱい、白・赤・黒に黄の差し色、真ん中に月（「現実主義 タロットリーディング」さんのチャンネル）。**まねは避けたい**。→ `make_thumbnails_v4.py`（第4弾G・H・I）：型の考え方だけ借り、破れた紙→筆の円相、真っ白→生成りの和紙、真っ赤→朱、人物写真→使わない、決まり文句の帯→使わない、かわりに朱の落款「星読」をチャンネルの印にした。
 
 ### この環境のネットワーク（Default の環境で許可済み）
 `www.youtube.com` `youtube.com` `i.ytimg.com` `i9.ytimg.com` `*.googlevideo.com` `www.irasutoya.com` `blogger.googleusercontent.com` `www.irasuton.com` `illust-navi.com` `pixabay.com` `cdn.pixabay.com`

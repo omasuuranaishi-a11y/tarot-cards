@@ -97,6 +97,7 @@
 - The Met（collectionapi.metmuseum.org、images.metmuseum.org）をネットワークに追加済み（パブリックドメインの浮世絵を調べるため。浮世絵はやめたので今は使っていない）。
 - **神仏を入れる型**（2026-11-07）：現実主義タロットさんのように「大きな文字＋テーマに合った神仏」も、②③のような静かな和の雰囲気（すだれ・和紙・暗い赤の円・後ろ姿・赤い実の枝）もおもしろい、とのこと。→ `make_thumbnails_v6.py`（第6弾M・N・O）。神仏はメトロポリタン美術館のパブリックドメイン（CC0）：愛染明王（14世紀の仏画、44910）＝蠍座の深い情／如意輪観音（1693年の像、49109）＝考える姿で「見直す」新月。画像と出典は `public_domain/`（sources.json）。
 - テーマに合う神仏の候補（今後の回で使える）：蠍座・縁＝愛染明王、金星（明けの明星）＝虚空蔵菩薩、金星の美と芸・水の星座＝弁財天、見直す・内省＝如意輪観音、守り・不動宮＝不動明王。Met で探すときは `collectionapi.metmuseum.org/public/collection/v1.1/search?q=...&departmentId=6`（v1 の search は廃止）。
+- **妖怪系・女性のポートレート系**（2026-11-07）：参考（いま活躍中の作家さんの絵）の絵柄はまねず、パブリックドメインの本物の素材で雰囲気を出す。**文字は特大**。→ `make_thumbnails_v7.py`（第7弾P・Q）：P＝能面「小面」（18世紀、Met 45501）を紫の水面に浮かべてゆがませる、「仮面を外す」。Q＝明治初めの手彩色写真の女性（鈴木真一、1870年代、Met 288484）をセピア＋帯の赤だけ残し、筆文字（Yuji Syuku）と朱の実。Q の女性は毎回の「顔」にできる。
 
 ### この環境のネットワーク（Default の環境で許可済み）
 `www.youtube.com` `youtube.com` `i.ytimg.com` `i9.ytimg.com` `*.googlevideo.com` `www.irasutoya.com` `blogger.googleusercontent.com` `www.irasuton.com` `illust-navi.com` `pixabay.com` `cdn.pixabay.com`

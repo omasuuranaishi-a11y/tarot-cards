@@ -18,5 +18,27 @@
   "license": "Public Domain (Open Access, CC0)",
   "credit": "Rogers Fund, 1956",
   "edit": "背景を切り抜き"
+ },
+ "ko_omote_cut": {
+  "title": "Ko-omote Noh Mask",
+  "artist": "",
+  "date": "18th century",
+  "museum": "The Metropolitan Museum of Art",
+  "url": "https://www.metmuseum.org/art/collection/search/45501",
+  "image": "https://images.metmuseum.org/CRDImages/as/original/DT7076.jpg",
+  "license": "Public Domain (Open Access, CC0)",
+  "credit": "Purchase, Lila Acheson Wallace Gift, 1993",
+  "edit": "背景を切り抜き"
+ },
+ "woman_1870s": {
+  "title": "[Young Japanese Woman]",
+  "artist": "Suzuki Shin'ichi",
+  "date": "1870s",
+  "museum": "The Metropolitan Museum of Art",
+  "url": "https://www.metmuseum.org/art/collection/search/288484",
+  "image": "https://images.metmuseum.org/CRDImages/ph/original/DP155370.jpg",
+  "license": "Public Domain (Open Access, CC0)",
+  "credit": "Gilman Collection, Museum Purchase, 2005",
+  "edit": "色と明るさを調整して使う"
  }
 }

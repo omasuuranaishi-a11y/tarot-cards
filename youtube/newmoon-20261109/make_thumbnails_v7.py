@@ -22,6 +22,7 @@ FONTS = os.path.join(HERE, "..", "fonts")
 PD = os.path.join(HERE, "public_domain")
 OUT = os.path.join(HERE, "thumbnails")
 W, H = 1280, 720
+NO_TEXT = False  # True のときは文字・印を入れない（第8弾で上から大きな文字をかぶせるため）
 OLDM = os.path.join(FONTS, "ZenOldMincho-Black.ttf")
 SANS = os.path.join(FONTS, "ZenKakuGothicNew-Black.ttf")
 BRUSH = os.path.join(FONTS, "YujiSyuku-Regular.ttf")
@@ -112,7 +113,8 @@ def make_p():
     vtext(img, 140, 20, "蠍座新月", 172, (255, 246, 232), step=170, stroke=8, stroke_fill=(30, 8, 70))
     vtext(img, 352, 40, "仮面を", 150, (255, 86, 70), step=148, stroke=8, stroke_fill=(30, 8, 70))
     vtext(img, 352, 40 + 148 * 3, "外す", 120, (255, 86, 70), step=118, stroke=7, stroke_fill=(30, 8, 70))
-    ImageDraw.Draw(img).text((1250, 690), "11.9 16:02", font=F(SANS, 30), fill=(230, 220, 255, 255), anchor="rs")
+    if not NO_TEXT:
+        ImageDraw.Draw(img).text((1250, 690), "11.9 16:02", font=F(SANS, 30), fill=(230, 220, 255, 255), anchor="rs")
     return img
 
 
@@ -164,6 +166,8 @@ def make_q():
     vtext(lay2, 380, 40, "縁が", 160, (184, 30, 30), step=158, stroke=1, stroke_fill=(184, 30, 30), shadow=False)
     vtext(lay2, 380, 40 + 158 * 2, "動く", 160, (184, 30, 30), step=158, stroke=1, stroke_fill=(184, 30, 30), shadow=False)
     img.alpha_composite(lay2)
+    if NO_TEXT:
+        return img
     # 朱の印と日付
     d = ImageDraw.Draw(img)
     d.rounded_rectangle((520, 600, 600, 690), 8, fill=(196, 42, 34, 255))

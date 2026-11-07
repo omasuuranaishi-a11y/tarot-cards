@@ -19,6 +19,7 @@ FONTS = os.path.join(HERE, "..", "fonts")
 PD = os.path.join(HERE, "public_domain")
 OUT = os.path.join(HERE, "thumbnails")
 W, H = 1280, 720
+NO_TEXT = False  # True のときは文字を入れない（第8弾で上から大きな文字をかぶせるため）
 OLDM = os.path.join(FONTS, "ZenOldMincho-Black.ttf")
 SANS = os.path.join(FONTS, "ZenKakuGothicNew-Black.ttf")
 
@@ -95,10 +96,9 @@ def htext(img, xy, s, size, fill, anchor="la", stroke=0, stroke_fill=None, font=
 
 
 # ---- M 愛染明王 ----
-def make_m():
+def make_m(cx=640, cy=350, R=300):
     img = paper((70, 12, 18), 91, grain=5, vign=0.45)
     d = ImageDraw.Draw(img)
-    cx, cy, R = 640, 350, 300
     for k in range(72):  # 円光のまわりの光の筋
         a = 2 * math.pi * k / 72
         r0, r1 = R + 18, R + (120 if k % 2 == 0 else 70)
@@ -121,6 +121,8 @@ def make_m():
     vtext(img, 160, 30, "蠍座新月", 166, (255, 250, 240), step=164, stroke=6, stroke_fill=(40, 6, 8))
     vtext(img, 1120, 30, "縁が", 166, (255, 250, 240), step=164, stroke=6, stroke_fill=(40, 6, 8))
     vtext(img, 1120, 362, "動く", 166, (255, 208, 70), step=164, stroke=6, stroke_fill=(40, 6, 8))
+    if NO_TEXT:
+        return img
     # 下：小さな札
     d = ImageDraw.Draw(img)
     d.rectangle((cx - 230, 664, cx + 230, 708), fill=(30, 6, 8, 230), outline=GOLD + (255,), width=2)

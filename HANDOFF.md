@@ -93,6 +93,8 @@
 - 書体は `youtube/fonts/`（Dela Gothic One、Zen Old Mincho Black、Kaisei Tokumin、Yuji Syuku、Zen Kaku Gothic New、Shippori Mincho B1。どれも SIL Open Font License で商用可。取得元 raw.githubusercontent.com/google/fonts）。
 - いらすとやの点数：動画の18点＋サムネイルの大仏・雷紋の丸枠の2点＝**20点（上限ちょうど）**。これ以上足すときは、ほかを減らす。
 - **いちばん参考にしたい雰囲気**（2026-11-07）：新聞の見出しのような極太明朝が画面いっぱい、白・赤・黒に黄の差し色、真ん中に月（「現実主義 タロットリーディング」さんのチャンネル）。**まねは避けたい**。→ `make_thumbnails_v4.py`（第4弾G・H・I）：型の考え方だけ借り、破れた紙→筆の円相、真っ白→生成りの和紙、真っ赤→朱、人物写真→使わない、決まり文句の帯→使わない、かわりに朱の落款「星読」をチャンネルの印にした。
+- **方向が決まった（2026-11-07）**：浮世絵（ネオ浮世絵）は「もうやっている人がいる」のでやめる。**中国・台湾・韓国のいまのグラフィック**の方が、ほかとかぶらない。→ `make_thumbnails_v5.py`（第5弾J・K・L）：2〜3色の重ね刷り（リソグラフ風の乗算・版ずれ・インクのムラ）、巨大な宋体（Noto Serif CJK Black）、網点の新月・蓮、丸い印章「星読」、小さな英文の情報、台湾レトロのラベル（朱の1色・二重の枠・丸の中の1文字）。
+- The Met（collectionapi.metmuseum.org、images.metmuseum.org）をネットワークに追加済み（パブリックドメインの浮世絵を調べるため。浮世絵はやめたので今は使っていない）。
 
 ### この環境のネットワーク（Default の環境で許可済み）
 `www.youtube.com` `youtube.com` `i.ytimg.com` `i9.ytimg.com` `*.googlevideo.com` `www.irasutoya.com` `blogger.googleusercontent.com` `www.irasuton.com` `illust-navi.com` `pixabay.com` `cdn.pixabay.com`

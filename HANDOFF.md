@@ -84,6 +84,15 @@
 - 時期は「何月ごろ」と具体的に。参照の小さい文字は入れない。「読みました」の連発は不可。
 - 価格は検討中（会話では 6,000円 案が出たが、動画には入れない）。
 
+### サムネイル（2026-11-07 時点）
+- 調査：`youtube/research/サムネイル調査_20261106.md`（登録者1万人以上のチャンネルの共通点）。
+- 山羊は画像が荒いのでサムネイルには使わない（おますさんの判断）。
+- 好み：心理学・心理占星術・仏教・台湾や韓国のデザイン。**エンジェル系ではない**。「仏像寄り。でもAI感より中華街っぽいデザイン」。
+- 参考にした型：極太の明朝・ゴシック、左右に文字を分けて真ん中に大きな絵、下に帯、1語だけ色を変える。
+- 作ったもの：`make_thumbnails.py`（第1弾、アイコン）、`make_thumbnails_v2.py`（第2弾：朱色・韓国風・夜と蓮）、`make_thumbnails_v3.py`（第3弾：中華街の円窓・春聯・台湾の翡翠色。金色に塗った大仏）。画像は `thumbnails/`。
+- 書体は `youtube/fonts/`（Dela Gothic One、Zen Old Mincho Black、Kaisei Tokumin、Yuji Syuku、Zen Kaku Gothic New、Shippori Mincho B1。どれも SIL Open Font License で商用可。取得元 raw.githubusercontent.com/google/fonts）。
+- いらすとやの点数：動画の18点＋サムネイルの大仏・雷紋の丸枠の2点＝**20点（上限ちょうど）**。これ以上足すときは、ほかを減らす。
+
 ### この環境のネットワーク（Default の環境で許可済み）
 `www.youtube.com` `youtube.com` `i.ytimg.com` `i9.ytimg.com` `*.googlevideo.com` `www.irasutoya.com` `blogger.googleusercontent.com` `www.irasuton.com` `illust-navi.com` `pixabay.com` `cdn.pixabay.com`
 - YouTube の動画本体と最新動画の字幕は、bot 対策で取れない（回避はしない）。サムネイル・一覧は取れる。

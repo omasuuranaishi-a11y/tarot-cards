@@ -226,22 +226,20 @@ def ellipsis(img, y, col=SUB):
 # 画面の上 200px（名前の欄）には大事なものを置かない。矢印の下はリンクスタンプの場所として大きくあける。
 # 文字は「もう少し大きく」（2026-11-08）で、見出し90・本文46・赤の行58・札と案内44。
 def story1():
-    """文字はすべて上に寄せ、矢印の下 y=1390〜1780 をリンクスタンプのために大きくあける（「これしかあいてないと貼れない」）。"""
+    """見出しを少し小さく、上の日付と参加人数は消して、全体を上へ。矢印の下 y=1160〜 を大きくあける（2026-11-08 の直し）。"""
     img = soft_bg(CREAM_BG, [((236, 222, 210), 880, 520, 260, 0.5), ((226, 232, 222), 200, 1500, 300, 0.5)], seed=1)
     inner_frame(img)
-    label(img, 214, "11月9日（月）16:02", size=36, line_len=60)
-    crescent(img, W / 2, 304, 40)
-    text_line(img, 440, [("明日は", TEXT, False)], 112, track=0.06)
-    text_line(img, 572, [("蠍座の新月", TEXT, True)], 124, track=0.05)
-    text_line(img, 728, [("いつもストーリーズでお届けしている", SUB, False)], 42, font=MARU_M, track=0.04)
-    text_line(img, 792, [("新月のお話、今回は", SUB, False)], 42, font=MARU_M, track=0.04)
-    play_line(img, 888, "", "YouTube", "で", 88)
-    thin(img, 970)
-    text_line(img, 1040, [("リンクは今夜20時、", TEXT, False)], 52, track=0.06)
-    text_line(img, 1114, [("一斉配信チャンネル", TEXT, True), ("でお届け", TEXT, False)], 52, track=0.05)
-    pill(img, 1210, "いま117名が参加中", 40)
-    text_line(img, 1290, [("参加はこちらから", SUB, False)], 40, font=MARU_M)
-    chevron(img, 1330, s=22)
+    crescent(img, W / 2, 252, 40)
+    text_line(img, 372, [("明日は", TEXT, False)], 90, track=0.06)
+    text_line(img, 484, [("蠍座の新月", TEXT, True)], 100, track=0.05)
+    text_line(img, 624, [("いつもストーリーズでお届けしている", SUB, False)], 42, font=MARU_M, track=0.04)
+    text_line(img, 688, [("新月のお話、今回は", SUB, False)], 42, font=MARU_M, track=0.04)
+    play_line(img, 778, "", "YouTube", "で", 84)
+    thin(img, 856)
+    text_line(img, 922, [("リンクは今夜20時、", TEXT, False)], 50, track=0.06)
+    text_line(img, 992, [("一斉配信チャンネル", TEXT, True), ("でお届け", TEXT, False)], 50, track=0.05)
+    text_line(img, 1076, [("参加はこちらから", SUB, False)], 40, font=MARU_M)
+    chevron(img, 1114, s=22)
     return img
 
 

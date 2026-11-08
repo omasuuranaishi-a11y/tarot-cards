@@ -199,23 +199,25 @@ def ellipsis(img, y, col=SUB):
 
 
 # ---- 1枚目（昼）：生成り＋細い内枠 ----
-# 画面の上 200px（名前の欄）と下 230px（返信の欄）には大事なものを置かない。
+# 画面の上 200px（名前の欄）には大事なものを置かない。矢印の下 y=1550〜1700 はリンクスタンプの場所。
+# 文字は「もう少し大きく」（2026-11-08）で、見出し90・本文46・赤の行58・札と案内44。
 def story1():
     img = soft_bg(CREAM_BG, [((236, 222, 210), 880, 520, 260, 0.5), ((226, 232, 222), 200, 1500, 300, 0.5)], seed=1)
     inner_frame(img)
-    label(img, 268, "11月9日（月）16:02")
-    crescent(img, W / 2, 380, 40)
-    text_line(img, 545, [("明日は、", TEXT, False)], 70)
-    text_line(img, 655, [("蠍座の新月", TEXT, True), ("です。", TEXT, False)], 70)
+    label(img, 236, "11月9日（月）16:02", size=36, line_len=60)
+    crescent(img, W / 2, 340, 44)
+    text_line(img, 490, [("明日は、", TEXT, False)], 90, track=0.06)
+    text_line(img, 606, [("蠍座の新月", TEXT, True), ("です。", TEXT, False)], 90, track=0.06)
     for i, s in enumerate(["いつもストーリーズでお届けしている", "新月のお話、今回はYouTubeで", "じっくりお話ししました。"]):
-        text_line(img, 830 + i * 74, [(s, SUB, False)], 38, font=MARU_M)
-    thin(img, 1060)
-    text_line(img, 1150, [("リンクは今夜20時、", ACCENT, False)], 48)
-    text_line(img, 1228, [("一斉配信チャンネル", ACCENT, True), ("でお届けします", ACCENT, False)], 48)
-    pill(img, 1350, "いま117名が参加中", 36)
-    text_line(img, 1452, [("参加はこちらから", SUB, False)], 36, font=MARU_M)
-    chevron(img, 1494)
-    ellipsis(img, 1740)
+        text_line(img, 770 + i * 76, [(s, SUB, False)], 46, font=MARU_M, track=0.05)
+    thin(img, 995)
+    text_line(img, 1075, [("リンクは今夜20時、", ACCENT, False)], 58, track=0.06)
+    text_line(img, 1157, [("一斉配信チャンネル", ACCENT, True), ("で", ACCENT, False)], 58, track=0.06)
+    text_line(img, 1239, [("お届けします", ACCENT, False)], 58, track=0.06)
+    pill(img, 1352, "いま117名が参加中", 44)
+    text_line(img, 1452, [("参加はこちらから", SUB, False)], 44, font=MARU_M)
+    chevron(img, 1496, s=22)
+    ellipsis(img, 1770)
     return img
 
 
@@ -223,20 +225,21 @@ def story1():
 def story2():
     img = soft_bg(SAGE_BG, seed=2, grain=1.5)
     grid(img)
-    scallop_card(img, (110, 150, 970, 1770))
-    img.alpha_composite(icon_circle(170), (W // 2 - 85, 196))
-    label(img, 420, "11/9 蠍座新月")
-    text_line(img, 520, [("YouTubeを", TEXT, False)], 72)
-    text_line(img, 628, [("公開しました", ACCENT, False)], 72)
-    pill(img, 770, "「あなたの縁が動き出す」", 40)
+    scallop_card(img, (100, 140, 980, 1780))
+    img.alpha_composite(icon_circle(180), (W // 2 - 90, 186))
+    label(img, 412, "11/9 蠍座新月", size=36, line_len=60)
+    text_line(img, 512, [("YouTubeを", TEXT, False)], 92, track=0.05)
+    text_line(img, 628, [("公開しました", ACCENT, False)], 92, track=0.06)
+    pill(img, 772, "「あなたの縁が動き出す」", 48)
     for i, s in enumerate(["見直してきた関係を、", "自分らしい形で育てていく。", "そんな新月のお話です。"]):
-        text_line(img, 900 + i * 72, [(s, SUB, False)], 38, font=MARU_M)
-    dotted(img, 1120, 240, 840)
-    text_line(img, 1210, [("リンクは", TEXT, False), ("一斉配信チャンネル", TEXT, True), ("に", TEXT, False)], 46)
-    text_line(img, 1288, [("お送りしました", TEXT, False)], 46)
-    text_line(img, 1420, [("まだの方はこちらから", SUB, False)], 36, font=MARU_M)
-    chevron(img, 1462)
-    ellipsis(img, 1712)
+        text_line(img, 892 + i * 76, [(s, SUB, False)], 46, font=MARU_M, track=0.05)
+    dotted(img, 1112, 220, 860)
+    text_line(img, 1192, [("リンクは", TEXT, False)], 56, track=0.06)
+    text_line(img, 1272, [("一斉配信チャンネル", TEXT, True), ("に", TEXT, False)], 56, track=0.06)
+    text_line(img, 1352, [("お送りしました", TEXT, False)], 56, track=0.06)
+    text_line(img, 1462, [("まだの方はこちらから", SUB, False)], 44, font=MARU_M)
+    chevron(img, 1506, s=22)
+    ellipsis(img, 1735)
     return img
 
 

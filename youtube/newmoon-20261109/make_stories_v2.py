@@ -135,7 +135,10 @@ def text_line(img, y, segs, size, font=MARU_B, track=0.08, anchor_y="m"):
     chars = [(ch, col, ul) for s, col, ul in segs for ch in s]
     widths = [d.textlength(ch, font=f) for ch, _, _ in chars]
     total = sum(widths) + gap * (len(chars) - 1)
-    x = W / 2 - total / 2
+    vis = total
+    if chars and chars[-1][0] in "、。，．":   # 最後の句読点は数えずに中心をとる（見た目の中心をそろえる）
+        vis -= widths[-1] * 0.55 + gap
+    x = W / 2 - vis / 2
     spans = []
     for (ch, col, ul), w in zip(chars, widths):
         d.text((x, y), ch, font=f, fill=col + (255,), anchor="l" + anchor_y)
@@ -152,6 +155,27 @@ def text_line(img, y, segs, size, font=MARU_B, track=0.08, anchor_y="m"):
                 x0, x1 = a, b
         d.line((x0, y + size * 0.62, x1, y + size * 0.62), fill=ACCENT + (255,), width=max(3, size // 18))
     return total
+
+
+def play_line(img, y, before, word, after, size, col_word=ACCENT, col=TEXT, track=0.04):
+    """再生ボタンのしるし＋「YouTube」で、YouTube だとひと目でわかる行。全体を真ん中にそろえる。"""
+    d = ImageDraw.Draw(img)
+    f = F(MARU_B, size)
+    gap = size * track
+    segs = [(before, col), (word, col_word), (after, col)]
+    chars = [(ch, c) for t, c in segs for ch in t]
+    widths = [d.textlength(ch, font=f) for ch, _ in chars]
+    tw = sum(widths) + gap * (len(chars) - 1)
+    bw, bh = int(size * 1.25), int(size * 0.88)
+    total = bw + size * 0.3 + tw
+    x = W / 2 - total / 2
+    d.rounded_rectangle((x, y - bh / 2, x + bw, y + bh / 2), radius=int(bh * 0.28), fill=col_word + (255,))
+    cx, cy, t = x + bw / 2 + bw * 0.04, y, bh * 0.24
+    d.polygon([(cx - t * 0.8, cy - t), (cx - t * 0.8, cy + t), (cx + t * 1.0, cy)], fill=CARD + (255,))
+    x += bw + size * 0.3
+    for (ch, c), w in zip(chars, widths):
+        d.text((x, y), ch, font=f, fill=c + (255,), anchor="lm")
+        x += w + gap
 
 
 def label(img, y, s, size=30, col=SUB, line_len=70):
@@ -205,19 +229,22 @@ def story1():
     img = soft_bg(CREAM_BG, [((236, 222, 210), 880, 520, 260, 0.5), ((226, 232, 222), 200, 1500, 300, 0.5)], seed=1)
     inner_frame(img)
     label(img, 236, "11月9日（月）16:02", size=36, line_len=60)
-    crescent(img, W / 2, 340, 44)
-    text_line(img, 490, [("明日は、", TEXT, False)], 90, track=0.06)
-    text_line(img, 606, [("蠍座の新月", TEXT, True), ("です。", TEXT, False)], 90, track=0.06)
-    for i, s in enumerate(["いつもストーリーズでお届けしている", "新月のお話、今回はYouTubeで", "じっくりお話ししました。"]):
-        text_line(img, 770 + i * 76, [(s, SUB, False)], 46, font=MARU_M, track=0.05)
-    thin(img, 995)
-    text_line(img, 1075, [("リンクは今夜20時、", ACCENT, False)], 58, track=0.06)
-    text_line(img, 1157, [("一斉配信チャンネル", ACCENT, True), ("で", ACCENT, False)], 58, track=0.06)
-    text_line(img, 1239, [("お届けします", ACCENT, False)], 58, track=0.06)
-    pill(img, 1352, "いま117名が参加中", 44)
-    text_line(img, 1452, [("参加はこちらから", SUB, False)], 44, font=MARU_M)
-    chevron(img, 1496, s=22)
-    ellipsis(img, 1770)
+    crescent(img, W / 2, 336, 44)
+    # 見出しは句読点をとって、真ん中にそろえる（「ここが文字が小さい」→ 大きく）
+    text_line(img, 500, [("明日は", TEXT, False)], 112, track=0.06)
+    text_line(img, 640, [("蠍座の新月", TEXT, True)], 124, track=0.05)
+    # YouTube だとひと目でわかるように
+    text_line(img, 826, [("いつもストーリーズでお届けしている", SUB, False)], 44, font=MARU_M, track=0.04)
+    text_line(img, 898, [("新月のお話、今回は", SUB, False)], 44, font=MARU_M, track=0.04)
+    play_line(img, 1010, "", "YouTube", "で", 92)
+    thin(img, 1118)
+    text_line(img, 1196, [("リンクは今夜20時、", TEXT, False)], 54, track=0.06)
+    text_line(img, 1274, [("一斉配信チャンネル", TEXT, True), ("で", TEXT, False)], 54, track=0.06)
+    text_line(img, 1352, [("お届けします", TEXT, False)], 54, track=0.06)
+    pill(img, 1462, "いま117名が参加中", 42)
+    text_line(img, 1556, [("参加はこちらから", SUB, False)], 42, font=MARU_M)
+    chevron(img, 1598, s=22)
+    ellipsis(img, 1812)
     return img
 
 
@@ -228,7 +255,7 @@ def story2():
     scallop_card(img, (100, 140, 980, 1780))
     img.alpha_composite(icon_circle(180), (W // 2 - 90, 186))
     label(img, 412, "11/9 蠍座新月", size=36, line_len=60)
-    text_line(img, 512, [("YouTubeを", TEXT, False)], 92, track=0.05)
+    play_line(img, 512, "", "YouTube", "を", 92, col_word=ACCENT)
     text_line(img, 628, [("公開しました", ACCENT, False)], 92, track=0.06)
     pill(img, 772, "「あなたの縁が動き出す」", 48)
     for i, s in enumerate(["見直してきた関係を、", "自分らしい形で育てていく。", "そんな新月のお話です。"]):

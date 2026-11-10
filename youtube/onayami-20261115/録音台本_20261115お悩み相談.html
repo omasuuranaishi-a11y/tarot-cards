@@ -1,0 +1,113 @@
+<title>11/15 お悩み相談 録音台本</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+/* 1段組みの読み上げ台本。上に章へのジャンプ、章ごとに台本→要点。スマホで読みやすい大きな文字 */
+:root {
+  --bg: #f3f5f4;
+  --paper: #ffffff;
+  --ink: #2c3331;
+  --muted: #66716e;
+  --accent: #4f6f6b;
+  --accent-soft: #e2eae8;
+  --gold: #a5803f;
+  --gold-soft: #f6efe1;
+  --line: #d9e0de;
+  --font-read: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+  --font-ui: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #161b1a; --paper: #1f2624; --ink: #e7ecea; --muted: #a2adaa; --accent: #8fb3ad;
+  --accent-soft: #283431; --gold: #d2b072; --gold-soft: #2e2a20; --line: #34403d; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #161b1a; --paper: #1f2624; --ink: #e7ecea; --muted: #a2adaa; --accent: #8fb3ad;
+  --accent-soft: #283431; --gold: #d2b072; --gold-soft: #2e2a20; --line: #34403d; color-scheme: dark; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); }
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 22px; }
+.top h1 { font-family: var(--font-read); font-weight: 700; font-size: clamp(1.5rem, 5vw, 2rem); margin: 0 0 6px; text-wrap: balance; }
+.top .sub { color: var(--muted); margin: 0; font-size: 0.95rem; line-height: 1.7; }
+.top .total { display: inline-block; margin-top: 10px; font-size: 0.85rem; color: var(--accent);
+  background: var(--accent-soft); border-radius: 999px; padding: 4px 12px; font-variant-numeric: tabular-nums; }
+.how { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 4px 18px; }
+.how summary { cursor: pointer; font-weight: 500; padding: 12px 0; color: var(--accent); }
+.how ol { margin: 0 0 14px; padding-left: 1.3em; line-height: 1.8; display: grid; gap: 6px; font-size: 0.95rem; }
+.how p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; margin: 0 0 14px; }
+nav.jump { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  padding-block: 10px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: thin;
+  border-bottom: 1px solid var(--line); }
+nav.jump a { flex: 0 0 auto; text-decoration: none; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px 6px 6px; font-size: 0.85rem;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+nav.jump a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.nav-num { background: var(--accent); color: var(--paper); border-radius: 999px; font-size: 0.75rem;
+  width: 24px; height: 24px; display: inline-grid; place-items: center; font-variant-numeric: tabular-nums; }
+.chapter { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 22px 20px 18px;
+  display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 70px; }
+.ch-head { display: flex; gap: 14px; align-items: flex-start; }
+.ch-num { font-family: var(--font-read); font-weight: 700; font-size: 1.6rem; color: var(--gold); line-height: 1;
+  padding-top: 4px; font-variant-numeric: tabular-nums; }
+.ch-title-wrap { min-width: 0; }
+.ch-head h2 { font-family: var(--font-read); font-weight: 700; font-size: 1.3rem; margin: 0; text-wrap: balance; }
+.ch-meta { margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.82rem; color: var(--muted); }
+.script { display: flex; flex-direction: column; gap: 1.1em; }
+.script p { margin: 0; font-family: var(--font-read); font-size: 1.2rem; line-height: 2.05; letter-spacing: 0.02em; }
+.adlib { display: flex; gap: 10px; align-items: baseline; background: var(--gold-soft); border-radius: 10px;
+  padding: 10px 14px; font-size: 0.95rem; line-height: 1.7; }
+.adlib-tag { flex: 0 0 auto; font-size: 0.75rem; font-weight: 500; color: var(--gold); border: 1px solid var(--gold);
+  border-radius: 999px; padding: 1px 8px; letter-spacing: 0.05em; }
+.points { border-top: 1px dashed var(--line); padding-top: 10px; }
+.points summary { cursor: pointer; font-size: 0.88rem; color: var(--accent); }
+.points ul { margin: 10px 0 2px; padding-left: 1.2em; line-height: 1.8; font-size: 0.92rem; color: var(--muted); }
+.pause { margin: 0; text-align: center; font-size: 0.8rem; color: var(--muted); letter-spacing: 0.05em; }
+.pause::before, .pause::after { content: "・・・"; margin: 0 8px; color: var(--line); }
+@media (max-width: 480px) { .script p { font-size: 1.12rem; line-height: 1.95; } .chapter { padding: 18px 16px 14px; } }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+<div class="wrap">
+  <header class="top"><h1>星よみお悩み相談<br>11月14日・16日の星の動き</h1><p class="sub">11月15日（日）20時公開予定。お悩みは、AIと一緒に考えた「よくあるお悩みの例」です。</p>
+  <span class="total">全6章・3,088字・約9分30秒（アドリブを入れると11〜12分）</span></header>
+  <details class="how"><summary>録音のしかた</summary><ol><li><strong>章ごとに1つのファイル</strong>で録ってください。ファイル名は章の番号（01〜06）にしていただけると助かります。1本にまとめて録っても大丈夫です。</li><li>段落の間（台本で行が空いているところ）は、1〜2秒あけます。</li><li>読み間違えたら、止めずに、その文の頭から読み直してください。</li><li>言いやすいように言いかえたり、アドリブを入れたりして大丈夫です。【アドリブ欄】は、話したいことがあるときだけで大丈夫です。</li><li>スマホのボイスメモで十分です。静かな部屋で、口とスマホは20〜30cmくらいです。</li></ol>
+  <p>テロップは、各章の「画面に出す要点」を表示します。話す言葉と一字一句そろえなくて大丈夫です。</p></details>
+  <nav class="jump" aria-label="章へ移動"><a href="#c01"><span class="nav-num">01</span>はじめに</a><a href="#c02"><span class="nav-num">02</span>11月14日と16日の星の動き</a><a href="#c03"><span class="nav-num">03</span>お悩み①</a><a href="#c04"><span class="nav-num">04</span>お悩み②</a><a href="#c05"><span class="nav-num">05</span>お悩み③</a><a href="#c06"><span class="nav-num">06</span>まとめ</a></nav>
+  <section class="chapter" id="c01">
+  <header class="ch-head"><span class="ch-num">01</span><div class="ch-title-wrap"><h2>はじめに</h2>
+  <p class="ch-meta"><span>映す画面：タイトルと、お悩み三つ</span><span>目安 1:11</span></p></div></header>
+  <div class="script"><p>こんにちは。星よみ専門家のおますです。</p><p>今日は、いつもと少し違う形でお届けします。よくあるお悩みを三つ取り上げて、今の星の動きから、私なりにお答えしていきたいと思います。</p><p>最初にお伝えしておきたいのですが、今日のお悩みは、実際にいただいたご相談ではありません。AIと一緒に、「こういうことで悩んでいる方、多いんじゃないかな」と考えた、お悩みの例です。なので、どなたかのお話ではないんですけれども、「あ、これ私のことかも」って思いながら聞いてもらえたら、うれしいです。</p><p>今回、星の動きで大事なのは、二つの日付です。一つは、11月14日。水星と金星が、そろって順行に戻りました。もう一つは、11月16日。火星と木星が、獅子座で重なります。</p><p>この二つの動きに合わせて、お悩みを三つ選びました。「連絡したいのに、送れない」。「自分の好きが、わからない」。「やりたいのに、一歩が出ない」。順番に見ていきますね。</p><div class="adlib"><span class="adlib-tag">アドリブ</span><span>11月9日の新月の動画を見てくださった方へのお礼など</span></div></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>よくあるお悩みに、今の星の動きから答えます</li><li>お悩みは、AIと一緒に考えた「よくあるお悩みの例」です</li><li>11/14 水星と金星が順行へ／11/16 火星と木星が重なる</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c02">
+  <header class="ch-head"><span class="ch-num">02</span><div class="ch-title-wrap"><h2>11月14日と16日の星の動き</h2>
+  <p class="ch-meta"><span>映す画面：日付と星の動きの図</span><span>目安 1:41</span></p></div></header>
+  <div class="script"><p>まずは、星の動きを確認しておきましょう。</p><p>水星は、10月24日から逆行していて、11月14日の夜中、0時53分に、蠍座の5度で順行に戻りました。金星は、10月3日から逆行していて、同じ14日の朝、9時27分に、天秤座の22度で順行に戻りました。</p><p>逆行は、地球から見て、星が後ろに進んでいるように見えることでしたね。占星術では、その星のテーマを見直す時期として読みます。水星は、言葉や、やりとり。金星は、人との関係や、自分にとっての心地よさです。この1か月くらい見直してきたことが、14日から、ゆっくり前に進み始めます。</p><p>そして、11月16日の午後3時23分。火星と木星が、獅子座の25度で、ぴったり重なります。火星は、動く力や勇気。木星は、広げる、育てる力。獅子座は、自分らしさを表に出すことを大切にするサインです。「やってみたい」という気持ちに、大きな後押しがある配置なんですね。</p><p>ただ、そのあと、11月18日と20日に、蠍座にいる太陽と、90度の角度になります。勢いがつきすぎて、空回りしやすいタイミングでもあるので、ここは、お悩み③で、くわしくお話ししますね。</p><p>それから、今日は、どなたかの出生図ではなく、みんなに共通する空の動きから読んでいきます。ご自分の出生図のどこでこの動きが起きるかによって、響き方は変わってきます。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>11/14 0:53 水星が順行へ（蠍座5度）／9:27 金星が順行へ（天秤座22度）</li><li>11/16 15:23 火星と木星が重なる（獅子座25度）</li><li>11/18・11/20 蠍座の太陽と90度 → 勢いのつけすぎに注意</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c03">
+  <header class="ch-head"><span class="ch-num">03</span><div class="ch-title-wrap"><h2>お悩み①：連絡したいのに、送れない</h2>
+  <p class="ch-meta"><span>映す画面：お悩みの手紙 → 水星の図</span><span>目安 1:26</span></p></div></header>
+  <div class="script"><p>一つ目のお悩みです。</p><p>「自分から連絡したいのに、重いと思われそうで、送れません。」</p><p>これ、すごくわかります。送る前に、「今さら何って思われないかな」「返事がなかったらどうしよう」って、頭の中で、相手の反応を先に考えてしまうんですよね。心理学では、こんなふうに、相手の気持ちを先に決めつけてしまうことを、「心の読みすぎ」と呼んだりします。</p><p>星の動きで見ると、水星は、10月の終わりから、蠍座で逆行していました。蠍座の水星は、言葉が深くなりやすいんです。軽い一言より、「ちゃんと伝えなきゃ」って、言葉が重くなりがちなんですね。この1か月、送れなかったのは、自分の気持ちを確かめる時間だったのかもしれません。</p><p>その水星が、14日に順行に戻りました。言葉が、また前に進み出すタイミングです。ただ、順行に戻ってすぐは、動きもゆっくりです。なので、長い気持ちを一度に伝えるより、短い一言で十分なんです。</p><p>重いと感じるかどうかは、相手が決めることで、こちらが先に決めなくて大丈夫です。</p><p>小さな一歩として、「元気？」の一言だけ、送ってみてください。続きは、返事が来てからで大丈夫です。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>送る前に、相手の反応を考えすぎてしまう（心の読みすぎ）</li><li>蠍座で逆行していた水星＝言葉が重くなりやすかった1か月</li><li>11/14 水星が順行へ → 長い気持ちより、短い一言</li><li>小さな一歩：「元気？」の一言だけ送ってみる</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c04">
+  <header class="ch-head"><span class="ch-num">04</span><div class="ch-title-wrap"><h2>お悩み②：自分の好きが、わからない</h2>
+  <p class="ch-meta"><span>映す画面：お悩みの手紙 → 金星の図</span><span>目安 1:54</span></p></div></header>
+  <div class="script"><p>二つ目のお悩みです。</p><p>「人に合わせてばかりで、自分が何を好きなのか、わからなくなりました。」</p><p>人に合わせられるのは、本当は、すてきな力なんですよね。場の空気を読んで、相手が心地よくいられるようにできる。でも、それが続きすぎると、自分の「好き」や「嫌だ」が、だんだん聞こえなくなってしまう。心理学では、こういう状態を、「過剰適応」と呼ぶことがあります。</p><p>星で見ると、金星は、10月3日に蠍座で逆行を始めて、10月25日に、天秤座に戻ってきていました。天秤座は、人と調和する、合わせることが得意なサインです。金星がそこを見直していたこの1か月は、「私、合わせすぎていたかも」って気づく時間だったのかもしれません。</p><p>その金星が、14日に順行に戻りました。金星は、人との関係の星であると同時に、自分にとって何が心地いいか、何が好きか、を表す星でもあるんです。ここから、自分の「好き」を、少しずつ取り戻していけるタイミングです。</p><p>仏教には、「自灯明」という言葉があります。お釈迦さまが、亡くなる前に弟子たちに残したといわれる言葉で、自分自身を灯りにして歩きなさい、という意味です。誰かの好みに照らすのではなくて、自分の中の小さな灯りを、もう一度見つけていく。そんなイメージです。</p><p>小さな一歩として、今日、自分のためだけに、小さなものを一つ選んでみてください。飲み物でも、ハンカチ一枚でも大丈夫です。「誰かがいいって言うから」じゃなくて、「私はこれがいい」で選んでみてくださいね。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>合わせられるのは、すてきな力。でも続きすぎると「好き」が聞こえなくなる（過剰適応）</li><li>天秤座で見直していた金星＝合わせすぎに気づく1か月</li><li>11/14 金星が順行へ → 自分の「好き」を取り戻す</li><li>仏教の「自灯明」：自分を灯りにして歩く</li><li>小さな一歩：自分のためだけに、小さなものを一つ選ぶ</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c05">
+  <header class="ch-head"><span class="ch-num">05</span><div class="ch-title-wrap"><h2>お悩み③：やりたいのに、一歩が出ない</h2>
+  <p class="ch-meta"><span>映す画面：お悩みの手紙 → 火星と木星の図</span><span>目安 1:37</span></p></div></header>
+  <div class="script"><p>三つ目のお悩みです。</p><p>「やりたいことがあるのに、目立つのが怖くて、一歩が出ません。」</p><p>やりたいことがある、というだけで、もうすてきなことだと思います。でも、いざ動こうとすると、「何か言われたらどうしよう」「失敗したら恥ずかしい」って、足が止まってしまう。これも、多くの方が感じていることだと思います。</p><p>11月16日、獅子座で、火星と木星が重なります。獅子座は、自分らしさを表に出す、表現するサインです。そこで、勇気の星の火星と、広げる星の木星が重なる。「やってみたい」を、外に出していく後押しが、とても強いタイミングです。</p><p>ただ、さっきお話ししたように、18日と20日には、蠍座の太陽と90度になります。蠍座は、深く、慎重に関わるサインでしたよね。勢いよく外に出したい気持ちと、深く確かめたい気持ちが、ぶつかりやすいんです。</p><p>だから、ここでのおすすめは、大きく宣言することより、小さく見せてみることです。仏教でいう「中道」、どちらかに偏りすぎない、真ん中の道ですね。怖さを無理に消さなくて大丈夫です。怖さを持ったまま、半歩だけ、外に出してみる。</p><p>小さな一歩として、やりたいことを、信頼できる一人にだけ、話してみてください。言葉にして誰かに伝えた瞬間から、それはもう、始まっているんです。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>11/16 獅子座で火星と木星が重なる＝「やってみたい」を外に出す後押し</li><li>11/18・11/20 蠍座の太陽と90度＝勢いと慎重さがぶつかりやすい</li><li>仏教の「中道」：大きく宣言するより、小さく見せる</li><li>小さな一歩：信頼できる一人にだけ話してみる</li></ul></details>
+  <p class="pause">ここで3秒あける（章ごとにファイルを分ける場合は不要）</p>
+</section><section class="chapter" id="c06">
+  <header class="ch-head"><span class="ch-num">06</span><div class="ch-title-wrap"><h2>まとめ</h2>
+  <p class="ch-meta"><span>映す画面：三つの小さな一歩</span><span>目安 1:28</span></p></div></header>
+  <div class="script"><p>今日は、11月14日と16日の星の動きから、三つのお悩みにお答えしました。</p><p>水星が順行に戻って、言葉が前に進み出す。金星が順行に戻って、自分の好きを取り戻していく。そして、火星と木星が重なって、やってみたい気持ちに後押しがある。どれも、この1か月見直してきたことを、少しずつ外に出していく流れなんですね。</p><p>小さな一歩を、もう一度まとめますね。「元気？」の一言を送ってみる。自分のためだけに、小さなものを一つ選ぶ。やりたいことを、信頼できる一人にだけ話してみる。全部じゃなくて、どれか一つで大丈夫です。</p><p>今日は、みんなに共通する空の動きからお話ししましたが、ご自分の出生図で、水星や金星、火星がどこにあるかによって、響き方は変わってきます。</p><div class="adlib"><span class="adlib-tag">アドリブ</span><span>13日から販売を始めた鑑定書のご案内（名前、どんな内容か、申し込みは概要欄から、など）</span></div><p>そして、11月24日の夜には、双子座で満月を迎えます。満月の動画もお届けしますので、よかったら、チャンネル登録をして待っていてくださいね。高評価も、とても励みになります。</p><p>今日のお悩みの中で、「これ、私だ」と思ったものがあったら、コメント欄で、番号だけでも教えてください。最後まで見てくださって、ありがとうございました。星よみ専門家のおますでした。</p></div>
+  <details class="points"><summary>画面に出す要点</summary><ul><li>言葉が前へ／自分の好きを取り戻す／やってみたいを外へ</li><li>小さな一歩：「元気？」の一言／自分のための一つ／一人にだけ話す</li><li>11/24 双子座の満月の動画もお届けします</li><li>コメント欄で、響いたお悩みの番号を教えてください</li></ul></details>
+  <p class="pause end">おわり</p>
+</section>
+</div>
